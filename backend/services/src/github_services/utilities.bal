@@ -1,3 +1,16 @@
+public function createFormattedIssue(json issue) returns json | error {
+
+    json labelDetails = check getLabels(<json[]>issue.labels);
+    json formattedIssue = {
+        "issueId":check issue.id,
+        "issueNumber":check issue.number,
+        "labels": labelDetails,
+        "issueTitle":check issue.title,
+        "issueBody":check issue.body
+    };
+    return formattedIssue;
+}
+
 public function extractIssuesRelatedToUser(json[] listOfIssues, string userName) returns json | error {
 
     json[] issues = [];
