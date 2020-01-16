@@ -13,6 +13,7 @@ service githubConnector on endPoint {
 }
 
 public function main() {
-    io:println(checkLabel("bugi", "yashodgayashan", "ballerina-github-connector"));
+    io:println(checkLabel("bugii", "yashodgayashan", "ballerina-github-connector"));
+    io:println(createLabel("yashodgayashan", "ballerina-github-connector", "bugiii", "test"));
 }
 
