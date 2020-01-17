@@ -106,11 +106,11 @@ service userService on endPoint {
             json | error labelName = jsonPayload.labelName;
             json | error labelDescription = jsonPayload.labelDescription;
             if (labelName is json && labelDescription is json) {
-                string[] status = createLabel(<@untained>labelName.toString(), <@untained>labelDescription.toString());
+                string[] status = createLabelIfNotExists(<@untained>labelName.toString(), <@untained>labelDescription.toString());
                 int | error statusCode = ints:fromString(status[0]);
                 if (statusCode is int) {
                     response.statusCode = statusCode;
-                    response.setPayload("Successfully created the label");
+                    response.setPayload(status[1]);
                 } else {
                     log:printError("Integer conversion error as the retrived status code from the github is invalid. Check createLabel function");
                     response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;

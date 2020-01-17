@@ -1,5 +1,24 @@
 import ballerina/http;
+import ballerina/lang.'int as ints;
 import ballerina/stringutils;
+
+// POST /repos/:owner/:repo/issues/:issue_number/labels
+
+
+public function assignLabel(string issueNumber, string[] labels) returns string[] {
+    string url = "repos/" + ORGANIZATION_NAME + "/" + REPOSITORY_NAME + "/issues/" + issueNumber + "/labels";
+
+    http:Request request = new;
+    request.addHeader("Authorization", ACCESS_TOKEN);
+    request.setJsonPayload({"labels": labels});
+    http:Response | error response = githubAPIEndpoint->post(url, request);
+
+    if (response is http:Response) {
+        return getStatus(response);
+    } else {
+        return getNotFoundStatus();
+    }
+}
 
 # The `checkLabel` function use to check whether the given label is available or not.
 # 
@@ -14,7 +33,7 @@ public function checkLabel(string labelName) returns @untainted string[] {
     request.addHeader("Authorization", ACCESS_TOKEN);
     http:Response | error response = githubAPIEndpoint->get(url, request);
 
-    if response is http:Response {
+    if (response is http:Response) {
         return getStatus(response);
     } else {
         return getNotFoundStatus();
@@ -41,22 +60,30 @@ public function createLabel(string labelName, string labelDescription) returns s
     request.setJsonPayload(requestPayLoad);
 
     http:Response | error response = githubAPIEndpoint->post(url, request);
-    if response is http:Response {
+    if (response is http:Response) {
         return getStatus(response);
     } else {
         return getNotFoundStatus();
     }
 }
 
-// # The `createLabelIfNotExists` function creates a label if the relevant label is not available.
-// #
-// # + labelName - The creating label name.
-// # + labelDescription - The description of the label
-// #
-// # + return - The `createLabelIfNotExists` function will return **json** to indicate the status.
-// public function createLabelIfNotExists(string labelName, string labelDescription) returns json {
+# The `createLabelIfNotExists` function creates a label if the relevant label is not available.
+#
+# + labelName - The creating label name.
+# + labelDescription - The description of the label
+#
+# + return - The `createLabelIfNotExists` function will return **string[]** to indicate the status.
+public function createLabelIfNotExists(string labelName, string labelDescription) returns string[] {
 
-// }
+    string[] status = checkLabel(labelName);
+    int | error statusCode = ints:fromString(status[0]);
+
+    if (statusCode is int && statusCode == http:STATUS_OK) {
+        return [status[0], "Already exists."];
+    } else {
+        return createLabel(labelName, labelDescription);
+    }
+}
 
 # The `getNotFoundStatus` function returns the not found status and the code as a json
 # 
