@@ -27,6 +27,7 @@ service userService on endPoint {
         string url = "/repos/" + ORGANIZATION_NAME + "/" + REPOSITORY_NAME + "/issues/" + issueNumber;
 
         // request.addHeader("Authorization", ACCESS_TOKEN);
+        // http:Response | error githubResponse = githubAPIEndpoint->get(<@untained>url, request);
         http:Response | error githubResponse = githubAPIEndpoint->get(<@untained>url);
 
         if (githubResponse is http:Response) {
@@ -66,6 +67,7 @@ service userService on endPoint {
         string url = "/repos/" + ORGANIZATION_NAME + "/" + REPOSITORY_NAME + "/issues?state=all";
 
         // request.addHeader("Authorization", ACCESS_TOKEN);
+        // http:Response | error githubResponse = githubAPIEndpoint->get(<@untained>url, request);
         http:Response | error githubResponse = githubAPIEndpoint->get(url);
 
         if (githubResponse is http:Response) {

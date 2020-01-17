@@ -2,12 +2,11 @@ import ballerina/http;
 import ballerina/lang.'int as ints;
 import ballerina/stringutils;
 
-# The `assignLabel` function will assign the labels to the given issue.
-# 
-# + issueNumber - The issue number which all the given labels are assigned.
-# + labels - Array of labels which should assign to the issue.
-# 
-# + return - The function will return the **string[]** which includes the status code and the message.
+# The `assignLabel` function will assign the labels to a given issue.
+#
+# + issueNumber - Issue number which the given labels should be assigned to.
+# + labels      - Array of labels which should be assigned to the issue.
+# + return      - Returns a **string[]** which includes the status code and the message.
 public function assignLabel(string issueNumber, string[] labels) returns string[] {
 
     string url = "repos/" + ORGANIZATION_NAME + "/" + REPOSITORY_NAME + "/issues/" + issueNumber + "/labels";
@@ -24,11 +23,10 @@ public function assignLabel(string issueNumber, string[] labels) returns string[
     }
 }
 
-# The `checkLabel` function use to check whether the given label is available or not.
+# The `checkLabel` function is used to check whether the given label is available or not.
 # 
-# + labelName - The checking label name.
-# 
-# + return - The `checkLabel` function will return **string[]** to indicate the status.
+# + labelName - Name of the label.
+# + return    - Returns a **string[]** which indicates the status.
 public function checkLabel(string labelName) returns @untainted string[] {
 
     string url = "/repos/" + ORGANIZATION_NAME + "/" + REPOSITORY_NAME + "/labels/" + labelName;
@@ -44,12 +42,11 @@ public function checkLabel(string labelName) returns @untainted string[] {
     }
 }
 
-# The `createLabel` Function will create a label in github in particular repositary.
-# 
-# + labelName - The creating label name.
-# + labelDescription - The description of the label
-# 
-# + return - The `createLabel` function will return **json** to indicate the status.
+# The `createLabel` function will create a label in a specified git repository.
+#
+# + labelName        - Name of the label.
+# + labelDescription - Description of the label.
+# + return           - Returns a **string[]** which indicates the status.
 public function createLabel(string labelName, string labelDescription) returns string[] {
 
     json requestPayLoad = {
@@ -71,12 +68,11 @@ public function createLabel(string labelName, string labelDescription) returns s
     }
 }
 
-# The `createLabelIfNotExists` function creates a label if the relevant label is not available.
-#
-# + labelName - The creating label name.
-# + labelDescription - The description of the label
-#
-# + return - The `createLabelIfNotExists` function will return **string[]** to indicate the status.
+# The `createLabelIfNotExists` function creates a label if the relevant label is not yet available.
+# 
+# + labelName        - Name of the label.
+# + labelDescription - Description of the label.
+# + return           - Returns a **string[]** which indicates the status.
 public function createLabelIfNotExists(string labelName, string labelDescription) returns string[] {
 
     string[] status = checkLabel(labelName);
@@ -89,9 +85,9 @@ public function createLabelIfNotExists(string labelName, string labelDescription
     }
 }
 
-# The `getNotFoundStatus` function returns the not found status and the code as a json
+# The `getNotFoundStatus` function returns the not found status and the code as a string[]
 # 
-# + return -  Returns not found status and status code.
+# + return - Returns status and status code.
 public function getNotFoundStatus() returns string[] {
 
     return ["404", "Not Found"];
@@ -99,9 +95,8 @@ public function getNotFoundStatus() returns string[] {
 
 # The `getStatus` function will return the status of the **http:Response**
 # 
-# + response - Inputting reponse
-# 
-# + return - The function will return the string array which includes the status code and the message.
+# + response - Http response.
+# + return   - Returns a **string[]** which includes the status code and the message.
 public function getStatus(http:Response response) returns string[] {
 
     string status = "";
@@ -114,9 +109,13 @@ public function getStatus(http:Response response) returns string[] {
     return [statusDetails[0], status];
 }
 
+# Rebuild a formatted issue using the retrieved issue from github API services.
+#
+# + issue  - Issue retrieved from github API services. 
+# + return - Formatted issue in json format, error if the issue cannot be rebuilt.
 public function createFormattedIssue(json issue) returns json | error {
 
-    json labelDetails = check getLabels(<json[]>issue.labels);
+    json labelDetails = check createFormattedLabels(<json[]>issue.labels);
     json formattedIssue = {
         "issueId":check issue.id,
         "issueNumber":check issue.number,
@@ -127,12 +126,17 @@ public function createFormattedIssue(json issue) returns json | error {
     return formattedIssue;
 }
 
+# Extract all the issues related to a specific user.
+#
+# + listOfIssues - All the issues related to a specific repsitory. 
+# + userName     - Name of the user. 
+# + return       - Issues related to a specific user in the form of json, error if issues cannot be extracted.
 public function extractIssuesRelatedToUser(json[] listOfIssues, string userName) returns json | error {
 
     json[] issues = [];
     foreach json issue in listOfIssues {
         map<json> issueVal = <map<json>>issue;
-        json labelDetails = check getLabels(<json[]>issueVal.labels);
+        json labelDetails = check createFormattedLabels(<json[]>issueVal.labels);
 
         if (userNameExists(<json[]>labelDetails, userName)) {
             json issueInfo = {
@@ -148,6 +152,11 @@ public function extractIssuesRelatedToUser(json[] listOfIssues, string userName)
     return issues;
 }
 
+# Check if the userName exists inside the labels.
+#
+# + labels   - Labels of an issue.
+# + userName - Name of the user.
+# + return   - True if the user exists, false if else.
 function userNameExists(json[] labels, string userName) returns boolean {
 
     foreach json label in labels {
@@ -158,7 +167,11 @@ function userNameExists(json[] labels, string userName) returns boolean {
     return false;
 }
 
-function getLabels(json[] labels) returns json | error {
+# Rebuild a formatted set of labels using the retrieved issue from github API services.
+#
+# + labels - Labels retrieved from github API services in the form of issue.  
+# + return - Formatted set of lables in json format, error if the set of labels cannot be rebuilt.
+function createFormattedLabels(json[] labels) returns json | error {
 
     json[] labelDetails = [];
     foreach json label in labels {
