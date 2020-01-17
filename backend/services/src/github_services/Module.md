@@ -8,52 +8,52 @@ This is the service for access github APIs'
 
 ### assignLabel
 
-The `assignLabel` function will assign the labels to the given issue.
+The `assignLabel` function will assign the labels to a given issue.
 
 - **Parameters**
 
-  - issueNumber - The issue number which all the given labels are assigned.
-  - labels - Array of labels which should assign to the issue.
+  - issueNumber - Issue number which the given labels should be assigned to.
+  - labels - Array of labels which should be assigned to the issue.
 
-- **return** - The function will return the **string[]** which includes the status code and the message.
+- **return** - Returns a **string[]** which includes the status code and the message.
 
 ### checkLabel
 
-The `checkLabel` function use to check whether the given label is available or not.
+The `checkLabel` function is used to check whether the given label is available or not.
 
 - **Parameters**
 
-  - labelName - The checking label name.
+  - labelName - Name of the label.
 
-- **return** - The `checkLabel` function will return **string[]** to indicate the status.
+- **return** - Returns a **string[]** which indicates the status.
 
 ### createLabel
 
-The `createLabel` Function will create a label in github in particular repositary.
+The `createLabel` function will create a label in a specified git repository.
 
 - **Parameters**
 
-  - labelName - The creating label name.
-  - labelDescription - The description of the label
+  - labelName - Name of the label.
+  - labelDescription - Description of the label.
 
-- **return** - The `createLabel` function will return **string[]** to indicate the status.
+- **return** - Returns a **string[]** which indicates the status.
 
 ### createLabelIfNotExists
 
-The `createLabelIfNotExists` function creates a label if the relevant label is not available.
+The `createLabelIfNotExists` function creates a label if the relevant label is not yet available.
 
 - **Parameters**
 
-  - labelName - The creating label name.
-  - labelDescription - The description of the label
+  - labelName - Name of the label.
+  - labelDescription - Description of the label.
 
-- **return** - The `createLabelIfNotExists` function will return **string[]** to indicate the status.
+- **return** - Returns a **string[]** which indicates the status.
 
 ### getNotFoundStatus
 
 The `getNotFoundStatus` function returns the not found status and the code as a string[]
 
-- **return** - Returns not found status and status code.
+- **return** - Returns status and status code.
 
 ### getStatus
 
@@ -61,6 +61,6 @@ The `getStatus` function will return the status of the **http:Response**
 
 - **Parameter**
 
-  - response - Inputting reponse
+  - response - Http response.
 
-- **return** - The function will return the **string array** which includes the status code and the message.
+- **return** - Returns a **string[]** which includes the status code and the message.
