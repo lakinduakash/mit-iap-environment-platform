@@ -1,11 +1,13 @@
 import React, { Fragment } from "react";
+
 import "./footer.css";
 
 const Footer = () => {
   return (
     <Fragment>
       <div className="footer">
-        <h6>MIT IAP 2020</h6>
+        <p></p>
+        <h6> @ Ballerina MIT IAP Program, 2020. All rights Reserved.</h6>
       </div>
     </Fragment>
   );

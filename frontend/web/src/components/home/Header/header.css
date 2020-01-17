@@ -7,12 +7,12 @@
   height: 4hv;
   z-index: 3;
   background-color: #000000;
-  color: rgb(253, 122, 0);
+  color: rgb(76, 175, 80);
+  text-align: center;
 }
 
 .header-logo {
-  display: inline;
-  color: rgb(253, 122, 0);
+  color: rgb(76, 175, 80);
   vertical-align: middle;
 }
 
