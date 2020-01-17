@@ -1,4 +1,5 @@
 import ballerina/http;
+import ballerina/io;
 import ballerina/lang.'int as ints;
 import ballerina/log;
 
@@ -140,7 +141,11 @@ service userService on endPoint {
         var jsonPayload = request.getJsonPayload();
 
         if (jsonPayload is json) {
-
+            json | error labels = jsonPayload.labelNames;
+            if labels is json {
+                string[] lane = <string[]>labels;
+                io:println(lane[0].toString());
+            }
         }
 
     }
