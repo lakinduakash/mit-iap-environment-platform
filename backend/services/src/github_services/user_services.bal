@@ -158,7 +158,10 @@ service userService on endPoint {
 
     }
 
-
+    @http:ResourceConfig {
+        methods: ["GET"],
+        path: "/get-all-labels"
+    }
     resource function getAllLabels(http:Caller caller, http:Request request) returns @untainted error? {
 
         http:Response response = new;
@@ -180,6 +183,55 @@ service userService on endPoint {
             log:printInfo("The github response is not in the expected form: http:Response.");
             response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
             response.setPayload(<@untained>githubResponse.reason());
+        }
+
+        error? respond = caller->respond(response);
+    }
+
+    @http:ResourceConfig {
+        methods: ["POST"],
+        path: "/post-issue/{userName}"
+    }
+    resource function postIssue(http:Caller caller, http:Request request, string userName) returns @untainted error? {
+
+        http:Response response = new;
+        http:Request callBackRequest = new;
+        callBackRequest.addHeader("Authorization", ACCESS_TOKEN);
+        string url = "/repos/" + ORGANIZATION_NAME + "/" + REPOSITORY_NAME + "/issues";
+
+        var receivedRequestPayload = request.getJsonPayload();
+        if (receivedRequestPayload is json) {
+            json | error payloadBody = receivedRequestPayload.body;
+            if (payloadBody is json) {
+                string stringPayloadBody = payloadBody.toJsonString();
+                http:Response | error githubResponse = githubAPIEndpoint->post(url, callBackRequest);
+                if (githubResponse is http:Response && githubResponse.statusCode == 201) {
+                    string[] status = createLabel(<@untained>userName, "Name of the user.");
+                    int | error statusCode = ints:fromString(status[0]);
+                    if (statusCode is int && statusCode == 201) {
+                        // Store issue id using gihubResponse.
+                        // Assign the label here.
+                        response.statusCode = statusCode;
+                        response.setPayload(status[1]);
+                    } else {
+                        log:printError("Either the status code is not a integer or the status code is invalid");
+                        response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
+                        response.setPayload("Error while obtaining the status from the response.");
+                    }
+                } else {
+                    log:printError("Error while obtaining the response from github api services.");
+                    response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
+                    response.setPayload("Error while obtaining the response from github api services.");
+                }
+            } else {
+                log:printInfo("Error while obtaining the json payload body from the request sent.");
+                response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
+                response.setPayload("Error while obtaining the json payload body from the request sent.");
+            }
+        } else {
+            log:printInfo("Error while obtaining the json payload from the request sent.");
+            response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
+            response.setPayload("Error while obtaining the json payload from the request sent.");
         }
 
         error? respond = caller->respond(response);
