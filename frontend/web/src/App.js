@@ -4,7 +4,10 @@ import './App.css';
 
 function App() {
   return (
-    <h1>Hello MIT IAP 2020</h1>
+    <h1>
+      <br/>
+      <br/>
+       MIT IAP 2020</h1>
   );
 }
 

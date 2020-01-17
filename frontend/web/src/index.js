@@ -10,8 +10,11 @@ import { Route, BrowserRouter as Router, Switch } from "react-router-dom";
 //import Users from "./users";
 //import Contact from "./contact";
 //import Notfound from "./notfound";
-import Header from "./components/Header/header";
-import Footer from "./components/Footer/footer";
+import Header from "./Components/Header/header";
+import Footer from "./Components/Footer/footer";
+import LoginForm from "./Components/login-signup/LoginForm";
+import SignupForm from "./Components/login-signup/SignupForm";
+import 'semantic-ui-css/semantic.min.css';
 
 //ReactDOM.render(<App />, document.getElementById('root'));
 
@@ -22,6 +25,10 @@ const routing = (
       <hr />
       <Switch>
         <Route exact path="/" component={App} />
+        <Route exact path="/login" component={LoginForm} />
+        <Route exact path="/signup" component={SignupForm} />
+
+
         {/* <Route path="/users" component={Users} />
         <Route path="/contact" component={Contact} />
         <Route component={Notfound} /> */}
