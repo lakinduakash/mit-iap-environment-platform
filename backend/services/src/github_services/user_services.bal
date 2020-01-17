@@ -130,4 +130,19 @@ service userService on endPoint {
         error? respond = caller->respond(response);
     }
 
+    @http:ResourceConfig {
+        methods: ["POST"],
+        path: "/assign-label/{issueNumber}"
+    }
+    resource function assignLabel(http:Caller caller, http:Request request, string issueNumber) returns @untainted error? {
+
+        http:Response response = new;
+        var jsonPayload = request.getJsonPayload();
+
+        if (jsonPayload is json) {
+
+        }
+
+    }
+
 }

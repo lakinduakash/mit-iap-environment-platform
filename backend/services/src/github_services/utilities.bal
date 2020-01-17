@@ -2,10 +2,14 @@ import ballerina/http;
 import ballerina/lang.'int as ints;
 import ballerina/stringutils;
 
-// POST /repos/:owner/:repo/issues/:issue_number/labels
-
-
+# The `assignLabel` function will assign the labels to the given issue.
+# 
+# + issueNumber - The issue number which all the given labels are assigned.
+# + labels - Array of labels which should assign to the issue.
+# 
+# + return - The function will return the **string[]** which includes the status code and the message.
 public function assignLabel(string issueNumber, string[] labels) returns string[] {
+
     string url = "repos/" + ORGANIZATION_NAME + "/" + REPOSITORY_NAME + "/issues/" + issueNumber + "/labels";
 
     http:Request request = new;
@@ -24,7 +28,7 @@ public function assignLabel(string issueNumber, string[] labels) returns string[
 # 
 # + labelName - The checking label name.
 # 
-# + return - The `checkLabel` function will return **json** to indicate the status.
+# + return - The `checkLabel` function will return **string[]** to indicate the status.
 public function checkLabel(string labelName) returns @untainted string[] {
 
     string url = "/repos/" + ORGANIZATION_NAME + "/" + REPOSITORY_NAME + "/labels/" + labelName;
