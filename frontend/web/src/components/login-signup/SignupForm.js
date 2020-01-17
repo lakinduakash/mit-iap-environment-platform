@@ -1,6 +1,6 @@
 import React from 'react';
 import {Grid, Form, Header, Button, Checkbox} from 'semantic-ui-react';
-
+import 'semantic-ui-css/semantic.min.css';
 
 class SignupForm extends React.Component {
     constructor(props) {

@@ -1,5 +1,6 @@
 import React from 'react';
 import {Grid, Checkbox, Form, Header, Segment, Message, Button} from 'semantic-ui-react';
+import 'semantic-ui-css/semantic.min.css';
 
 class LoginForm extends React.Component {
 
