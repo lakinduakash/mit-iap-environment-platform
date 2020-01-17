@@ -1,14 +1,14 @@
 import React, { Fragment } from "react";
 
-import Logo from "../../asserts/logo.jpeg";
+import Logo from "../../../asserts/logo.jpeg";
 import "./header.css";
-import { NavLink } from "react-router-dom";
+// import { NavLink } from "react-router-dom";
 
 
 const Header = () => {
   return (
-    <nav>
-      <NavLink exact activeClassName="active" to="/">
+    // <nav>
+    //   <NavLink exact activeClassName="active" to="/">
         <Fragment>
           <div className="header ">
             <img
@@ -23,8 +23,8 @@ const Header = () => {
             </h2>
           </div> 
         </Fragment>
-      </NavLink>
-      </nav>
+      // </NavLink>
+      // </nav>
   );
 };
 export default Header;
