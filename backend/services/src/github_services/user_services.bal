@@ -153,7 +153,8 @@ service userService on endPoint {
     }
 
 
-    resource function getAllLabels(http:Caller caller, http:Request request) returns @untainted error?{
+    resource function getAllLabels(http:Caller caller, http:Request request) returns @untainted error? {
+
         http:Response response = new;
         string url = "/repos/" + ORGANIZATION_NAME + "/" + REPOSITORY_NAME + "/labels";
 
@@ -166,12 +167,12 @@ service userService on endPoint {
                 response.setJsonPayload(<@untained>labelDetails);
             } else {
                 log:printInfo("Invalcheckid json payload received from the response obtained from github.");
-                response.statusCode = 500;
+                response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
                 response.setPayload("Invalid payload received from github response.");
             }
         } else {
             log:printInfo("The github response is not in the expected form: http:Response.");
-            response.statusCode = 500;
+            response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
             response.setPayload(<@untained>githubResponse.reason());
         }
 
