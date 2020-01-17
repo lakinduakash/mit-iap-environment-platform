@@ -55,6 +55,7 @@ class LoginForm extends React.Component {
                         </Header>
                         <Form>
                             <Segment stacked>
+
                                 <Form.Input icon='user' iconPosition='left' placeholder='Email' name='email' onChange={this.handleInputChange} value={this.state.email} />
                                 <Form.Input icon='lock' iconPosition='left' placeholder='Password' name='password' onChange={this.handleInputChange} value={this.state.password}/>
                                 <Checkbox label='Remember password'/><br></br><br></br>
