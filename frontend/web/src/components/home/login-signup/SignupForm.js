@@ -36,6 +36,7 @@ class SignupForm extends React.Component {
                 <Form >
                     <Form.Field>
                         <label>First Name</label>
+
                         <input placeholder='First Name' name ='firstName' onChange={this.handleInputChange} value={this.state.firstName}/>
                     </Form.Field>
                     <Form.Field>
