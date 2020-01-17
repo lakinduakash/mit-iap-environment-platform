@@ -62,6 +62,7 @@ public function createLabel(string labelName, string labelDescription) returns s
 # 
 # + return -  Returns not found status and status code.
 public function getNotFoundStatus() returns string[] {
+
     return ["404", "Not Found"];
 }
 
@@ -71,6 +72,7 @@ public function getNotFoundStatus() returns string[] {
 # 
 # + return - The function will return the string array which includes the status code and the message.
 public function getStatus(http:Response response) returns string[] {
+
     string status = "";
     status = response.getHeader("Status");
     string[] statusDetails = stringutils:split(status, " ");
