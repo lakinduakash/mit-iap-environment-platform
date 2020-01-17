@@ -18,9 +18,9 @@ service userService on endPoint {
 
     @http:ResourceConfig {
         methods: ["GET"],
-        path: "/get-request-for-user/{issueNumber}"
+        path: "/get-request-for-user/{userName}/{issueNumber}"
     }
-    resource function getRequestRelatedToUser(http:Caller caller, http:Request req, string issueNumber) returns error? {
+    resource function getRequestRelatedToUser(http:Caller caller, http:Request req, string userName, string issueNumber) returns error? {
 
         // http:Request request = new;
         http:Response response = new;
@@ -35,21 +35,27 @@ service userService on endPoint {
             if (jsonPayload is json) {
                 json | error formattedIssue = createFormattedIssue(jsonPayload);
                 if (formattedIssue is json) {
-                    response.statusCode = 200;
-                    response.setJsonPayload(<@untained>formattedIssue);
+                    if (userNameExists(<json[]>formattedIssue.labels, userName)) {
+                        response.statusCode = http:STATUS_OK;
+                        response.setJsonPayload(<@untained>formattedIssue);
+                    } else {
+                        log:printInfo("Issue is not related to the username specified.");
+                        response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
+                        response.setPayload("Issue is not related to the username specified.");
+                    }
                 } else {
                     log:printInfo("Error occurred during the process of formatting the issue.");
-                    response.statusCode = 500;
+                    response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
                     response.setPayload(<@untained>formattedIssue.reason());
                 }
             } else {
                 log:printInfo("Invalid json payload received from the response obtained from github.");
-                response.statusCode = 500;
+                response.statusCode = http:STATUS_NOT_ACCEPTABLE;
                 response.setPayload(<@untained>jsonPayload.reason());
             }
         } else {
             log:printInfo("The github response is not in the expected form: http:Response.");
-            response.statusCode = 500;
+            response.statusCode = http:STATUS_NOT_ACCEPTABLE;
             response.setPayload(<@untained>githubResponse.reason());
         }
 
@@ -75,21 +81,21 @@ service userService on endPoint {
             if (jsonPayload is json[]) {
                 json | error issues = extractIssuesRelatedToUser(jsonPayload, userName);
                 if (issues is json) {
-                    response.statusCode = 200;
+                    response.statusCode = http:STATUS_OK;
                     response.setJsonPayload(<@untained>issues);
                 } else {
                     log:printInfo("The issues related to user could not be converted to json.");
-                    response.statusCode = 500;
+                    response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
                     response.setPayload(<@untained>issues.reason());
                 }
             } else {
                 log:printInfo("Invalid json payload received from the response obtained from github.");
-                response.statusCode = 500;
+                response.statusCode = http:STATUS_NOT_ACCEPTABLE;
                 response.setPayload("Invalid payload received from github response.");
             }
         } else {
             log:printInfo("The github response is not in the expected form: http:Response.");
-            response.statusCode = 500;
+            response.statusCode = http:STATUS_NOT_ACCEPTABLE;
             response.setPayload(<@untained>githubResponse.reason());
         }
 
