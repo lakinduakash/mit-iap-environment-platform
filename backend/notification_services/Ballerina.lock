@@ -1,0 +1,9 @@
+org_name = "ashera"
+version = "0.1.0"
+lockfile_version = "1.0.0"
+ballerina_version = "1.1.0"
+
+[[imports."ashera/nats_consumer:0.1.0"]]
+org_name = "ashera"
+name = "ws_server"
+version = "0.1.0"
