@@ -18,7 +18,7 @@ class SignupForm extends React.Component {
         this.handleInputChange.bind(this);
     }
 
-    handleInputChange(event) {
+    handleInputChange = (event) => {
         const target = event.target;
         const name = target.name;
         const value = target.type === 'checkbox' ? target.checked : target.value;
@@ -29,9 +29,6 @@ class SignupForm extends React.Component {
         return (
             <Grid textAlign='center' style={{ height: '100vh' }} verticalAlign='middle'>
                 <Grid.Column textAlign='left' style={{ maxWidth: 450 }}>
-                <Header as='h2' color='teal' textAlign='center' >
-                    Environmental Management Platform User Information
-                </Header>
                 <br></br>
                 <Form >
                     <Form.Field>

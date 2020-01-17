@@ -1,8 +1,11 @@
 import React from 'react';
-import {Grid, Checkbox, Form, Header, Segment, Message, Button} from 'semantic-ui-react';
+import {Grid, Checkbox, Form, Segment, Message, Button} from 'semantic-ui-react';
+import Header from '../Header/header';
+import Footer from '../Footer/footer';
 import {Redirect} from 'react-router-dom';
 import 'semantic-ui-css/semantic.min.css';
 import App from '../../../App';
+
 
 class LoginForm extends React.Component {
 
@@ -16,7 +19,7 @@ class LoginForm extends React.Component {
         this.handleInputChange.bind(this);
     }
 
-    handleInputChange(event) {
+    handleInputChange = (event) => {
         const target = event.target;
         const name = target.name;
         const value = target.type === 'checkbox' ? target.checked : target.value;
@@ -42,17 +45,17 @@ class LoginForm extends React.Component {
             <Segment>
                 <Grid columns={2} textAlign='center' padded style={{ height: '100vh' }} verticalAlign='middle'>
                     <Grid.Column  style={{ maxWidth: 1600 }}>
-                        <Header as='h2' color='teal' textAlign='center' >
-                            Environmental Management Platform  
-                        </Header>
+                        <Header/>
                         <Message>
-                            Description
+                            MIT IAP Environment Platform is a service for customers to request land for private or commercaial reasons...
                         </Message>
                     </Grid.Column>
                     <Grid.Column textAlign='left' style={{ maxWidth: 400 }}>
-                        <Header as='h2' color='teal' textAlign='center' >
+                        <strong>
                             Log in
-                        </Header>
+                        </strong>
+                        <br/>
+                        <br/>
                         <Form>
                             <Segment stacked>
 
@@ -65,6 +68,7 @@ class LoginForm extends React.Component {
                         <Message>
                             New to us? <a href ='/signup'>Sign Up</a>
                         </Message>
+                        <Footer/>
                     </Grid.Column>
                 </Grid>
 
