@@ -1,10 +1,12 @@
-import React from 'react';
-//import logo from './logo.svg';
-import './App.css';
+import React, { Fragment } from "react";
+import "./App.css";
+import Home from "./home";
 
 function App() {
   return (
-    <h1>Hello MIT IAP 2020</h1>
+    <Fragment>
+      <Home />
+    </Fragment>
   );
 }
 

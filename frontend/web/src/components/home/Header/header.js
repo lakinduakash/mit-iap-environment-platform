@@ -1,6 +1,6 @@
 import React, { Fragment } from "react";
 
-import Logo from "../../asserts/logo.jpeg";
+import Logo from "../../asserts/logoMain.jpg";
 import "./header.css";
 
 const Header = () => {
@@ -9,8 +9,8 @@ const Header = () => {
       <div className="header ">
         <img
           src={Logo}
-          alt="WSO2"
-          width="60"
+          alt="Env"
+          width="100"
           height="60"
           className="header-logo"
         />
