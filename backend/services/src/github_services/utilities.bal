@@ -115,14 +115,26 @@ public function getStatus(http:Response response) returns string[] {
 # + return - Formatted issue in json format, error if the issue cannot be rebuilt.
 public function createFormattedIssue(json issue) returns json | error {
 
-    json labelDetails = check createFormattedLabels(<json[]>issue.labels);
-    json formattedIssue = {
-        "issueId":check issue.id,
-        "issueNumber":check issue.number,
-        "labels": labelDetails,
-        "issueTitle":check issue.title,
-        "issueBody":check issue.body
-    };
+    json formattedIssue = {};
+    json[] | error labels = trap <json[]>issue.labels;
+
+    if (labels is json[]) {
+        json | error labelDetails = createFormattedLabels(labels);
+        if (labelDetails is json) {
+            formattedIssue = {
+                "issueId":check issue.id,
+                "issueNumber":check issue.number,
+                "labels": labelDetails,
+                "issueTitle":check issue.title,
+                "issueBody":check issue.body
+            };
+        } else {
+            return error("Error while creating a formatted set of labels using the extracted issue labels.");
+        }
+    } else {
+        return error("Issue with the given issue number cannot be found.");
+    }
+
     return formattedIssue;
 }
 
@@ -149,7 +161,13 @@ public function extractIssuesRelatedToUser(json[] listOfIssues, string userName)
             issues[issues.length()] = issueInfo;
         }
     }
-    return issues;
+
+    if (issues.length() > 0) {
+        return issues;
+    } else {
+        return error("Issues for the specified user cannot be found.");
+    }
+
 }
 
 # Check if the userName exists inside the labels.
