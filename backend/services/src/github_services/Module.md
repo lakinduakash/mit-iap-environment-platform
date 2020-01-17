@@ -13,8 +13,6 @@ The `checkLabel` function use to check whether the given label is available or n
 - **Parameters**
 
   - labelName - The checking label name.
-  - repoUser - The name of the repositary owner.
-  - repoName - The name of the repositary.
 
 - **return** - The `checkLabel` function will return **json** to indicate the status.
 
@@ -24,16 +22,25 @@ The `createLabel` Function will create a label in github in particular repositar
 
 - **Parameters**
 
-  - repoUser - The name of the repositary owner.
-  - repoName - The name of the repositary.
   - labelName - The creating label name.
   - labelDescription - The description of the label
 
 - **return** - The `createLabel` function will return **json** to indicate the status.
 
+### createLabelIfNotExists
+
+The `createLabelIfNotExists` function creates a label if the relevant label is not available.
+
+- **Parameters**
+
+  - labelName - The creating label name.
+  - labelDescription - The description of the label
+
+- **return** - The `createLabelIfNotExists` function will return **json** to indicate the status.
+
 ### getNotFoundStatus
 
-The `getNotFoundStatus` function returns the not found status and the code as a json
+The `getNotFoundStatus` function returns the not found status and the code as a string[]
 
 - **return** - Returns not found status and status code.
 
@@ -45,4 +52,4 @@ The `getStatus` function will return the status of the **http:Response**
 
   - response - Inputting reponse
 
-- **return** - The function will return the status code and the description as a json.
+- **return** - The function will return the **string array** which includes the status code and the message.
