@@ -152,7 +152,10 @@ service userService on endPoint {
 
     }
 
-
+    @http:ResourceConfig {
+        methods: ["GET"],
+        path: "/get-all-labels"
+    }
     resource function getAllLabels(http:Caller caller, http:Request request) returns @untainted error? {
 
         http:Response response = new;
@@ -166,7 +169,7 @@ service userService on endPoint {
                 json labelDetails = check createFormattedLabels(jsonPayload);
                 response.setJsonPayload(<@untained>labelDetails);
             } else {
-                log:printInfo("Invalcheckid json payload received from the response obtained from github.");
+                log:printInfo("Invalid json payload received from the response obtained from github.");
                 response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
                 response.setPayload("Invalid payload received from github response.");
             }
@@ -178,4 +181,58 @@ service userService on endPoint {
 
         error? respond = caller->respond(response);
     }
+
+    @http:ResourceConfig {
+        methods: ["GET"],
+        path: "/get-all-requests"
+    }
+
+    resource function getAllRequests(http:Caller caller, http:Request request) returns @untainted error? {
+
+        // http:Request request = new;
+        http:Response response = new;
+        string url = "/repos/" + ORGANIZATION_NAME + "/" + REPOSITORY_NAME + "/issues?state=all";
+
+        // request.addHeader("Authorization", ACCESS_TOKEN);
+        // http:Response | error githubResponse = githubAPIEndpoint->get(<@untained>url, request);
+        http:Response | error githubResponse = githubAPIEndpoint->get(url);
+
+        if (githubResponse is http:Response) {
+            var jsonPayload = githubResponse.getJsonPayload();
+            if (jsonPayload is json[]) {
+                json[] issues = [];
+                foreach json issue in issues {
+                    json labelDetails = check createFormattedLabels(<json[]>issue.labels);
+                    issues[issues.length()] = {
+                        "issueId":check issue.id,
+                        "issueNumber":check issue.number,
+                        "labels": labelDetails,
+                        "issueTitle":check issue.title,
+                        "issueBody":check issue.body
+                     };
+                }
+                if (issues is json[]) {
+                    response.statusCode = 200;
+                    response.setJsonPayload(<@untained>issues);
+                } else {
+                    log:printInfo("The issues related to user could not be converted to json[].");
+                    response.statusCode = 500;
+                    response.setPayload(<@untained>issues.reason());
+                }
+            } else {
+                log:printInfo("Invalid json payload received from the response obtained from github.");
+                response.statusCode = 500;
+                response.setPayload("Invalid payload received from github response.");
+            }
+        } else {
+            log:printInfo("The github response is not in the expected form: http:Response.");
+            response.statusCode = 500;
+            response.setPayload(<@untained>githubResponse.reason());
+        }
+
+        error? respond = caller->respond(response);
+    }
+    }
+    
+
 }
