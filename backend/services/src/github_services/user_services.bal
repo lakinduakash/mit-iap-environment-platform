@@ -1,20 +1,19 @@
 import ballerina/http;
+import ballerina/lang.'int as ints;
 import ballerina/log;
 
-const string organizationName = "yashodgayashan";
-const string repositoryName = "ballerina-github-connector";
-// const string ACCESS_TOKEN = "Bearer <token-id>";
+http:Client githubAPIEndpoint = new (GITHUB_API_URL);
 
-http:Client clientEndpoint = new ("https://api.github.com");
+listener http:Listener endPoint = new (PORT);
 
 @http:ServiceConfig {
-    basePath: "/github",
+    basePath: BASEPATH,
     cors: {
         allowOrigins: ["*"]
     }
 }
 
-service userService on new http:Listener(9090) {
+service userService on endPoint {
 
     @http:ResourceConfig {
         methods: ["GET"],
@@ -24,10 +23,10 @@ service userService on new http:Listener(9090) {
 
         // http:Request request = new;
         http:Response response = new;
-        string url = "/repos/" + organizationName + "/" + repositoryName + "/issues/" + issueNumber;
+        string url = "/repos/" + ORGANIZATION_NAME + "/" + REPOSITORY_NAME + "/issues/" + issueNumber;
 
         // request.addHeader("Authorization", ACCESS_TOKEN);
-        http:Response | error githubResponse = clientEndpoint->get(<@untained>url);
+        http:Response | error githubResponse = githubAPIEndpoint->get(<@untained>url);
 
         if (githubResponse is http:Response) {
             json | error jsonPayload = githubResponse.getJsonPayload();
@@ -63,10 +62,10 @@ service userService on new http:Listener(9090) {
 
         // http:Request request = new;
         http:Response response = new;
-        string url = "/repos/" + organizationName + "/" + repositoryName + "/issues?state=all";
+        string url = "/repos/" + ORGANIZATION_NAME + "/" + REPOSITORY_NAME + "/issues?state=all";
 
         // request.addHeader("Authorization", ACCESS_TOKEN);
-        http:Response | error githubResponse = clientEndpoint->get(url);
+        http:Response | error githubResponse = githubAPIEndpoint->get(url);
 
         if (githubResponse is http:Response) {
             var jsonPayload = githubResponse.getJsonPayload();
@@ -93,4 +92,57 @@ service userService on new http:Listener(9090) {
 
         error? respond = caller->respond(response);
     }
+
+    @http:ResourceConfig {
+        methods: ["POST"],
+        path: "/create-label"
+    }
+    resource function createLabel(http:Caller caller, http:Request request) returns @untainted error? {
+
+        http:Response response = new;
+        var jsonPayload = request.getJsonPayload();
+
+        if jsonPayload is json {
+            json | error labelName = jsonPayload.labelName;
+            json | error labelDescription = jsonPayload.labelDescription;
+            if (labelName is json && labelDescription is json) {
+                string[] status = createLabelIfNotExists(<@untained>labelName.toString(), <@untained>labelDescription.toString());
+                int | error statusCode = ints:fromString(status[0]);
+                if (statusCode is int) {
+                    response.statusCode = statusCode;
+                    response.setPayload(status[1]);
+                } else {
+                    log:printError("Integer conversion error as the retrived status code from the github is invalid. Check createLabel function");
+                    response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
+                    response.setPayload("Internal server error occured.");
+                }
+            } else {
+                log:printError("Invalid json payload received from the response.");
+                response.statusCode = http:STATUS_NOT_ACCEPTABLE;
+                response.setPayload("Not acceptable payload");
+            }
+        } else {
+            log:printError("Invalid payload type received from the response.");
+            response.statusCode = http:STATUS_NOT_ACCEPTABLE;
+            response.setPayload("Not acceptable payload type");
+        }
+
+        error? respond = caller->respond(response);
+    }
+
+    @http:ResourceConfig {
+        methods: ["POST"],
+        path: "/assign-label/{issueNumber}"
+    }
+    resource function assignLabel(http:Caller caller, http:Request request, string issueNumber) returns @untainted error? {
+
+        http:Response response = new;
+        var jsonPayload = request.getJsonPayload();
+
+        if (jsonPayload is json) {
+
+        }
+
+    }
+
 }
