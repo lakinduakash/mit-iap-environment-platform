@@ -18,6 +18,7 @@ service eventListener on new http:Listener(9090) {
         methods: ["GET"]
     }
     resource function getEvent(http:Caller caller, http:Request request) {
+        
         var data = request.getJsonPayload();
         if (data is json) {
             io:println(data.toJsonString());
