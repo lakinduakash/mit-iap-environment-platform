@@ -152,4 +152,29 @@ service userService on endPoint {
 
     }
 
+
+    resource function getAllLabels(http:Caller caller, http:Request request) returns @untainted error?{
+        http:Response response = new;
+        string url = "/repos/" + ORGANIZATION_NAME + "/" + REPOSITORY_NAME + "/labels";
+
+        http:Response | error githubResponse = githubAPIEndpoint->get(url);
+
+        if (githubResponse is http:Response) {
+            var jsonPayload = githubResponse.getJsonPayload();
+            if (jsonPayload is json[]) {
+                json labelDetails = check createFormattedLabels(jsonPayload);
+                response.setJsonPayload(<@untained>labelDetails);
+            } else {
+                log:printInfo("Invalcheckid json payload received from the response obtained from github.");
+                response.statusCode = 500;
+                response.setPayload("Invalid payload received from github response.");
+            }
+        } else {
+            log:printInfo("The github response is not in the expected form: http:Response.");
+            response.statusCode = 500;
+            response.setPayload(<@untained>githubResponse.reason());
+        }
+
+        error? respond = caller->respond(response);
+    }
 }
