@@ -20,14 +20,14 @@ service userService on endPoint {
         methods: ["GET"],
         path: "/get-request-for-user/{userName}/{issueNumber}"
     }
-    resource function getRequestRelatedToUser(http:Caller caller, http:Request req, string userName, string issueNumber) returns error? {
+    resource function getRequestRelatedToUser(http:Caller caller, http:Request request, string userName, string issueNumber) {
 
-        // http:Request request = new;
+        // http:Request callBackRequest = new;
         http:Response response = new;
         string url = "/repos/" + ORGANIZATION_NAME + "/" + REPOSITORY_NAME + "/issues/" + issueNumber;
 
-        // request.addHeader("Authorization", ACCESS_TOKEN);
-        // http:Response | error githubResponse = githubAPIEndpoint->get(<@untained>url, request);
+        // callBackRequest.addHeader("Authorization", ACCESS_TOKEN);
+        // http:Response | error githubResponse = githubAPIEndpoint->get(<@untained>url, callBackRequest);
         http:Response | error githubResponse = githubAPIEndpoint->get(<@untained>url);
 
         if (githubResponse is http:Response) {
@@ -50,7 +50,7 @@ service userService on endPoint {
                 }
             } else {
                 log:printInfo("Invalid json payload received from the response obtained from github.");
-                response.statusCode = http:STATUS_NOT_ACCEPTABLE;
+                response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
                 response.setPayload(<@untained>jsonPayload.reason());
             }
         } else {
@@ -66,14 +66,14 @@ service userService on endPoint {
         methods: ["GET"],
         path: "/get-requests-for-user/{userName}"
     }
-    resource function getRequestsRelatedToUser(http:Caller caller, http:Request req, string userName) returns error? {
+    resource function getRequestsRelatedToUser(http:Caller caller, http:Request request, string userName) {
 
-        // http:Request request = new;
+        // http:Request callBackRequest = new;
         http:Response response = new;
         string url = "/repos/" + ORGANIZATION_NAME + "/" + REPOSITORY_NAME + "/issues?state=all";
 
-        // request.addHeader("Authorization", ACCESS_TOKEN);
-        // http:Response | error githubResponse = githubAPIEndpoint->get(<@untained>url, request);
+        // callBackRequest.addHeader("Authorization", ACCESS_TOKEN);
+        // http:Response | error githubResponse = githubAPIEndpoint->get(<@untained>url, callBackRequest);
         http:Response | error githubResponse = githubAPIEndpoint->get(url);
 
         if (githubResponse is http:Response) {
@@ -90,8 +90,8 @@ service userService on endPoint {
                 }
             } else {
                 log:printInfo("Invalid json payload received from the response obtained from github.");
-                response.statusCode = http:STATUS_NOT_ACCEPTABLE;
-                response.setPayload("Invalid payload received from github response.");
+                response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
+                response.setPayload("Invalid json payload received from github response.");
             }
         } else {
             log:printInfo("The github response is not in the expected form: http:Response.");
@@ -106,7 +106,7 @@ service userService on endPoint {
         methods: ["POST"],
         path: "/create-label"
     }
-    resource function createLabel(http:Caller caller, http:Request request) returns @untainted error? {
+    resource function createLabel(http:Caller caller, http:Request request) {
 
         http:Response response = new;
         var jsonPayload = request.getJsonPayload();
@@ -143,7 +143,7 @@ service userService on endPoint {
         methods: ["POST"],
         path: "/assign-label/{issueNumber}"
     }
-    resource function assignLabel(http:Caller caller, http:Request request, string issueNumber) returns @untainted error? {
+    resource function assignLabel(http:Caller caller, http:Request request, string issueNumber) {
 
         http:Response response = new;
         var jsonPayload = request.getJsonPayload();
@@ -162,7 +162,7 @@ service userService on endPoint {
         methods: ["GET"],
         path: "/get-all-labels"
     }
-    resource function getAllLabels(http:Caller caller, http:Request request) returns @untainted error? {
+    resource function getAllLabels(http:Caller caller, http:Request request) {
 
         http:Response response = new;
         string url = "/repos/" + ORGANIZATION_NAME + "/" + REPOSITORY_NAME + "/labels";
@@ -172,16 +172,23 @@ service userService on endPoint {
         if (githubResponse is http:Response) {
             var jsonPayload = githubResponse.getJsonPayload();
             if (jsonPayload is json[]) {
-                json labelDetails = check createFormattedLabels(jsonPayload);
-                response.setJsonPayload(<@untained>labelDetails);
+                json | error formattedLabels = createFormattedLabels(jsonPayload);
+                if (formattedLabels is json) {
+                    response.statusCode = http:STATUS_OK;
+                    response.setJsonPayload(<@untained>formattedLabels);
+                } else {
+                    log:printInfo("Error occured during the process of rebuiliding the list of labels");
+                    response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
+                    response.setJsonPayload(<@untained>formattedLabels.reason());
+                }
             } else {
-                log:printInfo("Invalcheckid json payload received from the response obtained from github.");
+                log:printInfo("Invalid json payload received from the response obtained from github.");
                 response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
-                response.setPayload("Invalid payload received from github response.");
+                response.setPayload("Invalid json payload received from github response.");
             }
         } else {
             log:printInfo("The github response is not in the expected form: http:Response.");
-            response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
+            response.statusCode = http:STATUS_NOT_ACCEPTABLE;
             response.setPayload(<@untained>githubResponse.reason());
         }
 
@@ -192,7 +199,7 @@ service userService on endPoint {
         methods: ["POST"],
         path: "/post-request/{userName}"
     }
-    resource function postRequest(http:Caller caller, http:Request request, string userName) returns @untainted error? {
+    resource function postRequest(http:Caller caller, http:Request request, string userName) {
 
         http:Response response = new;
         http:Request callBackRequest = new;
@@ -220,7 +227,7 @@ service userService on endPoint {
                     }
                 } else {
                     log:printError("Error while obtaining the response from github api services.");
-                    response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
+                    response.statusCode = http:STATUS_NOT_ACCEPTABLE;
                     response.setPayload("Error while obtaining the response from github api services.");
                 }
             } else {
@@ -241,7 +248,7 @@ service userService on endPoint {
         methods: ["GET"],
         path: "/get-all-collaborators"
     }
-    resource function getAllCollaborators(http:Caller caller, http:Request request) returns @untainted error? {
+    resource function getAllCollaborators(http:Caller caller, http:Request request) {
 
         http:Request callBackRequest = new;
         http:Response response = new;
@@ -258,13 +265,14 @@ service userService on endPoint {
                     response.statusCode = http:STATUS_OK;
                     response.setPayload(<@untained>collaboratorDetails);
                 } else {
+                    log:printInfo("Error occured during the process of rebuiliding the list of collaborators");
                     response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
                     response.setPayload(<@untained>collaboratorDetails.reason());
                 }
             } else {
                 log:printInfo("Invalid json payload received from the response obtained from github.");
                 response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
-                response.setPayload("Invalid payload received from github response.");
+                response.setPayload("Invalid json payload received from github response.");
             }
         } else {
             log:printInfo("The github response is not in the expected form: http:Response.");
