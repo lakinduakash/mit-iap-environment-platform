@@ -198,3 +198,20 @@ function createFormattedLabels(json[] labels) returns json | error {
     }
     return labelDetails;
 }
+
+public function createFormattedIssues(json[] issues) returns json[] | error{
+
+    json[] returnedIssues = [];
+    foreach json issue in issues {
+        json labelDetails = check createFormattedLabels(<json[]>issue.labels);
+        returnedIssues[returnedIssues.length()] = {
+            "issueId":check issue.id,
+            "issueNumber":check issue.number,
+            "labels": labelDetails,
+            "issueTitle":check issue.title,
+            "issueBody":check issue.body
+            };
+    }
+
+    return returnedIssues;
+}

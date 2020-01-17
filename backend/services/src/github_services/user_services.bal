@@ -172,8 +172,14 @@ service userService on endPoint {
         if (githubResponse is http:Response) {
             var jsonPayload = githubResponse.getJsonPayload();
             if (jsonPayload is json[]) {
-                json labelDetails = check createFormattedLabels(jsonPayload);
-                response.setJsonPayload(<@untained>labelDetails);
+                json|error labelDetails = createFormattedLabels(jsonPayload);
+                if (labelDetails is json){
+                    response.setJsonPayload(<@untained>labelDetails);
+                } else {
+                    log:printInfo("Error occurred during the process of formatting the labels.");
+                    response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
+                    response.setPayload(<@untained>labelDetails.reason());
+                }
             } else {
                 log:printInfo("Invalid json payload received from the response obtained from github.");
                 response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
@@ -206,39 +212,29 @@ service userService on endPoint {
         if (githubResponse is http:Response) {
             var jsonPayload = githubResponse.getJsonPayload();
             if (jsonPayload is json[]) {
-                json[] issues = [];
-                foreach json issue in issues {
-                    json labelDetails = check createFormattedLabels(<json[]>issue.labels);
-                    issues[issues.length()] = {
-                        "issueId":check issue.id,
-                        "issueNumber":check issue.number,
-                        "labels": labelDetails,
-                        "issueTitle":check issue.title,
-                        "issueBody":check issue.body
-                     };
-                }
-                if (issues is json[]) {
+                json[] |error issues = createFormattedIssues(jsonPayload);
+                if (issues is json[]){
                     response.statusCode = 200;
                     response.setJsonPayload(<@untained>issues);
                 } else {
-                    log:printInfo("The issues related to user could not be converted to json[].");
-                    response.statusCode = 500;
+                    log:printInfo("The issues related to user could not be converted to json.");
+                    response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
                     response.setPayload(<@untained>issues.reason());
                 }
             } else {
                 log:printInfo("Invalid json payload received from the response obtained from github.");
-                response.statusCode = 500;
+                response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
                 response.setPayload("Invalid payload received from github response.");
             }
         } else {
             log:printInfo("The github response is not in the expected form: http:Response.");
-            response.statusCode = 500;
+            response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
             response.setPayload(<@untained>githubResponse.reason());
         }
 
         error? respond = caller->respond(response);
     }
-    }
+    
     
 
 }
