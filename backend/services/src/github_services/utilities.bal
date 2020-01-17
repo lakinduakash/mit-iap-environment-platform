@@ -215,3 +215,25 @@ public function createFormattedIssues(json[] issues) returns json[] | error{
 
     return returnedIssues;
 }
+
+public function createFormattedComments( json[] comments) returns json[] | error {
+    
+    json[] returnedComments = [];
+    foreach json comment in comments {
+        json userDetails = check createFormattedUser(<json>comment.user);
+        returnedComments[returnedComments.length()] = {
+            "commentBody":check comment.body,
+            "commentUser":check userDetails.userName
+            };
+    }
+
+    return returnedComments;
+}
+
+function createFormattedUser(json user) returns json | error {
+
+        map<json> userVal = <map<json>>user;
+        json userDetails = {"userName":check userVal.login};
+    
+    return userDetails;
+}
