@@ -198,3 +198,17 @@ function createFormattedLabels(json[] labels) returns json | error {
     }
     return labelDetails;
 }
+
+# Rebuild a formatted set of collaborators using the retrieved issue from github API services.
+#
+# + collaborators - Collaborators retrieved from github API services.  
+# + return        - Formatted set of collaborators in json format, error if the set of collaborators cannot be rebuilt.
+function createFormattedCollaborators(json[] collaborators) returns json | error {
+
+    json[] formattedCollaborators = [];
+    foreach json collaborator in collaborators {
+        map<json> collaboratorValue = <map<json>>collaborator;
+        formattedCollaborators[formattedCollaborators.length()] = {"id":check collaboratorValue.id, "name":check collaboratorValue.login, "url":check collaboratorValue.url};
+    }
+    return formattedCollaborators;
+}

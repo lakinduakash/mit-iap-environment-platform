@@ -190,9 +190,9 @@ service userService on endPoint {
 
     @http:ResourceConfig {
         methods: ["POST"],
-        path: "/post-issue/{userName}"
+        path: "/post-request/{userName}"
     }
-    resource function postIssue(http:Caller caller, http:Request request, string userName) returns @untainted error? {
+    resource function postRequest(http:Caller caller, http:Request request, string userName) returns @untainted error? {
 
         http:Response response = new;
         http:Request callBackRequest = new;
@@ -232,6 +232,44 @@ service userService on endPoint {
             log:printInfo("Error while obtaining the json payload from the request sent.");
             response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
             response.setPayload("Error while obtaining the json payload from the request sent.");
+        }
+
+        error? respond = caller->respond(response);
+    }
+
+    @http:ResourceConfig {
+        methods: ["GET"],
+        path: "/get-all-collaborators"
+    }
+    resource function getAllCollaborators(http:Caller caller, http:Request request) returns @untainted error? {
+
+        http:Request callBackRequest = new;
+        http:Response response = new;
+        string url = "/repos/" + ORGANIZATION_NAME + "/" + REPOSITORY_NAME + "/collaborators";
+
+        callBackRequest.addHeader("Authorization", ACCESS_TOKEN);
+        http:Response | error githubResponse = githubAPIEndpoint->get(<@untained>url, callBackRequest);
+
+        if (githubResponse is http:Response) {
+            var jsonPayload = githubResponse.getJsonPayload();
+            if (jsonPayload is json[]) {
+                json | error collaboratorDetails = createFormattedCollaborators(jsonPayload);
+                if (collaboratorDetails is json) {
+                    response.statusCode = http:STATUS_OK;
+                    response.setPayload(<@untained>collaboratorDetails);
+                } else {
+                    response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
+                    response.setPayload(<@untained>collaboratorDetails.reason());
+                }
+            } else {
+                log:printInfo("Invalid json payload received from the response obtained from github.");
+                response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
+                response.setPayload("Invalid payload received from github response.");
+            }
+        } else {
+            log:printInfo("The github response is not in the expected form: http:Response.");
+            response.statusCode = http:STATUS_NOT_ACCEPTABLE;
+            response.setPayload(<@untained>githubResponse.reason());
         }
 
         error? respond = caller->respond(response);
