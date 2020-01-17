@@ -1,6 +1,6 @@
 import React, { Fragment } from "react";
 
-import Logo from "../../asserts/logoMain.jpg";
+import Logo from "../../../asserts/logoMain.jpg";
 import "./header.css";
 
 const Header = () => {
