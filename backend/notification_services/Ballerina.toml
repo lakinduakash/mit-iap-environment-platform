@@ -1,0 +1,5 @@
+[project]
+org-name= "ashera"
+version= "0.1.0"
+
+[dependencies]
