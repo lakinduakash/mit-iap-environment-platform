@@ -32,7 +32,7 @@ service userService on endPoint {
         if (githubResponse is http:Response) {
             json | error jsonPayload = githubResponse.getJsonPayload();
             if (jsonPayload is json) {
-                json | error formattedIssue = createFormattedIssue(jsonPayload);
+                json | error formattedIssue = createAFormattedJsonOfAnIssue(jsonPayload);
                 if (formattedIssue is json) {
                     if (userNameExists(<json[]>formattedIssue.labels, userName)) {
                         response.statusCode = http:STATUS_OK;
@@ -194,7 +194,7 @@ service userService on endPoint {
         if (githubResponse is http:Response) {
             var jsonPayload = githubResponse.getJsonPayload();
             if (jsonPayload is json[]) {
-                json | error formattedLabels = createFormattedLabels(jsonPayload);
+                json | error formattedLabels = createAFormattedJsonOfLabels(jsonPayload);
                 if (formattedLabels is json) {
                     response.statusCode = http:STATUS_OK;
                     response.setJsonPayload(<@untained>formattedLabels);
@@ -347,7 +347,7 @@ service userService on endPoint {
         if (githubResponse is http:Response) {
             var jsonPayload = githubResponse.getJsonPayload();
             if (jsonPayload is json[]) {
-                json | error collaboratorDetails = createFormattedCollaborators(jsonPayload);
+                json | error collaboratorDetails = createAFormattedJsonOfCollaborators(jsonPayload);
                 if (collaboratorDetails is json) {
                     response.statusCode = http:STATUS_OK;
                     response.setPayload(<@untained>collaboratorDetails);
@@ -381,7 +381,7 @@ service userService on endPoint {
         string url = "/repos/" + ORGANIZATION_NAME + "/" + REPOSITORY_NAME + "/collaborators/" + userName;
         callBackRequest.addHeader("Authorization", ACCESS_TOKEN);
 
-        boolean | error isACollaborator = isCollaborator(<@untained>userName);
+        boolean | error isACollaborator = isValidCollaborator(<@untained>userName);
         if (isACollaborator is boolean) {
             if (!isACollaborator) {
                 http:Response | error githubResponse = githubAPIEndpoint->get(<@untained>url, callBackRequest);
@@ -423,7 +423,7 @@ service userService on endPoint {
         string url = "/repos/" + ORGANIZATION_NAME + "/" + REPOSITORY_NAME + "/collaborators/" + userName;
         callBackRequest.addHeader("Authorization", ACCESS_TOKEN);
 
-        boolean | error isACollaborator = isCollaborator(<@untained>userName);
+        boolean | error isACollaborator = isValidCollaborator(<@untained>userName);
         if (isACollaborator is boolean) {
             if (isACollaborator) {
                 http:Response | error githubResponse = githubAPIEndpoint->get(<@untained>url, callBackRequest);
@@ -471,7 +471,7 @@ service userService on endPoint {
         if (githubResponse is http:Response) {
             var jsonPayload = githubResponse.getJsonPayload();
             if (jsonPayload is json[]) {
-                json | error assigneeDetails = createFormattedAssignees(jsonPayload);
+                json | error assigneeDetails = createAFormattedJsonOfAssignees(jsonPayload);
                 if (assigneeDetails is json) {
                     response.statusCode = http:STATUS_OK;
                     response.setPayload(<@untained>assigneeDetails);
@@ -507,14 +507,14 @@ service userService on endPoint {
         // Please change the scope of the access token to make the function work
         callBackRequest.addHeader("Authorization", ACCESS_TOKEN);
 
-        boolean | error isValidIssue = checkIssue(<@untained>issueNumber);
-        if (isValidIssue is boolean) {
-            if (isValidIssue) {
+        boolean | error validIssue = isValidIssue(<@untained>issueNumber);
+        if (validIssue is boolean) {
+            if (validIssue) {
                 var receivedRequestPayload = request.getJsonPayload();
                 if (receivedRequestPayload is json) {
                     json | error payloadContent = receivedRequestPayload.assignees;
                     if (payloadContent is json) {
-                        boolean | error validOperation = checkAssignees(<@untained><json[]>payloadContent);
+                        boolean | error validOperation = areValidAssignees(<@untained><json[]>payloadContent);
                         if (validOperation is boolean) {
                             if (validOperation) {
                                 callBackRequest.setPayload(<@untained>receivedRequestPayload);
@@ -572,14 +572,14 @@ service userService on endPoint {
         // Please change the scope of the access token to make the function work
         callBackRequest.addHeader("Authorization", ACCESS_TOKEN);
 
-        boolean | error isValidIssue = checkIssue(<@untained>issueNumber);
-        if (isValidIssue is boolean) {
-            if (isValidIssue) {
+        boolean | error validIssue = isValidIssue(<@untained>issueNumber);
+        if (validIssue is boolean) {
+            if (validIssue) {
                 var receivedRequestPayload = request.getJsonPayload();
                 if (receivedRequestPayload is json) {
                     json | error payloadContent = receivedRequestPayload.assignees;
                     if (payloadContent is json) {
-                        boolean | error validOperation = checkAssignees(<@untained><json[]>payloadContent);
+                        boolean | error validOperation = areValidAssignees(<@untained><json[]>payloadContent);
                         if (validOperation is boolean) {
                             if (validOperation) {
                                 callBackRequest.setPayload(<@untained>receivedRequestPayload);

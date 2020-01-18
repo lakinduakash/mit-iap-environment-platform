@@ -15,13 +15,13 @@ public function assignLabel(string issueNumber, string[] labels) returns string[
     http:Request request = new;
     request.addHeader("Authorization", ACCESS_TOKEN);
     request.setJsonPayload({"labels": labels});
-    http:Response | error response = githubAPIEndpoint->post(url, request);
+    http:Response | error githubResponse = githubAPIEndpoint->post(url, request);
 
-    if (response is http:Response) {
-        io:println(response.getJsonPayload());
-        return getStatus(response);
+    if (githubResponse is http:Response) {
+        io:println(githubResponse.getJsonPayload());
+        return getStatus(githubResponse);
     } else {
-        io:println(response.reason());
+        io:println(githubResponse.reason());
         return getNotFoundStatus();
     }
 }
@@ -36,10 +36,10 @@ public function checkLabel(string labelName) returns @untainted string[] {
 
     http:Request request = new;
     request.addHeader("Authorization", ACCESS_TOKEN);
-    http:Response | error response = githubAPIEndpoint->get(url, request);
+    http:Response | error githubResponse = githubAPIEndpoint->get(url, request);
 
-    if (response is http:Response) {
-        return getStatus(response);
+    if (githubResponse is http:Response) {
+        return getStatus(githubResponse);
     } else {
         return getNotFoundStatus();
     }
@@ -130,17 +130,19 @@ public function getStatus(http:Response response) returns string[] {
     return [statusDetails[0], status];
 }
 
-# Rebuild a formatted issue using the retrieved issue from github API services.
+# The `createAFormattedJsonOfAnIssue` function rebuilds a formatted issue using the retrieved 
+# json issue.
 #
-# + issue  - Issue retrieved from github API services. 
-# + return - Formatted issue in json format, error if the issue cannot be rebuilt.
-public function createFormattedIssue(json issue) returns json | error {
+# + issue  - Issue retrieved from the github API service. 
+# + return - Returns a formatted **json** of an issue, **error** if a formatted json issue 
+#            cannot be rebuilt or the issue with the issue number doesn't exist.
+public function createAFormattedJsonOfAnIssue(json issue) returns json | error {
 
     json formattedIssue = {};
     json[] | error labels = trap <json[]>issue.labels;
 
     if (labels is json[]) {
-        json | error labelDetails = createFormattedLabels(labels);
+        json | error labelDetails = createAFormattedJsonOfLabels(labels);
         if (labelDetails is json) {
             formattedIssue = {
                 "issueId":check issue.id,
@@ -159,25 +161,27 @@ public function createFormattedIssue(json issue) returns json | error {
     return formattedIssue;
 }
 
-# Extract all the issues related to a specific user.
+# The `extractIssuesRelatedToUser` function extracts all the issues related to a specific user.
 #
 # + listOfIssues - All the issues related to a specific repsitory. 
-# + userName     - Name of the user. 
-# + return       - Issues related to a specific user in the form of json, error if issues cannot be extracted.
+# + userName     - Username of the user. 
+# + return       - Returns a formatted **json[]** of issues related to the user, **error** 
+#                  if a formatted json array of issues cannot be rebuilt or the length of
+#                  the json array length is zero.
 public function extractIssuesRelatedToUser(json[] listOfIssues, string userName) returns json | error {
 
     json[] issues = [];
     foreach json issue in listOfIssues {
-        map<json> issueVal = <map<json>>issue;
-        json labelDetails = check createFormattedLabels(<json[]>issueVal.labels);
+        map<json> issueRecord = <map<json>>issue;
+        json labelDetails = check createAFormattedJsonOfLabels(<json[]>issueRecord.labels);
 
         if (userNameExists(<json[]>labelDetails, userName)) {
             json issueInfo = {
-                "issueId":check issueVal.id,
-                "issueNumber":check issueVal.number,
+                "issueId":check issueRecord.id,
+                "issueNumber":check issueRecord.number,
                 "labels": labelDetails,
-                "issueTitle":check issueVal.title,
-                "issueBody":check issueVal.body
+                "issueTitle":check issueRecord.title,
+                "issueBody":check issueRecord.body
             };
             issues[issues.length()] = issueInfo;
         }
@@ -191,11 +195,11 @@ public function extractIssuesRelatedToUser(json[] listOfIssues, string userName)
 
 }
 
-# Check if the userName exists inside the labels.
+# The `userNameExists` function checks if the username exists inside the labels of the issue.
 #
-# + labels   - Labels of an issue.
+# + labels   - Labels of the issue.
 # + userName - Name of the user.
-# + return   - True if the user exists, false if else.
+# + return   - Returns a **boolean** which indicates whether the user exists or not.
 function userNameExists(json[] labels, string userName) returns boolean {
 
     foreach json label in labels {
@@ -206,65 +210,80 @@ function userNameExists(json[] labels, string userName) returns boolean {
     return false;
 }
 
-# Rebuild a formatted set of labels using the retrieved issue from github API services.
-#
-# + labels - Labels retrieved from github API services in the form of issue.  
-# + return - Formatted set of lables in json format, error if the set of labels cannot be rebuilt.
-function createFormattedLabels(json[] labels) returns json | error {
+# The `createAFormattedJsonOfLabels` function rebuilds a formatted json array of labels out 
+# of the original json array of labels.
+# 
+# + labels - Original json array of labels.  
+# + return - Returns a formatted **json[]** of labels, **error** if a formatted json array 
+#            of labels cannot be rebuilt.
+function createAFormattedJsonOfLabels(json[] labels) returns json | error {
 
     json[] labelDetails = [];
     foreach json label in labels {
-        map<json> labelVal = <map<json>>label;
-        labelDetails[labelDetails.length()] = {"labelName":check labelVal.name, "labelDescription":check labelVal.description};
+        map<json> labelRecord = <map<json>>label;
+        labelDetails[labelDetails.length()] = {
+            "labelName":check labelRecord.name,
+            "labelDescription":check labelRecord.description
+        };
     }
     return labelDetails;
 }
 
-# Rebuild a formatted set of collaborators using the retrieved issue from github API services.
-#
-# + collaborators - Collaborators retrieved from github API services.  
-# + return        - Formatted set of collaborators in json format, error if the set of collaborators cannot be rebuilt.
-function createFormattedCollaborators(json[] collaborators) returns json | error {
+# The `createAFormattedJsonOfCollaborators` function rebuilds a formatted json array of 
+# collaborators out of the original json array of collaborators.
+# 
+# + collaborators - Original json array of collaborators.  
+# + return        - Returns a formatted **json[]** of collaborators, **error** if a formatted 
+#                   json array of collaborators cannot be rebuilt.
+function createAFormattedJsonOfCollaborators(json[] collaborators) returns json | error {
 
     json[] formattedCollaborators = [];
     foreach json collaborator in collaborators {
-        map<json> collaboratorValue = <map<json>>collaborator;
-        formattedCollaborators[formattedCollaborators.length()] = {"id":check collaboratorValue.id, "name":check collaboratorValue.login, "url":check collaboratorValue.url};
+        map<json> collaboratorRecord = <map<json>>collaborator;
+        formattedCollaborators[formattedCollaborators.length()] = {
+            "id":check collaboratorRecord.id,
+            "name":check collaboratorRecord.login,
+            "url":check collaboratorRecord.url
+        };
     }
     return formattedCollaborators;
 }
 
-# Retrieve all the labels for a specific repository using github API services.
+# The `getAllLabels` function retrieves all the labels of the repository using the github 
+# API services.
 #
-# + return - All the labels related to specific repository.
+# + return - Returns a **json** consisting all the labels, **error** if the labels cannot 
+#            be extracted properly.
 public function getAllLabels() returns json | error {
 
     string url = "/repos/" + ORGANIZATION_NAME + "/" + REPOSITORY_NAME + "/labels";
 
     http:Request request = new;
     request.addHeader("Authorization", ACCESS_TOKEN);
-    http:Response | error response = githubAPIEndpoint->get(url, request);
+    http:Response | error githubResponse = githubAPIEndpoint->get(url, request);
 
-    if (response is http:Response) {
-        var jsonPayload = response.getJsonPayload();
+    if (githubResponse is http:Response) {
+        var jsonPayload = githubResponse.getJsonPayload();
         if (jsonPayload is json) {
             return <@untainted>jsonPayload;
         } else {
-            return error("Error of the jsonPayload.");
+            return error("Error while extracting the jsonPayload from the github response.");
         }
     } else {
-        return error("Error while retreving labels from the github.");
+        return error("The github response is not in the expected form: http:Response.");
     }
 }
 
-# Extract the names of the labels.
+# The `extractLabelNames` function extract the names of the labels from a json .
 #
 # + labels - Intial set of labels containing varous attributes. 
-# + return - Formatted set of label names in the format of string[].
-public function getLabelNames(json | error labels) returns string[] | error {
+# + return - Returns a **string[]** consisting an array of label names, returns an **error** if
+#            an array of label names cannot be created. 
+public function extractLabelNames(json | error labels) returns string[] | error {
 
     string[] labelNames = [];
     json[] | error labelArray = trap <json[]>labels;
+
     if (labelArray is json[]) {
         foreach json item in labelArray {
             map<json> | error labelInfo = trap <map<json>>item;
@@ -282,11 +301,12 @@ public function getLabelNames(json | error labels) returns string[] | error {
 }
 
 
-# Check whether a user is a collaborator or not.
+# The `isValidCollaborator` function checks whether a user is a collaborator or not.
 #
 # + collaboratorName - Username of the collaborator. 
-# + return           - True if the collaborator exist, false if else.
-public function isCollaborator(string collaboratorName) returns boolean | error {
+# + return           - Returns a **boolean** which indicates whether the collaborator exists or not
+#                      , returns an **error** if the github response is not in the expected form.
+public function isValidCollaborator(string collaboratorName) returns boolean | error {
 
     string url = "/repos/" + ORGANIZATION_NAME + "/" + REPOSITORY_NAME + "/collaborators/" + collaboratorName;
 
@@ -301,25 +321,32 @@ public function isCollaborator(string collaboratorName) returns boolean | error 
     }
 }
 
-# Rebuild a formatted set of assignees using the retrieved data from github API services.
+# The `createAFormattedJsonOfAssignees` function rebuilds a formatted json array of 
+# assignees out of the original json array of assignees.
 #
-# + assignees - Assignees retrieved from github API services.  
-# + return    - Formatted set of assignees in json format, error if the set of assignees cannot be rebuilt.
-function createFormattedAssignees(json[] assignees) returns json | error {
+# + assignees - Original json array of assignees.  
+# + return    - Returns a formatted **json[]** of assignees, **error** if a formatted 
+#               json array of assignees cannot be rebuilt.
+function createAFormattedJsonOfAssignees(json[] assignees) returns json | error {
 
     json[] assigneeDetails = [];
     foreach json assignee in assignees {
-        map<json> assigneeVal = <map<json>>assignee;
-        assigneeDetails[assigneeDetails.length()] = {"id":check assigneeVal.id, "userName":check assigneeVal.login, "url":check assigneeVal.url};
+        map<json> assigneeRecord = <map<json>>assignee;
+        assigneeDetails[assigneeDetails.length()] = {
+            "id":check assigneeRecord.id,
+            "userName":check assigneeRecord.login,
+            "url":check assigneeRecord.url
+        };
     }
     return assigneeDetails;
 }
 
-# Check if the assignees 
+# The `areValidAssignees` function checks if the assignees already exists.
 #
-# + userNames - Names of the assignees. 
-# + return    - True if the assignees exist, false if else.
-function checkAssignees(json[] userNames) returns boolean | error {
+# + userNames - Usernames corresponding to the assignees. 
+# + return    - Returns a **boolean** which indicates whether all the assignees exists or not
+#               , returns an **error** if the github response is not in the expected form.
+function areValidAssignees(json[] userNames) returns boolean | error {
 
     foreach json userName in userNames {
         string url = "/repos/" + ORGANIZATION_NAME + "/" + REPOSITORY_NAME + "/assignees/" + userName.toString();
@@ -340,11 +367,12 @@ function checkAssignees(json[] userNames) returns boolean | error {
     return true;
 }
 
-# Check whether an issue with the given issueNumber exists.
+# The `isValidIssue` function checks whether an issue with the provided issue number exists.
 #
-# + issueNumber - The issue number. 
-# + return      - True if the issue exist, false if else.
-function checkIssue(string issueNumber) returns boolean | error {
+# + issueNumber - Issue number related to the issue. 
+# + return      - Returns a **boolean** which indicates whether the issue exists or not, 
+#                 returns an **error** if the github response is not in the expected form.
+function isValidIssue(string issueNumber) returns boolean | error {
 
     string url = "/repos/" + ORGANIZATION_NAME + "/" + REPOSITORY_NAME + "/issues/" + issueNumber;
 
