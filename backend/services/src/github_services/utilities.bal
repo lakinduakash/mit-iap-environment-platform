@@ -273,11 +273,3 @@ public function getLabelNames(json | error labels) returns string[] | error {
         return labelArray;
     }
 }
-<<<<<<< HEAD
-=======
-
-
-
-
-
->>>>>>> 654d4c2c345bc53f128d3ea6e124d2fbfa8fcf6f
