@@ -53,7 +53,7 @@ public function checkLabels(string labelName) returns @untainted string[] {
 # The `toStringArray` function will convert a json array into string array.
 # 
 # + inputArray - Json array.
-# + return - Returns the converted json array as a string array.
+# + return     - Returns the converted json array as a string array.
 public function toStringArray(json[] inputArray) returns string[] {
 
     string[] outputArray = [];
@@ -234,6 +234,9 @@ function createFormattedCollaborators(json[] collaborators) returns json | error
     return formattedCollaborators;
 }
 
+# Retrieve all the labels for a specific repository using github API services.
+#
+# + return - All the labels related to specific repository.
 public function getAllLabels() returns json | error {
 
     string url = "/repos/" + ORGANIZATION_NAME + "/" + REPOSITORY_NAME + "/labels";
@@ -254,6 +257,10 @@ public function getAllLabels() returns json | error {
     }
 }
 
+# Extract the names of the labels.
+#
+# + labels - Intial set of labels containing varous attributes. 
+# + return - Formatted set of label names in the format of string[].
 public function getLabelNames(json | error labels) returns string[] | error {
 
     string[] labelNames = [];
