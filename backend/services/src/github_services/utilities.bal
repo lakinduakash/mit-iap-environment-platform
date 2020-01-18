@@ -279,10 +279,3 @@ public function getLabelNames(json | error labels) returns string[] | error {
     }
 
 }
-
-
-
-
-
-
-
