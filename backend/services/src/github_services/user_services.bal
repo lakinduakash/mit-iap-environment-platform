@@ -4,7 +4,7 @@ import ballerina/log;
 
 http:Client githubAPIEndpoint = new (GITHUB_API_URL);
 
-listener http:Listener endPoint = new (PORT);
+listener http:Listener endPoint = new (USER_SERVICES_PORT);
 
 @http:ServiceConfig {
     basePath: BASEPATH,
@@ -230,22 +230,38 @@ service userService on endPoint {
 
         var receivedRequestPayload = request.getJsonPayload();
         if (receivedRequestPayload is json) {
+            json | error payloadTitle = receivedRequestPayload.title;
             json | error payloadBody = receivedRequestPayload.body;
-            if (payloadBody is json) {
+            if (payloadTitle is json && payloadBody is json) {
                 string stringPayloadBody = payloadBody.toJsonString();
+                callBackRequest.setPayload(<@untained> ({"title": payloadTitle, "body": stringPayloadBody}));
                 http:Response | error githubResponse = githubAPIEndpoint->post(url, callBackRequest);
                 if (githubResponse is http:Response && githubResponse.statusCode == 201) {
-                    string[] status = createLabel(<@untained>userName, "Name of the user.");
-                    int | error statusCode = ints:fromString(status[0]);
-                    if (statusCode is int && statusCode == 201) {
-                        // Store issue id using gihubResponse.
-                        // Assign the label here.
-                        response.statusCode = statusCode;
-                        response.setPayload(status[1]);
+                    string[] createLabelResult = createLabel(<@untained>userName, "Name of the user.");
+                    int | error createLabelResultCode = ints:fromString(createLabelResult[0]);
+                    if (createLabelResultCode is int && createLabelResultCode == 201) {
+                        json | error githubResponsePayload = githubResponse.getJsonPayload();
+                        if (githubResponsePayload is json) {
+                            string issueNumber = githubResponsePayload.number.toString();
+                            string[] assignLabelResult = assignLabel(<@untained>  issueNumber, [userName]);
+                            int | error assignLabelResultCode = ints:fromString(assignLabelResult[0]);
+                            if (assignLabelResultCode is int && assignLabelResultCode == 200) {
+                                response.statusCode = 201;
+                                response.setPayload(assignLabelResult[1]);
+                            } else {
+                                log:printError("Either the status code for assigning label is not a integer or it is invalid");
+                                response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
+                                response.setPayload("Error in the status code for assigning label.");
+                            }
+                        } else {
+                            log:printError("Error while extracting the json payload from the github response");
+                            response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
+                            response.setPayload(<@untained>githubResponsePayload.reason());
+                        }
                     } else {
-                        log:printError("Either the status code is not a integer or the status code is invalid");
+                        log:printError("Either the status code for creating label is not a integer or it is invalid");
                         response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
-                        response.setPayload("Error while obtaining the status from the response.");
+                        response.setPayload("Error in the status code for creating label.");
                     }
                 } else {
                     log:printError("Error while obtaining the response from github api services.");
@@ -253,14 +269,62 @@ service userService on endPoint {
                     response.setPayload("Error while obtaining the response from github api services.");
                 }
             } else {
-                log:printInfo("Error while obtaining the json payload body from the request sent.");
+                log:printInfo("Error while obtaining the json payload body/title from the request received.");
                 response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
-                response.setPayload("Error while obtaining the json payload body from the request sent.");
+                response.setPayload("Error while obtaining the json payload body/title from the request received.");
             }
         } else {
-            log:printInfo("Error while obtaining the json payload from the request sent.");
+            log:printInfo("Error while obtaining the json payload from the request received.");
             response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
-            response.setPayload("Error while obtaining the json payload from the request sent.");
+            response.setPayload("Error while obtaining the json payload from the request received.");
+        }
+
+        error? respond = caller->respond(response);
+    }
+
+    @http:ResourceConfig {
+        methods: ["PATCH"],
+        path: "/edit-request/{issueNumber}"
+    }
+    resource function editRequest(http:Caller caller, http:Request request, string issueNumber) {
+
+        http:Response response = new;
+        http:Request callBackRequest = new;
+        callBackRequest.addHeader("Authorization", ACCESS_TOKEN);
+        string url = "/repos/" + ORGANIZATION_NAME + "/" + REPOSITORY_NAME + "/issues/" +issueNumber;
+
+        var receivedRequestPayload = request.getJsonPayload();
+        if (receivedRequestPayload is json) {
+            json | error payloadTitle = receivedRequestPayload.title;
+            json | error payloadBody = receivedRequestPayload.body;
+            json | error payloadState = receivedRequestPayload.state;
+            if (payloadTitle is json && payloadBody is json && payloadState is json) {
+                string stringPayloadBody = payloadBody.toJsonString();
+                callBackRequest.setPayload(<@untained> ({"title": payloadTitle, "body": stringPayloadBody, "state": payloadState}));
+                http:Response | error githubResponse = githubAPIEndpoint->patch(<@untained>url, callBackRequest);
+                if (githubResponse is http:Response) {
+                    if (githubResponse.statusCode == 200) {
+                        response.statusCode = http:STATUS_OK;
+                        response.setPayload(<@untained>("Updated issue number: " + issueNumber));
+                    } else {
+                        log:printError("Github response status code was not 200 OK.");
+                        response.statusCode = githubResponse.statusCode;
+                        response.setPayload("Issue was not updated succesfully. Please check the issue number");
+                    }
+                } else {
+                    log:printError("Error while obtaining the response from github api services.");
+                    response.statusCode = http:STATUS_NOT_ACCEPTABLE;
+                    response.setPayload(githubResponse.reason());
+                }
+            } else {
+                log:printInfo("Error while obtaining the json payload body/title from the request received.");
+                response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
+                response.setPayload("Error while obtaining the json payload body/title from the request received.");
+            }
+        } else {
+            log:printInfo("Error while obtaining the json payload from the request received.");
+            response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
+            response.setPayload("Error while obtaining the json payload from the request received.");
         }
 
         error? respond = caller->respond(response);
