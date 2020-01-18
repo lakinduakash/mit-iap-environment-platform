@@ -1,5 +1,4 @@
 import ballerina/http;
-import ballerina/io;
 import ballerina/lang.'int as ints;
 import ballerina/log;
 
@@ -151,11 +150,34 @@ service userService on endPoint {
         if (jsonPayload is json) {
             json | error labels = jsonPayload.labelNames;
             if labels is json {
-                string[] lane = <string[]>labels;
-                io:println(lane[0].toString());
+                json[] | error labelArray = trap <json[]>labels;
+                if (labelArray is json[]) {
+                    string[] status = assignLabel(<@untainted>issueNumber,<@untainted > toStringArray(labelArray));
+                    int | error statusCode = ints:fromString(status[0]);
+                    if (statusCode is int) {
+                        response.statusCode = statusCode;
+                        response.setPayload(status[1]);
+                    } else {
+                        log:printError("Integer conversion error as the retrived status code from the github is invalid. Check createLabel function");
+                        response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
+                        response.setPayload("Internal server error occured.");
+                    }
+                } else {
+                    log:printError("Invalid json payload received from the response.");
+                    response.statusCode = http:STATUS_NOT_ACCEPTABLE;
+                    response.setPayload("Not acceptable payload");
+                }
+            } else {
+                log:printError("Invalid json payload received from the response.");
+                response.statusCode = http:STATUS_NOT_ACCEPTABLE;
+                response.setPayload("Not acceptable payload");
             }
+        } else {
+            log:printError("Invalid payload type received from the response.");
+            response.statusCode = http:STATUS_NOT_ACCEPTABLE;
+            response.setPayload("Not acceptable payload type");
         }
-
+        error? respond = caller->respond(response);
     }
 
     @http:ResourceConfig {

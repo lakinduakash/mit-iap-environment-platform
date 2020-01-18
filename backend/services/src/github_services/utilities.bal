@@ -1,4 +1,5 @@
 import ballerina/http;
+import ballerina/io;
 import ballerina/lang.'int as ints;
 import ballerina/stringutils;
 
@@ -9,7 +10,7 @@ import ballerina/stringutils;
 # + return      - Returns a **string[]** which includes the status code and the message.
 public function assignLabel(string issueNumber, string[] labels) returns string[] {
 
-    string url = "repos/" + ORGANIZATION_NAME + "/" + REPOSITORY_NAME + "/issues/" + issueNumber + "/labels";
+    string url = "/repos/" + ORGANIZATION_NAME + "/" + REPOSITORY_NAME + "/issues/" + issueNumber + "/labels";
 
     http:Request request = new;
     request.addHeader("Authorization", ACCESS_TOKEN);
@@ -17,8 +18,10 @@ public function assignLabel(string issueNumber, string[] labels) returns string[
     http:Response | error response = githubAPIEndpoint->post(url, request);
 
     if (response is http:Response) {
+        io:println(response.getJsonPayload());
         return getStatus(response);
     } else {
+        io:println(response.reason());
         return getNotFoundStatus();
     }
 }
@@ -42,11 +45,29 @@ public function checkLabel(string labelName) returns @untainted string[] {
     }
 }
 
+
+public function checkLabels(string labelName) returns @untainted string[] {
+    return [];
+}
+
+# The `toStringArray` function will convert a json array into string array.
+# 
+# + inputArray - Json array.
+# + return - Returns the converted json array as a string array.
+public function toStringArray(json[] inputArray) returns string[] {
+
+    string[] outputArray = [];
+    foreach var item in inputArray {
+        outputArray[outputArray.length()] = item.toString();
+    }
+    return outputArray;
+}
+
 # The `createLabel` function will create a label in a specified git repository.
-#
+# 
 # + labelName        - Name of the label.
 # + labelDescription - Description of the label.
-# + return           - Returns a **string[]** which indicates the status.
+# + return           - Returns a **json** which indicates the status.
 public function createLabel(string labelName, string labelDescription) returns string[] {
 
     json requestPayLoad = {
@@ -211,4 +232,44 @@ function createFormattedCollaborators(json[] collaborators) returns json | error
         formattedCollaborators[formattedCollaborators.length()] = {"id":check collaboratorValue.id, "name":check collaboratorValue.login, "url":check collaboratorValue.url};
     }
     return formattedCollaborators;
+}
+
+public function getAllLabels() returns json | error {
+
+    string url = "/repos/" + ORGANIZATION_NAME + "/" + REPOSITORY_NAME + "/labels";
+
+    http:Request request = new;
+    request.addHeader("Authorization", ACCESS_TOKEN);
+    http:Response | error response = githubAPIEndpoint->get(url, request);
+
+    if (response is http:Response) {
+        var jsonPayload = response.getJsonPayload();
+        if (jsonPayload is json) {
+            return <@untainted>jsonPayload;
+        } else {
+            return error("Error of the jsonPayload.");
+        }
+    } else {
+        return error("Error while retreving labels from the github.");
+    }
+}
+
+public function getLabelNames(json | error labels) returns string[] | error {
+
+    string[] labelNames = [];
+    json[] | error labelArray = trap <json[]>labels;
+    if (labelArray is json[]) {
+        foreach json item in labelArray {
+            map<json> | error labelInfo = trap <map<json>>item;
+            if (labelInfo is map<json>) {
+                string labelName = labelInfo.name.toString();
+                labelNames[labelNames.length()] = labelName;
+            } else {
+                return labelInfo;
+            }
+        }
+        return labelNames;
+    } else {
+        return labelArray;
+    }
 }
