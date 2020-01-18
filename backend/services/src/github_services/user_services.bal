@@ -276,6 +276,7 @@ service userService on endPoint {
         http:Response response = new;
         string url = "/repos/" + ORGANIZATION_NAME + "/" + REPOSITORY_NAME + "/collaborators";
 
+        // Please change the scope of the access token to make the function work
         callBackRequest.addHeader("Authorization", ACCESS_TOKEN);
         http:Response | error githubResponse = githubAPIEndpoint->get(<@untained>url, callBackRequest);
 
