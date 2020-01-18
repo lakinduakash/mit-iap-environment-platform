@@ -300,3 +300,61 @@ public function isCollaborator(string collaboratorName) returns boolean | error 
         return error("The github response is not in the expected form: http:Response.");
     }
 }
+
+# Rebuild a formatted set of assignees using the retrieved data from github API services.
+#
+# + assignees - Assignees retrieved from github API services.  
+# + return    - Formatted set of assignees in json format, error if the set of assignees cannot be rebuilt.
+function createFormattedAssignees(json[] assignees) returns json | error {
+
+    json[] assigneeDetails = [];
+    foreach json assignee in assignees {
+        map<json> assigneeVal = <map<json>>assignee;
+        assigneeDetails[assigneeDetails.length()] = {"id":check assigneeVal.id, "userName":check assigneeVal.login, "url":check assigneeVal.url};
+    }
+    return assigneeDetails;
+}
+
+# Check if the assignees 
+#
+# + userNames - Names of the assignees. 
+# + return    - True if the assignees exist, false if else.
+function checkAssignees(json[] userNames) returns boolean | error {
+
+    foreach json userName in userNames {
+        string url = "/repos/" + ORGANIZATION_NAME + "/" + REPOSITORY_NAME + "/assignees/" + userName.toString();
+
+        http:Request request = new;
+        request.addHeader("Authorization", ACCESS_TOKEN);
+        http:Response | error githubResponse = githubAPIEndpoint->get(url, request);
+
+        if (githubResponse is http:Response) {
+            if (githubResponse.statusCode != 204) {
+                return false;
+            }
+        } else {
+            return error("The github response is not in the expected form: http:Response.");
+        }
+    }
+
+    return true;
+}
+
+# Check whether an issue with the given issueNumber exists.
+#
+# + issueNumber - The issue number. 
+# + return      - True if the issue exist, false if else.
+function checkIssue(string issueNumber) returns boolean | error {
+
+    string url = "/repos/" + ORGANIZATION_NAME + "/" + REPOSITORY_NAME + "/issues/" + issueNumber;
+
+    http:Request request = new;
+    request.addHeader("Authorization", ACCESS_TOKEN);
+    http:Response | error githubResponse = githubAPIEndpoint->get(url, request);
+
+    if (githubResponse is http:Response) {
+        return githubResponse.statusCode == 200 ? true : false;
+    } else {
+        return error("The github response is not in the expected form: http:Response.");
+    }
+}

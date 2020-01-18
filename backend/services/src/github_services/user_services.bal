@@ -453,4 +453,109 @@ service userService on endPoint {
 
         error? respond = caller->respond(response);
     }
+
+    @http:ResourceConfig {
+        methods: ["GET"],
+        path: "/get-all-assignees"
+    }
+    resource function getAllAssignees(http:Caller caller, http:Request request) {
+
+        http:Request callBackRequest = new;
+        http:Response response = new;
+        string url = "/repos/" + ORGANIZATION_NAME + "/" + REPOSITORY_NAME + "/assignees";
+
+        // Please change the scope of the access token to make the function work
+        callBackRequest.addHeader("Authorization", ACCESS_TOKEN);
+        http:Response | error githubResponse = githubAPIEndpoint->get(<@untained>url, callBackRequest);
+
+        if (githubResponse is http:Response) {
+            var jsonPayload = githubResponse.getJsonPayload();
+            if (jsonPayload is json[]) {
+                json | error assigneeDetails = createFormattedAssignees(jsonPayload);
+                if (assigneeDetails is json) {
+                    response.statusCode = http:STATUS_OK;
+                    response.setPayload(<@untained>assigneeDetails);
+                } else {
+                    log:printInfo("Error occured during the process of rebuiliding the list of assignees");
+                    response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
+                    response.setPayload(<@untained>assigneeDetails.reason());
+                }
+            } else {
+                log:printInfo("Invalid json payload received from the response obtained from github.");
+                response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
+                response.setPayload("Invalid json payload received from github response.");
+            }
+        } else {
+            log:printInfo("The github response is not in the expected form: http:Response.");
+            response.statusCode = http:STATUS_NOT_ACCEPTABLE;
+            response.setPayload(<@untained>githubResponse.reason());
+        }
+
+        error? respond = caller->respond(response);
+    }
+
+    @http:ResourceConfig {
+        methods: ["POST"],
+        path: "/add-assignees/{issueNumber}"
+    }
+    resource function addAssigneesToIssue(http:Caller caller, http:Request request, string issueNumber) {
+
+        http:Request callBackRequest = new;
+        http:Response response = new;
+        string url = "/repos/" + ORGANIZATION_NAME + "/" + REPOSITORY_NAME + "/issues/" + issueNumber + "/assignees";
+
+        // Please change the scope of the access token to make the function work
+        callBackRequest.addHeader("Authorization", ACCESS_TOKEN);
+
+        boolean | error isValidIssue = checkIssue(<@untained>issueNumber);
+        if (isValidIssue is boolean) {
+            if (isValidIssue) {
+                var receivedRequestPayload = request.getJsonPayload();
+                if (receivedRequestPayload is json) {
+                    json | error payloadContent = receivedRequestPayload.assignees;
+                    if (payloadContent is json) {
+                        boolean | error validOperation = checkAssignees(<@untained><json[]>payloadContent);
+                        if (validOperation is boolean) {
+                            if (validOperation) {
+                                callBackRequest.setPayload(<@untained>receivedRequestPayload);
+                                http:Response | error githubResponse = githubAPIEndpoint->post(<@untained>url, callBackRequest);
+                                if (githubResponse is http:Response) {
+                                    if (githubResponse.statusCode == 201) {
+                                        response.statusCode = githubResponse.statusCode;
+                                        response.setPayload("Assignees added successfully.");
+                                    } else {
+                                        response.statusCode = githubResponse.statusCode;
+                                        response.setPayload("Assignees was not added successfully.");
+                                    }
+                                } else {
+                                    response.statusCode = http:STATUS_NOT_ACCEPTABLE;
+                                    response.setPayload(githubResponse.reason());
+                                }
+                            } else {
+                                response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
+                                response.setPayload("One or more of the assignees passed cannot be assigned");
+                            }
+                        } else {
+                            response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
+                            response.setPayload(validOperation.reason());
+                        }
+                    } else {
+                        response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
+                        response.setPayload("Invalid payload content extracted.");
+                    }
+                } else {
+                    response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
+                    response.setPayload("Invalid json payload extracted.");
+                }
+            } else {
+                response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
+                response.setPayload("Issue with the given issue number does not exist.");
+            }
+        } else {
+            response.statusCode = http:STATUS_NOT_ACCEPTABLE;
+            response.setPayload("Error occurred while checking the validity of the issue");
+        } 
+
+        error? respond = caller->respond(response);
+    }
 }
