@@ -525,7 +525,7 @@ service userService on endPoint {
                                         response.setPayload("Assignees added successfully.");
                                     } else {
                                         response.statusCode = githubResponse.statusCode;
-                                        response.setPayload("Assignees was not added successfully.");
+                                        response.setPayload("Assignees were not added successfully.");
                                     }
                                 } else {
                                     response.statusCode = http:STATUS_NOT_ACCEPTABLE;
@@ -534,6 +534,71 @@ service userService on endPoint {
                             } else {
                                 response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
                                 response.setPayload("One or more of the assignees passed cannot be assigned");
+                            }
+                        } else {
+                            response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
+                            response.setPayload(validOperation.reason());
+                        }
+                    } else {
+                        response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
+                        response.setPayload("Invalid payload content extracted.");
+                    }
+                } else {
+                    response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
+                    response.setPayload("Invalid json payload extracted.");
+                }
+            } else {
+                response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
+                response.setPayload("Issue with the given issue number does not exist.");
+            }
+        } else {
+            response.statusCode = http:STATUS_NOT_ACCEPTABLE;
+            response.setPayload("Error occurred while checking the validity of the issue");
+        } 
+
+        error? respond = caller->respond(response);
+    }
+
+    @http:ResourceConfig {
+        methods: ["DELETE"],
+        path: "/remove-assignees/{issueNumber}"
+    }
+    resource function removeAssigneesFromIssue(http:Caller caller, http:Request request, string issueNumber) {
+
+        http:Request callBackRequest = new;
+        http:Response response = new;
+        string url = "/repos/" + ORGANIZATION_NAME + "/" + REPOSITORY_NAME + "/issues/" + issueNumber + "/assignees";
+
+        // Please change the scope of the access token to make the function work
+        callBackRequest.addHeader("Authorization", ACCESS_TOKEN);
+
+        boolean | error isValidIssue = checkIssue(<@untained>issueNumber);
+        if (isValidIssue is boolean) {
+            if (isValidIssue) {
+                var receivedRequestPayload = request.getJsonPayload();
+                if (receivedRequestPayload is json) {
+                    json | error payloadContent = receivedRequestPayload.assignees;
+                    if (payloadContent is json) {
+                        boolean | error validOperation = checkAssignees(<@untained><json[]>payloadContent);
+                        if (validOperation is boolean) {
+                            if (validOperation) {
+                                callBackRequest.setPayload(<@untained>receivedRequestPayload);
+                                http:Response | error githubResponse = githubAPIEndpoint->delete(<@untained>url, callBackRequest);
+                                if (githubResponse is http:Response) {
+                                    if (githubResponse.statusCode == 200) {
+                                        response.statusCode = githubResponse.statusCode;
+                                        response.setPayload("Assignees removed successfully.");
+                                    } else {
+                                        response.statusCode = githubResponse.statusCode;
+                                        response.setPayload("Assignees were not removed successfully.");
+                                    }
+                                } else {
+                                    response.statusCode = http:STATUS_NOT_ACCEPTABLE;
+                                    response.setPayload(githubResponse.reason());
+                                }
+                            } else {
+                                response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
+                                response.setPayload("One or more of the assignees passed cannot be unassigned");
                             }
                         } else {
                             response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
