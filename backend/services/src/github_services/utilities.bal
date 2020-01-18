@@ -53,7 +53,6 @@ public function checkLabels(string labelName) returns @untainted string[] {
 # The `toStringArray` function will convert a json array into string array.
 # 
 # + inputArray - Json array.
-# 
 # + return - Returns the converted json array as a string array.
 public function toStringArray(json[] inputArray) returns string[] {
 
@@ -68,7 +67,6 @@ public function toStringArray(json[] inputArray) returns string[] {
 # 
 # + labelName - The creating label name.
 # + labelDescription - The description of the label
-# 
 # + return - The `createLabel` function will return **json** to indicate the status.
 public function createLabel(string labelName, string labelDescription) returns string[] {
 
@@ -236,8 +234,6 @@ function createFormattedCollaborators(json[] collaborators) returns json | error
     return formattedCollaborators;
 }
 
-
-
 public function getAllLabels() returns json | error {
 
     string url = "/repos/" + ORGANIZATION_NAME + "/" + REPOSITORY_NAME + "/labels";
@@ -258,7 +254,6 @@ public function getAllLabels() returns json | error {
     }
 }
 
-
 public function getLabelNames(json | error labels) returns string[] | error {
 
     string[] labelNames = [];
@@ -277,5 +272,4 @@ public function getLabelNames(json | error labels) returns string[] | error {
     } else {
         return labelArray;
     }
-
 }
