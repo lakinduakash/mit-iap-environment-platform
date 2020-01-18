@@ -369,4 +369,88 @@ service userService on endPoint {
 
         error? respond = caller->respond(response);
     }
+
+    @http:ResourceConfig {
+        methods: ["PUT"],
+        path: "/add-collaborator/{userName}"
+    }
+    resource function addCollaborator(http:Caller caller, http:Request request, string userName) {
+
+        http:Request callBackRequest = new;
+        http:Response response = new;
+        string url = "/repos/" + ORGANIZATION_NAME + "/" + REPOSITORY_NAME + "/collaborators/" + userName;
+        callBackRequest.addHeader("Authorization", ACCESS_TOKEN);
+
+        boolean | error isACollaborator = isCollaborator(<@untained>userName);
+        if (isACollaborator is boolean) {
+            if (!isACollaborator) {
+                http:Response | error githubResponse = githubAPIEndpoint->get(<@untained>url, callBackRequest);
+                if (githubResponse is http:Response) {
+                    if (githubResponse.statusCode == 201) {
+                        response.statusCode = githubResponse.statusCode;
+                        response.setPayload("Collaborator added successfully.");
+                    } else {
+                        response.statusCode = githubResponse.statusCode;
+                        response.setPayload("Collaborator was not added successfully.");
+                    }
+                } else {
+                    log:printInfo("The github response is not in the expected form: http:Response.");
+                    response.statusCode = http:STATUS_NOT_ACCEPTABLE;
+                    response.setPayload(githubResponse.reason());
+                }
+            } else {
+                log:printInfo("The user is already a collaborator in the repository");
+                response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
+                response.setPayload("The user is already a collaborator");
+            }
+        } else {
+            log:printInfo("Error occurred while checking whether the collaborator already exists");
+            response.statusCode = http:STATUS_NOT_ACCEPTABLE;
+            response.setPayload(isACollaborator.reason());
+        }
+
+        error? respond = caller->respond(response);
+    }
+
+    @http:ResourceConfig {
+        methods: ["DELETE"],
+        path: "/remove-collaborator/{userName}"
+    }
+    resource function removeCollaborator(http:Caller caller, http:Request request, string userName) {
+
+        http:Request callBackRequest = new;
+        http:Response response = new;
+        string url = "/repos/" + ORGANIZATION_NAME + "/" + REPOSITORY_NAME + "/collaborators/" + userName;
+        callBackRequest.addHeader("Authorization", ACCESS_TOKEN);
+
+        boolean | error isACollaborator = isCollaborator(<@untained>userName);
+        if (isACollaborator is boolean) {
+            if (isACollaborator) {
+                http:Response | error githubResponse = githubAPIEndpoint->get(<@untained>url, callBackRequest);
+                if (githubResponse is http:Response) {
+                    if (githubResponse.statusCode == 204) {
+                        response.statusCode = githubResponse.statusCode;
+                        response.setPayload("Collaborator wad removed successfully.");
+                    } else {
+                        response.statusCode = githubResponse.statusCode;
+                        response.setPayload("Collaborator was not removed successfully.");
+                    }
+                } else {
+                    log:printInfo("The github response is not in the expected form: http:Response.");
+                    response.statusCode = http:STATUS_NOT_ACCEPTABLE;
+                    response.setPayload(githubResponse.reason());
+                }
+            } else {
+                log:printInfo("The user is not a collaborator in the repository");
+                response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
+                response.setPayload("The user is not a collaborator");
+            }
+        } else {
+            log:printInfo("Error occurred while checking whether the collaborator already exists");
+            response.statusCode = http:STATUS_NOT_ACCEPTABLE;
+            response.setPayload(isACollaborator.reason());
+        }
+
+        error? respond = caller->respond(response);
+    }
 }

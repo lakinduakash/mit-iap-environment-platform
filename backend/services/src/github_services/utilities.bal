@@ -280,3 +280,23 @@ public function getLabelNames(json | error labels) returns string[] | error {
         return labelArray;
     }
 }
+
+
+# Check whether a user is a collaborator or not.
+#
+# + collaboratorName - Username of the collaborator. 
+# + return           - True if the collaborator exist, false if else.
+public function isCollaborator(string collaboratorName) returns boolean | error {
+
+    string url = "/repos/" + ORGANIZATION_NAME + "/" + REPOSITORY_NAME + "/collaborators/" + collaboratorName;
+
+    http:Request request = new;
+    request.addHeader("Authorization", ACCESS_TOKEN);
+    http:Response | error githubResponse = githubAPIEndpoint->get(url, request);
+
+    if (githubResponse is http:Response) {
+        return githubResponse.statusCode == 204 ? true : false;
+    } else {
+        return error("The github response is not in the expected form: http:Response.");
+    }
+}
