@@ -67,7 +67,7 @@ public function toStringArray(json[] inputArray) returns string[] {
 # 
 # + labelName        - Name of the label.
 # + labelDescription - Description of the label.
-# + return - The `createLabel` function will return **json** to indicate the status.
+# + return           - Returns a **json** which indicates the status.
 public function createLabel(string labelName, string labelDescription) returns string[] {
 
     json requestPayLoad = {
