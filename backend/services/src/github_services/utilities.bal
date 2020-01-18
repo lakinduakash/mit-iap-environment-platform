@@ -66,7 +66,7 @@ public function toStringArray(json[] inputArray) returns string[] {
 
 # The `createLabel` function will create a label in a specified git repository.
 # 
-# + labelName - The creating label name.
+# + labelName        - Name of the label.
 # + labelDescription - The description of the label
 # 
 # + return - The `createLabel` function will return **json** to indicate the status.
@@ -279,7 +279,6 @@ public function getLabelNames(json | error labels) returns string[] | error {
     }
 
 }
-
 
 
 
