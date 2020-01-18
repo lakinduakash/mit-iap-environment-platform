@@ -2,7 +2,7 @@
 const string GITHUB_API_URL = "https://api.github.com";
 const string ORGANIZATION_NAME = "yashodgayashan";
 const string REPOSITORY_NAME = "ballerina-github-connector";
-const string ACCESS_TOKEN = "Bearer 61d98df051c935ec6c59b6560c7753cec1c6ebdd";
+const string ACCESS_TOKEN = "Bearer <token>";
 
 // Listner configurations.
 const int ADMIN_SERVICES_PORT = 9070;
