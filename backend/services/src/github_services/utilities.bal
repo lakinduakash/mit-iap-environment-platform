@@ -235,3 +235,54 @@ function createFormattedCollaborators(json[] collaborators) returns json | error
     }
     return formattedCollaborators;
 }
+
+
+
+public function getAllLabels() returns json | error {
+
+    string url = "/repos/" + ORGANIZATION_NAME + "/" + REPOSITORY_NAME + "/labels";
+
+    http:Request request = new;
+    request.addHeader("Authorization", ACCESS_TOKEN);
+    http:Response | error response = githubAPIEndpoint->get(url, request);
+
+    if (response is http:Response) {
+        var jsonPayload = response.getJsonPayload();
+        if (jsonPayload is json) {
+            return <@untainted>jsonPayload;
+        } else {
+            return error("Error of the jsonPayload.");
+        }
+    } else {
+        return error("Error while retreving labels from the github.");
+    }
+}
+
+
+public function getLabelNames(json | error labels) returns string[] | error {
+
+    string[] labelNames = [];
+    json[] | error labelArray = trap <json[]>labels;
+    if (labelArray is json[]) {
+        foreach json item in labelArray {
+            map<json> | error labelInfo = trap <map<json>>item;
+            if (labelInfo is map<json>) {
+                string labelName = labelInfo.name.toString();
+                labelNames[labelNames.length()] = labelName;
+            } else {
+                return labelInfo;
+            }
+        }
+        return labelNames;
+    } else {
+        return labelArray;
+    }
+
+}
+
+
+
+
+
+
+
