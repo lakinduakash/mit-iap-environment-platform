@@ -624,8 +624,6 @@ service userService on endPoint {
         error? respond = caller->respond(response);
     }
 
-    
-
     @http:ResourceConfig {
         methods: ["POST"],
         path: "admin/post-comment/{issueNumber}"
@@ -675,6 +673,60 @@ service userService on endPoint {
         } else {
             response.statusCode = http:STATUS_NOT_ACCEPTABLE;
             response.setPayload("Error occurred while checking the validity of the issue");
+        } 
+
+        error? respond = caller->respond(response);
+    }
+
+    @http:ResourceConfig {
+        methods: ["PATCH"],
+        path: "admin/edit-comment/{commentId}"
+    }
+    resource function editCommentOnIssue(http:Caller caller, http:Request request, string commentId) {
+
+        http:Request callBackRequest = new;
+        http:Response response = new;
+        string url = "/repos/" + ORGANIZATION_NAME + "/" + REPOSITORY_NAME + "/issues/comments/" + commentId;
+
+        // Please change the scope of the access token to make the function work
+        callBackRequest.addHeader("Authorization", ACCESS_TOKEN);
+
+        boolean | error validComment = isValidComment(<@untained>commentId);
+        if (validComment is boolean) {
+            if (validComment) {
+                var receivedRequestPayload = request.getJsonPayload();
+                if (receivedRequestPayload is json) {
+                    json | error payloadContent = receivedRequestPayload.body;
+                    if (payloadContent is json) {
+                        callBackRequest.setPayload(<@untained>receivedRequestPayload);
+                        http:Response | error githubResponse = githubAPIEndpoint->patch(<@untained>url, callBackRequest);
+                        if (githubResponse is http:Response) {
+                            if (githubResponse.statusCode == 200) {
+                                response.statusCode = githubResponse.statusCode;
+                                response.setPayload("Comment updated successfully.");
+                            } else {
+                                response.statusCode = githubResponse.statusCode;
+                                response.setPayload("Comment was not updated successfully.");
+                            }
+                        } else {
+                            response.statusCode = http:STATUS_NOT_ACCEPTABLE;
+                            response.setPayload(githubResponse.reason());
+                        }
+                    } else {
+                        response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
+                        response.setPayload("Invalid payload content extracted.");
+                    }
+                } else {
+                    response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
+                    response.setPayload("Invalid json payload extracted.");
+                }
+            } else {
+                response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
+                response.setPayload("Comment with the given comment id does not exist.");
+            }
+        } else {
+            response.statusCode = http:STATUS_NOT_ACCEPTABLE;
+            response.setPayload("Error occurred while checking the validity of the comment");
         } 
 
         error? respond = caller->respond(response);

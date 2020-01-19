@@ -386,3 +386,23 @@ function isValidIssue(string issueNumber) returns boolean | error {
         return error("The github response is not in the expected form: http:Response.");
     }
 }
+
+# The `isValidComment` function checks whether a comment with the provided comment id exists.
+#
+# + commentId - Comment Id related to the comment. 
+# + return    - Returns a **boolean** which indicates whether the comment exists or not, 
+#               returns an **error** if the github response is not in the expected form.
+function isValidComment(string commentId) returns boolean | error {
+
+    string url = "/repos/" + ORGANIZATION_NAME + "/" + REPOSITORY_NAME + "/issues/comments/" + commentId;
+
+    http:Request request = new;
+    request.addHeader("Authorization", ACCESS_TOKEN);
+    http:Response | error githubResponse = githubAPIEndpoint->get(url, request);
+
+    if (githubResponse is http:Response) {
+        return githubResponse.statusCode == 200 ? true : false;
+    } else {
+        return error("The github response is not in the expected form: http:Response.");
+    }
+}
