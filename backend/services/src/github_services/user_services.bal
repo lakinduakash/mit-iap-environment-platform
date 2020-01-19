@@ -623,4 +623,60 @@ service userService on endPoint {
 
         error? respond = caller->respond(response);
     }
+
+    
+
+    @http:ResourceConfig {
+        methods: ["POST"],
+        path: "admin/post-comment/{issueNumber}"
+    }
+    resource function postCommentOnIssue(http:Caller caller, http:Request request, string issueNumber) {
+
+        http:Request callBackRequest = new;
+        http:Response response = new;
+        string url = "/repos/" + ORGANIZATION_NAME + "/" + REPOSITORY_NAME + "/issues/" + issueNumber + "/comments";
+
+        // Please change the scope of the access token to make the function work
+        callBackRequest.addHeader("Authorization", ACCESS_TOKEN);
+
+        boolean | error validIssue = isValidIssue(<@untained>issueNumber);
+        if (validIssue is boolean) {
+            if (validIssue) {
+                var receivedRequestPayload = request.getJsonPayload();
+                if (receivedRequestPayload is json) {
+                    json | error payloadContent = receivedRequestPayload.body;
+                    if (payloadContent is json) {
+                        callBackRequest.setPayload(<@untained>receivedRequestPayload);
+                        http:Response | error githubResponse = githubAPIEndpoint->post(<@untained>url, callBackRequest);
+                        if (githubResponse is http:Response) {
+                            if (githubResponse.statusCode == 201) {
+                                response.statusCode = githubResponse.statusCode;
+                                response.setPayload("Comment added successfully.");
+                            } else {
+                                response.statusCode = githubResponse.statusCode;
+                                response.setPayload("Comment was not added successfully.");
+                            }
+                        } else {
+                            response.statusCode = http:STATUS_NOT_ACCEPTABLE;
+                            response.setPayload(githubResponse.reason());
+                        }
+                    } else {
+                        response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
+                        response.setPayload("Invalid payload content extracted.");
+                    }
+                } else {
+                    response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
+                    response.setPayload("Invalid json payload extracted.");
+                }
+            } else {
+                response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
+                response.setPayload("Issue with the given issue number does not exist.");
+            }
+        } else {
+            response.statusCode = http:STATUS_NOT_ACCEPTABLE;
+            response.setPayload("Error occurred while checking the validity of the issue");
+        } 
+
+        error? respond = caller->respond(response);
+    }
 }
