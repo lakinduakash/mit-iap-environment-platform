@@ -388,7 +388,7 @@ service userService on endPoint {
                 if (githubResponse is http:Response) {
                     if (githubResponse.statusCode == 201) {
                         response.statusCode = githubResponse.statusCode;
-                        response.setPayload("Collaborator was added successfully.");
+                        response.setPayload("Collaborator added successfully.");
                     } else {
                         response.statusCode = githubResponse.statusCode;
                         response.setPayload("Collaborator was not added successfully.");
@@ -430,7 +430,7 @@ service userService on endPoint {
                 if (githubResponse is http:Response) {
                     if (githubResponse.statusCode == 204) {
                         response.statusCode = githubResponse.statusCode;
-                        response.setPayload("Collaborator was removed successfully.");
+                        response.setPayload("Collaborator removed successfully.");
                     } else {
                         response.statusCode = githubResponse.statusCode;
                         response.setPayload("Collaborator was not removed successfully.");
@@ -788,20 +788,25 @@ service userService on endPoint {
                         response.statusCode = githubResponse.statusCode;
                         response.setPayload("Comment deleted successfully.");
                     } else {
+                        log:printInfo("The github response status was: " + githubResponse.statusCode.toString() 
+                        + " instead of 204");
                         response.statusCode = githubResponse.statusCode;
                         response.setPayload("Comment was not deleted successfully.");
                     }
                 } else {
+                    log:printInfo("The github response is not in the expected form: http:Response.");
                     response.statusCode = http:STATUS_NOT_ACCEPTABLE;
                     response.setPayload(githubResponse.reason());
                 }
             } else {
+                log:printInfo("Comment with the given comment id does not exist.");
                 response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
                 response.setPayload("Comment with the given comment id does not exist.");
             }
         } else {
+            log:printInfo("Error occurred while checking the validity of the comment");
             response.statusCode = http:STATUS_NOT_ACCEPTABLE;
-            response.setPayload("Error occurred while checking the validity of the comment");
+            response.setPayload(validComment.reason());
         } 
 
         error? respond = caller->respond(response);
