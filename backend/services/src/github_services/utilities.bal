@@ -436,3 +436,26 @@ function getLabelsOnIssue(string issueNumber) returns json[] | error {
         return error("The github response is not in the expected form: http:Response.");
     }
 }
+
+# The `isUserNameOnIssue` function checks whether the issue is related to the given user.
+# 
+# + userName - Name of the user.
+# + issueNumber - Number of the issue.
+# + return - Return a **boolean** indicating whther the issue is related to the user or the
+#           **error** occur.
+function isUserNameOnIssue(string userName, string issueNumber) returns boolean | error {
+
+    json[] | error labels = getLabelsOnIssue(issueNumber);
+
+    if (labels is json[]) {
+        json | error formattedLabels = createAFormattedJsonOfLabels(labels);
+        if (formattedLabels is json) {
+            json[] labelArray = <json[]>formattedLabels;
+            return userNameExists(labelArray, userName);
+        } else {
+            return error("Json format of the label list is not valid");
+        }
+    } else {
+        return labels;
+    }
+}
