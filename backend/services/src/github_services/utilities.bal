@@ -437,7 +437,6 @@ function getLabelsOnIssue(string issueNumber) returns json[] | error {
     }
 }
 
-<<<<<<< HEAD
 # The `isValidUserOnIssue` function checks whether the issue is related to the given user.
 # 
 # + userName - Name of the user.
@@ -445,15 +444,6 @@ function getLabelsOnIssue(string issueNumber) returns json[] | error {
 # + return - Return a **boolean** indicating whther the issue is related to the user or the
 #           **error** occur.
 function isValidUserOnIssue(string userName, string issueNumber) returns boolean | error {
-=======
-# The `isUserNameOnIssue` function checks whether the issue is related to a particular user.
-# 
-# + userName    - Username of the collaborator.
-# + issueNumber - Issue number related to the issue.
-# + return      - Return a **boolean** indicating whether the issue is related to the user or an
-#                 **error** occurred during proccessing.
-function isUserNameOnIssue(string userName, string issueNumber) returns boolean | error {
->>>>>>> 5be3cf606bd0fe05815a47892c125e5d4e55e428
 
     json[] | error labels = getLabelsOnIssue(issueNumber);
 
@@ -468,4 +458,24 @@ function isUserNameOnIssue(string userName, string issueNumber) returns boolean 
     } else {
         return labels;
     }
+}
+
+# The `createAFormattedJsonOfComments` function rebuilds a formatted json array of 
+# comments out of the original json array of comments.
+#
+# + comments - Original json array of comments.  
+# + return    - Returns a formatted **json[]** of comments, **error** if a formatted 
+#               json array of comments cannot be rebuilt.
+function createAFormattedJsonOfComments(json[] comments) returns json | error {
+
+    json[] assigneeDetails = [];
+    foreach json assignee in comments {
+        map<json> assigneeRecord = <map<json>>assignee;
+        assigneeDetails[assigneeDetails.length()] = {
+            "id":check assigneeRecord.id,
+            "userName":check assigneeRecord.login,
+            "url":check assigneeRecord.url
+        };
+    }
+    return assigneeDetails;
 }
