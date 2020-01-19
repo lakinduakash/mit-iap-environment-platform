@@ -388,7 +388,7 @@ service userService on endPoint {
                 if (githubResponse is http:Response) {
                     if (githubResponse.statusCode == 201) {
                         response.statusCode = githubResponse.statusCode;
-                        response.setPayload("Collaborator added successfully.");
+                        response.setPayload("Collaborator was added successfully.");
                     } else {
                         response.statusCode = githubResponse.statusCode;
                         response.setPayload("Collaborator was not added successfully.");
@@ -430,7 +430,7 @@ service userService on endPoint {
                 if (githubResponse is http:Response) {
                     if (githubResponse.statusCode == 204) {
                         response.statusCode = githubResponse.statusCode;
-                        response.setPayload("Collaborator wad removed successfully.");
+                        response.setPayload("Collaborator was removed successfully.");
                     } else {
                         response.statusCode = githubResponse.statusCode;
                         response.setPayload("Collaborator was not removed successfully.");
@@ -524,36 +524,46 @@ service userService on endPoint {
                                         response.statusCode = githubResponse.statusCode;
                                         response.setPayload("Assignees added successfully.");
                                     } else {
+                                        log:printInfo("The github response status was: " + githubResponse.statusCode.toString() + 
+                                        " instead of 201");
                                         response.statusCode = githubResponse.statusCode;
                                         response.setPayload("Assignees were not added successfully.");
                                     }
                                 } else {
+                                    log:printInfo("The github response is not in the expected form: http:Response.");
                                     response.statusCode = http:STATUS_NOT_ACCEPTABLE;
                                     response.setPayload(githubResponse.reason());
                                 }
                             } else {
+                                log:printInfo("One or more of the assignees passed cannot be assigned because" + 
+                                "they do not have the relevant permissions required.");
                                 response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
                                 response.setPayload("One or more of the assignees passed cannot be assigned");
                             }
                         } else {
+                            log:printInfo("Error occurred while checking the validity of the assignees");
                             response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
                             response.setPayload(validOperation.reason());
                         }
                     } else {
+                        log:printInfo("Invalid payload content extracted.");
                         response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
-                        response.setPayload("Invalid payload content extracted.");
+                        response.setPayload(<@untained>payloadContent.reason());
                     }
                 } else {
+                    log:printInfo("Invalid json payload extracted.");
                     response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
                     response.setPayload("Invalid json payload extracted.");
                 }
             } else {
+                log:printInfo("Issue with the given issue number does not exist.");
                 response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
                 response.setPayload("Issue with the given issue number does not exist.");
             }
         } else {
+            log:printInfo("Error occurred while checking the validity of the issue");
             response.statusCode = http:STATUS_NOT_ACCEPTABLE;
-            response.setPayload("Error occurred while checking the validity of the issue");
+            response.setPayload(validIssue.reason());
         } 
 
         error? respond = caller->respond(response);
@@ -589,36 +599,46 @@ service userService on endPoint {
                                         response.statusCode = githubResponse.statusCode;
                                         response.setPayload("Assignees removed successfully.");
                                     } else {
+                                        log:printInfo("The github response status was: " + githubResponse.statusCode.toString() + 
+                                        " instead of 200");
                                         response.statusCode = githubResponse.statusCode;
                                         response.setPayload("Assignees were not removed successfully.");
                                     }
                                 } else {
+                                    log:printInfo("The github response is not in the expected form: http:Response.");
                                     response.statusCode = http:STATUS_NOT_ACCEPTABLE;
                                     response.setPayload(githubResponse.reason());
                                 }
                             } else {
+                                log:printInfo("One or more of the assignees passed cannot be unassigned because" + 
+                                "they do not have the relevant permissions required or they are not assigned yet.");
                                 response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
                                 response.setPayload("One or more of the assignees passed cannot be unassigned");
                             }
                         } else {
+                            log:printInfo("Error occurred while checking the validity of the assignees");
                             response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
                             response.setPayload(validOperation.reason());
                         }
                     } else {
+                        log:printInfo("Invalid payload content extracted.");
                         response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
-                        response.setPayload("Invalid payload content extracted.");
+                        response.setPayload(<@untained>payloadContent.reason());
                     }
                 } else {
+                    log:printInfo("Invalid json payload extracted.");
                     response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
                     response.setPayload("Invalid json payload extracted.");
                 }
             } else {
+                log:printInfo("Issue with the given issue number does not exist.");
                 response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
                 response.setPayload("Issue with the given issue number does not exist.");
             }
         } else {
+            log:printInfo("Error occurred while checking the validity of the issue");
             response.statusCode = http:STATUS_NOT_ACCEPTABLE;
-            response.setPayload("Error occurred while checking the validity of the issue");
+            response.setPayload(validIssue.reason());
         } 
 
         error? respond = caller->respond(response);
@@ -651,28 +671,35 @@ service userService on endPoint {
                                 response.statusCode = githubResponse.statusCode;
                                 response.setPayload("Comment added successfully.");
                             } else {
+                                log:printInfo("The github response status was: " + githubResponse.statusCode.toString() 
+                                + " instead of 201");
                                 response.statusCode = githubResponse.statusCode;
                                 response.setPayload("Comment was not added successfully.");
                             }
                         } else {
+                            log:printInfo("The github response is not in the expected form: http:Response.");
                             response.statusCode = http:STATUS_NOT_ACCEPTABLE;
                             response.setPayload(githubResponse.reason());
                         }
                     } else {
+                        log:printInfo("Invalid payload content extracted.");
                         response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
-                        response.setPayload("Invalid payload content extracted.");
+                        response.setPayload(<@untained>payloadContent.reason());
                     }
                 } else {
+                    log:printInfo("Invalid json payload extracted.");
                     response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
                     response.setPayload("Invalid json payload extracted.");
                 }
             } else {
+                log:printInfo("Issue with the given issue number does not exist.");
                 response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
                 response.setPayload("Issue with the given issue number does not exist.");
             }
         } else {
+            log:printInfo("Error occurred while checking the validity of the issue");
             response.statusCode = http:STATUS_NOT_ACCEPTABLE;
-            response.setPayload("Error occurred while checking the validity of the issue");
+            response.setPayload(validIssue.reason());
         } 
 
         error? respond = caller->respond(response);
@@ -705,28 +732,35 @@ service userService on endPoint {
                                 response.statusCode = githubResponse.statusCode;
                                 response.setPayload("Comment updated successfully.");
                             } else {
+                                log:printInfo("The github response status was: " + githubResponse.statusCode.toString() 
+                                + " instead of 200");
                                 response.statusCode = githubResponse.statusCode;
                                 response.setPayload("Comment was not updated successfully.");
                             }
                         } else {
+                            log:printInfo("The github response is not in the expected form: http:Response.");
                             response.statusCode = http:STATUS_NOT_ACCEPTABLE;
                             response.setPayload(githubResponse.reason());
                         }
                     } else {
+                        log:printInfo("Invalid payload content extracted.");
                         response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
-                        response.setPayload("Invalid payload content extracted.");
+                        response.setPayload(<@untained>payloadContent.reason());
                     }
                 } else {
+                    log:printInfo("Invalid json payload extracted.");
                     response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
                     response.setPayload("Invalid json payload extracted.");
                 }
             } else {
+                log:printInfo("Comment with the given comment id does not exist.");
                 response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
                 response.setPayload("Comment with the given comment id does not exist.");
             }
         } else {
+            log:printInfo("Error occurred while checking the validity of the comment");
             response.statusCode = http:STATUS_NOT_ACCEPTABLE;
-            response.setPayload("Error occurred while checking the validity of the comment");
+            response.setPayload(validComment.reason());
         } 
 
         error? respond = caller->respond(response);
