@@ -406,3 +406,33 @@ function isValidComment(string commentId) returns boolean | error {
         return error("The github response is not in the expected form: http:Response.");
     }
 }
+
+# The `getLabelsIsOnIssue` function get all the labels for the given issue.
+# 
+# + issueNumber - Number of the Issue.
+# + return - Returns a **json[]** which includes all the labels for the given issue or the 
+#           corresponding error.
+function getLabelsOnIssue(string issueNumber) returns json[] | error {
+
+    string url = "/repos/" + ORGANIZATION_NAME + "/" + REPOSITORY_NAME + "/issues/" + issueNumber + "/labels";
+
+    http:Request request = new;
+    request.addHeader("Authorization", ACCESS_TOKEN);
+    http:Response | error githubResponse = githubAPIEndpoint->get(url, request);
+
+    if (githubResponse is http:Response) {
+        var jsonPayload = githubResponse.getJsonPayload();
+        if (jsonPayload is json) {
+            json[] | error labelArray = trap <json[]>jsonPayload;
+            if (labelArray is json[]) {
+                return <@untainted>labelArray;
+            } else {
+                return error("The github jsonPayload is not in the expected form: json[]");
+            }
+        } else {
+            return error("Error while extracting the jsonPayload from the github response.");
+        }
+    } else {
+        return error("The github response is not in the expected form: http:Response.");
+    }
+}
