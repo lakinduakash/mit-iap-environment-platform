@@ -468,14 +468,47 @@ function isValidUserOnIssue(string userName, string issueNumber) returns boolean
 #               json array of comments cannot be rebuilt.
 function createAFormattedJsonOfComments(json[] comments) returns json | error {
 
-    json[] assigneeDetails = [];
-    foreach json assignee in comments {
-        map<json> assigneeRecord = <map<json>>assignee;
-        assigneeDetails[assigneeDetails.length()] = {
-            "id":check assigneeRecord.id,
-            "userName":check assigneeRecord.login,
-            "url":check assigneeRecord.url
+    json[] commentDetails = [];
+    foreach json comment in comments {
+        map<json> commentRecord = <map<json>>comment;
+        map<json> user = <map<json>>commentRecord.user;
+        commentDetails[commentDetails.length()] = {
+            "id":check commentRecord.id,
+            "body":check commentRecord.body,
+            "user":check user.login
         };
     }
-    return assigneeDetails;
+    return commentDetails;
+}
+
+# The `isValidCommentOfUser` function checks whether a comment with the provided comment id is created by the 
+# given user.
+#
+# + commentId - Comment Id related to the comment. 
+# + userName - Name of the user.
+# + return    - Returns a **boolean** which indicates whether the comment is created by the given user or
+#               returns an **error** if the github response is not in the expected form.
+function isValidCommentOfUser(string commentId, string userName) returns boolean | error {
+
+    string url = "/repos/" + ORGANIZATION_NAME + "/" + REPOSITORY_NAME + "/issues/comments/" + commentId;
+
+    http:Request request = new;
+    request.addHeader("Authorization", ACCESS_TOKEN);
+    http:Response | error githubResponse = githubAPIEndpoint->get(url, request);
+
+    if (githubResponse is http:Response) {
+        if (githubResponse.statusCode == 200) {
+            var jsonPayload = githubResponse.getJsonPayload();
+            if (jsonPayload is json) {
+                map<json> user = <map<json>>jsonPayload;
+                return user.login == userName ? true : false;
+            } else {
+                return error("The payload is not in json format");
+            }
+        } else {
+            return error("The comment id is not valid");
+        }
+    } else {
+        return error("The github response is not in the expected form: http:Response.");
+    }
 }
