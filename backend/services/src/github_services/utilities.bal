@@ -437,13 +437,13 @@ function getLabelsOnIssue(string issueNumber) returns json[] | error {
     }
 }
 
-# The `isUserNameOnIssue` function checks whether the issue is related to the given user.
+# The `isValidUserOnIssue` function checks whether the issue is related to the given user.
 # 
 # + userName - Name of the user.
 # + issueNumber - Number of the issue.
 # + return - Return a **boolean** indicating whther the issue is related to the user or the
 #           **error** occur.
-function isUserNameOnIssue(string userName, string issueNumber) returns boolean | error {
+function isValidUserOnIssue(string userName, string issueNumber) returns boolean | error {
 
     json[] | error labels = getLabelsOnIssue(issueNumber);
 
