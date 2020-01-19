@@ -1,4 +1,5 @@
 import React from "react"
+import BMap from './Map'
 import { Map, CircleMarker, TileLayer, Polygon } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import { polygon } from 'leaflet';
@@ -38,14 +39,14 @@ addCat = (e) => {
 
 handleSubmit = (e) => { 
   var temp =[]
-  if (this.state.cats.length>=2){
+  if (this.state.cats.length>=3){
     for (let index = 0; index < this.state.cats.length; index++) { 
       if(this.state.cats[index].lat!=="" || this.state.cats[index].long !==""){
         console.log(this.state.cats[index].lat, this.state.cats[index].long)
         temp.push([this.state.cats[index].lat, this.state.cats[index].long] )
       }
     }
-    if (temp.length > 1){
+    if (temp.length > 2){
       console.log("temp", temp)
       this.setState({points:temp})
       
@@ -58,6 +59,15 @@ handleSubmit = (e) => {
 }
 render() {
     let {cats} = this.state
+    let error_msg;
+    let poly;
+    if(this.state.points.length<3){
+      error_msg = "\nNeed at least 3 points"
+    }
+    else{
+      poly = <Polygon  positions = {this.state.points}/>
+      error_msg=""
+    }
     return (
       <div>
         <Map
@@ -71,9 +81,7 @@ render() {
             positions = {yala}
             color = 'red'
           />
-          <Polygon //blue polygon for given coords 
-            positions = {this.state.points}
-          />
+          {poly}}
         </Map>
       
       
@@ -103,10 +111,17 @@ render() {
                   value={cats[idx].long} 
                   className="long"
                 />
+                
               </div>
+              
             )
+            
           })
         }
+        <div>
+              {error_msg}
+              </div>
+
         <input type="submit" value="Submit" /> 
       </form>
       </div>
