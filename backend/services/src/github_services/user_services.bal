@@ -731,4 +731,45 @@ service userService on endPoint {
 
         error? respond = caller->respond(response);
     }
+
+    @http:ResourceConfig {
+        methods: ["DELETE"],
+        path: "admin/delete-comment/{commentId}"
+    }
+    resource function deleteCommentOnIssue(http:Caller caller, http:Request request, string commentId) {
+
+        http:Request callBackRequest = new;
+        http:Response response = new;
+        string url = "/repos/" + ORGANIZATION_NAME + "/" + REPOSITORY_NAME + "/issues/comments/" + commentId;
+
+        // Please change the scope of the access token to make the function work
+        callBackRequest.addHeader("Authorization", ACCESS_TOKEN);
+
+        boolean | error validComment = isValidComment(<@untained>commentId);
+        if (validComment is boolean) {
+            if (validComment) {
+                http:Response | error githubResponse = githubAPIEndpoint->delete(<@untained>url, callBackRequest);
+                if (githubResponse is http:Response) {
+                    if (githubResponse.statusCode == 204) {
+                        response.statusCode = githubResponse.statusCode;
+                        response.setPayload("Comment deleted successfully.");
+                    } else {
+                        response.statusCode = githubResponse.statusCode;
+                        response.setPayload("Comment was not deleted successfully.");
+                    }
+                } else {
+                    response.statusCode = http:STATUS_NOT_ACCEPTABLE;
+                    response.setPayload(githubResponse.reason());
+                }
+            } else {
+                response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
+                response.setPayload("Comment with the given comment id does not exist.");
+            }
+        } else {
+            response.statusCode = http:STATUS_NOT_ACCEPTABLE;
+            response.setPayload("Error occurred while checking the validity of the comment");
+        } 
+
+        error? respond = caller->respond(response);
+    }
 }
