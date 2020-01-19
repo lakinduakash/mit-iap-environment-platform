@@ -1,0 +1,391 @@
+{
+	"info": {
+		"_postman_id": "c25e01fb-99be-488d-ad9d-4f628cbdbf73",
+		"name": "github-services",
+		"description": "Test backend github services for mit-iap-environment-platform ",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Get requests for user",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:9080/github/get-requests-for-user/userName",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9080",
+					"path": [
+						"github",
+						"get-requests-for-user",
+						"userName"
+					]
+				},
+				"description": "Get all the requests related to the user."
+			},
+			"response": []
+		},
+		{
+			"name": "Get request for user",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:9080/github/get-request-for-user/userName/8",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9080",
+					"path": [
+						"github",
+						"get-request-for-user",
+						"userName",
+						"8"
+					]
+				},
+				"description": "Get a specific request related to the user."
+			},
+			"response": []
+		},
+		{
+			"name": "Get all collaborators",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer 61d98df051c935ec6c59b6560c7753cec1c6ebdd",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:9080/github/get-all-collaborators",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9080",
+					"path": [
+						"github",
+						"get-all-collaborators"
+					]
+				},
+				"description": "Get all collaborators for a specific github repository."
+			},
+			"response": []
+		},
+		{
+			"name": "Post request",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"title\": \"5 Testing post request\",\n\t\"body\": \"Initial test 5 for post request\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:9080/github/post-request/deshank?",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9080",
+					"path": [
+						"github",
+						"post-request",
+						"deshank"
+					],
+					"query": [
+						{
+							"key": "title",
+							"value": "Test",
+							"disabled": true
+						},
+						{
+							"key": "body",
+							"value": "creating an issue using github api service.",
+							"disabled": true
+						}
+					]
+				},
+				"description": "Post a request(issue in a specific repository)."
+			},
+			"response": []
+		},
+		{
+			"name": "Edit request",
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"title\": \"5 Testing edit request\",\n\t\"body\": \"Initial test 5 for edit request\",\n\t\"state\": \"closed\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:9080/github/edit-request/14",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9080",
+					"path": [
+						"github",
+						"edit-request",
+						"14"
+					]
+				},
+				"description": "Edit a request(issue in a specific repository)."
+			},
+			"response": []
+		},
+		{
+			"name": "Post comment",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"body\": \"Test post comment function\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:9080/github/admin/post-comment/14",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9080",
+					"path": [
+						"github",
+						"admin",
+						"post-comment",
+						"14"
+					]
+				},
+				"description": "Post a comment(add a comment to a specific issue in a github repository)"
+			},
+			"response": []
+		},
+		{
+			"name": "Edit comment",
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"body\": \"Test post comment edit function\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:9080/github/admin/edit-comment/575960519",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9080",
+					"path": [
+						"github",
+						"admin",
+						"edit-comment",
+						"575960519"
+					]
+				},
+				"description": "Edit a comment(edit a comment of a specific issue in a github repository)"
+			},
+			"response": []
+		},
+		{
+			"name": "Delete comment",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:9080/github/admin/delete-comment/575969844",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9080",
+					"path": [
+						"github",
+						"admin",
+						"delete-comment",
+						"575969844"
+					]
+				},
+				"description": "Delete a comment(delete a comment in a specific issue in a github repository)"
+			},
+			"response": []
+		},
+		{
+			"name": "Get all assignees",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:9080/github/get-all-assignees",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9080",
+					"path": [
+						"github",
+						"get-all-assignees"
+					]
+				},
+				"description": "Get all the assignees available for the repository."
+			},
+			"response": []
+		},
+		{
+			"name": "Add assignees",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"assignees\": [\n    \"deshankoswatte\"\n  ]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:9080/github/add-assignees/13",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9080",
+					"path": [
+						"github",
+						"add-assignees",
+						"13"
+					]
+				},
+				"description": "Add a set of assignees to a specific issue."
+			},
+			"response": []
+		},
+		{
+			"name": "Remove assignee",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"assignees\": [\n    \"deshankoswatte\"\n  ]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:9080/github/remove-assignees/13",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9080",
+					"path": [
+						"github",
+						"remove-assignees",
+						"13"
+					]
+				},
+				"description": "Remove an assignee from a specific issue."
+			},
+			"response": []
+		},
+		{
+			"name": "Get all labels",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:9080/github/get-all-labels",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9080",
+					"path": [
+						"github",
+						"get-all-labels"
+					]
+				},
+				"description": "Get all the labels of the repository."
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}
