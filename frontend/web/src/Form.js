@@ -111,18 +111,52 @@ render() {
                   value={cats[idx].long} 
                   className="long"
                 />
-                
-              </div>
-              
+              </div> 
             )
-            
           })
         }
         <div>
-              {error_msg}
-              </div>
+          {error_msg}
+        </div>
+        <input type="submit" value="Check Availability" /> 
 
-        <input type="submit" value="Submit" /> 
+        <br></br>
+        <label>
+          <br></br>
+            Land Type: 
+            <select>
+              <option value="Plantation">Plantation</option>
+              <option value="Forestation">Forestation</option>
+              <option selected value="Deforestation">Deforestation</option>
+              <option value="Hotel">Hotel</option>
+            </select>
+        </label>
+
+        <br></br>
+        <label>
+            Timeframe: 
+            <input
+            Timeframe=""
+            type="text"
+            value={this.state.fullname}
+            onChange={this.handleInputChange} />
+        </label>
+
+        <br></br>
+        <label>
+            Description: 
+            <input
+            Timeframe=""
+            type="text"
+            value={this.state.fullname}
+            onChange={this.handleInputChange} />
+        </label>
+        <br></br>
+        <label>Attach Files: </label>
+        <input type="file" />
+        <br></br>
+        <input type="submit" value="Submit Form" /> 
+        
       </form>
       </div>
       
