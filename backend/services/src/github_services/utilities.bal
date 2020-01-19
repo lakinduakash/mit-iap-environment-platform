@@ -407,11 +407,11 @@ function isValidComment(string commentId) returns boolean | error {
     }
 }
 
-# The `getLabelsIsOnIssue` function get all the labels for the given issue.
+# The `getLabelsIsOnIssue` function retrieves all the labels for a given issue.
 # 
-# + issueNumber - Number of the Issue.
-# + return - Returns a **json[]** which includes all the labels for the given issue or the 
-#           corresponding error.
+# + issueNumber - Issue number related to the issue.
+# + return      - Returns a **json[]** which includes all the labels for the given issue or 
+#                 an **error** occurred during processing.
 function getLabelsOnIssue(string issueNumber) returns json[] | error {
 
     string url = "/repos/" + ORGANIZATION_NAME + "/" + REPOSITORY_NAME + "/issues/" + issueNumber + "/labels";
@@ -437,12 +437,12 @@ function getLabelsOnIssue(string issueNumber) returns json[] | error {
     }
 }
 
-# The `isUserNameOnIssue` function checks whether the issue is related to the given user.
+# The `isUserNameOnIssue` function checks whether the issue is related to a particular user.
 # 
-# + userName - Name of the user.
-# + issueNumber - Number of the issue.
-# + return - Return a **boolean** indicating whther the issue is related to the user or the
-#           **error** occur.
+# + userName    - Username of the collaborator.
+# + issueNumber - Issue number related to the issue.
+# + return      - Return a **boolean** indicating whether the issue is related to the user or an
+#                 **error** occurred during proccessing.
 function isUserNameOnIssue(string userName, string issueNumber) returns boolean | error {
 
     json[] | error labels = getLabelsOnIssue(issueNumber);
