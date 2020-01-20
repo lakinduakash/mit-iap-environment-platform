@@ -13,7 +13,6 @@ function App() {
 export default App;
 
 
-
 // const position = [51.505, -0.09]
 // const map = (
 //   <Map center={position} zoom={13}>
