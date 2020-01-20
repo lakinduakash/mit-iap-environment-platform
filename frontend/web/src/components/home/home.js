@@ -15,30 +15,26 @@ import User from "../user_dash/user";
 import Admin from "../admin_dash/admin";
 
 // import 'semantic-ui-css/semantic.min.css';
-
-
+import "./home.css";
 
 const Home = () => {
-    return (
-        <Router>
-            <Fragment>
-                <Header/>
-
-                <Switch>
-                    {/* <Route exact path="/" component={App} /> */}
-                    <Route exact path="/login" component={LoginForm} />
-                    <Route exact path="/signup" component={SignupForm} />
-                    <Route exact path="/user-dash" component={User} />
-                    <Route exact path="/admin-dash" component={Admin} />
-
-                </Switch>
-        
-                <Footer/>
-            </Fragment>
-        </Router>
-    );
+  return (
+    <Router>
+      <Fragment>
+        <Header />
+        <div className="body">
+          <Switch>
+            {/* <Route exact path="/" component={App} /> */}
+            <Route exact path="/login" component={LoginForm} />
+            <Route exact path="/signup" component={SignupForm} />
+            <Route exact path="/user-dash" component={User} />
+            <Route exact path="/admin-dash" component={Admin} />
+          </Switch>
+        </div>
+        <Footer />
+      </Fragment>
+    </Router>
+  );
 };
 
 export default Home;
-
-
