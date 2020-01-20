@@ -1017,4 +1017,86 @@ service userService on endPoint {
         }
         error? respond = caller->respond(response);
     }
+
+
+    @http:ResourceConfig {
+        methods: ["GET"],
+        path: "/get-comments/{issueNumber}"
+    }
+    resource function getComments(http:Caller caller, http:Request request, string issueNumber) returns @untainted error? {
+
+        // http:Request request = new;
+        http:Response response = new;
+        string url = "/repos/" + ORGANIZATION_NAME + "/" + REPOSITORY_NAME + "/" + issueNumber + "/comments";
+
+        // request.addHeader("Authorization", ACCESS_TOKEN);
+        // http:Response | error githubResponse = githubAPIEndpoint->get(<@untained>url, request);
+        http:Response | error githubResponse = githubAPIEndpoint->get(<@untained>url);
+
+        if (githubResponse is http:Response) {
+            var jsonPayload = githubResponse.getJsonPayload();
+            if (jsonPayload is json[]) {
+                json[] |error comments = createFormattedComments(jsonPayload);
+                if (comments is json[]){
+                    response.statusCode = http:STATUS_OK;
+                    response.setJsonPayload(<@untained>comments);
+                } else {
+                    log:printInfo("The comments related to issue could not be converted to json.");
+                    response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
+                    response.setPayload(<@untained>comments.reason());
+                }
+            } else {
+                log:printInfo("Invalid json payload received from the response obtained from github.");
+                response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
+                response.setPayload("Invalid payload received from github response.");
+            }
+        } else {
+            log:printInfo("The github response is not in the expected form: http:Response.");
+            response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
+            response.setPayload(<@untained>githubResponse.reason());
+        }
+
+        error? respond = caller->respond(response);
+    }
+
+    @http:ResourceConfig {
+        methods: ["GET"],
+        path: "/get-all-requests"
+    }
+    resource function getAllRequests(http:Caller caller, http:Request request) returns @untainted error? {
+
+        // http:Request request = new;
+        http:Response response = new;
+        string url = "/repos/" + ORGANIZATION_NAME + "/" + REPOSITORY_NAME + "/issues?state=all";
+
+        // request.addHeader("Authorization", ACCESS_TOKEN);
+        // http:Response | error githubResponse = githubAPIEndpoint->get(<@untained>url, request);
+        http:Response | error githubResponse = githubAPIEndpoint->get(url);
+
+        if (githubResponse is http:Response) {
+            var jsonPayload = githubResponse.getJsonPayload();
+            if (jsonPayload is json[]) {
+                json[] |error issues = createFormattedIssues(jsonPayload);
+                if (issues is json[]){
+                    response.statusCode = http:STATUS_OK;
+                    response.setJsonPayload(<@untained>issues);
+                } else {
+                    log:printInfo("The issues related to user could not be converted to json.");
+                    response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
+                    response.setPayload(<@untained>issues.reason());
+                }
+            } else {
+                log:printInfo("Invalid json payload received from the response obtained from github.");
+                response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
+                response.setPayload("Invalid payload received from github response.");
+            }
+        } else {
+            log:printInfo("The github response is not in the expected form: http:Response.");
+            response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
+            response.setPayload(<@untained>githubResponse.reason());
+        }
+
+        error? respond = caller->respond(response);
+    }
+
 }
