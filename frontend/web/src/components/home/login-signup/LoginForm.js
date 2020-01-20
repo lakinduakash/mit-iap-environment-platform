@@ -58,7 +58,7 @@ class LoginForm extends React.Component {
           <Grid.Column style={{ maxWidth: 1600 }}>
             <Message>
               MIT IAP Environment Platform is a service for customers to request
-              land for private or commercaial reasons...
+              land for private or commercial reasons...
             </Message>
           </Grid.Column>
           <Grid.Column textAlign="left" style={{ maxWidth: 400 }}>

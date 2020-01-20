@@ -16,14 +16,23 @@ const columns = [
   { key: "id", name: "Issue ID" },
   { key: "title", name: "Title" },
   { key: "description", name: "Description" },
-  { key: "status", name: "Status" }
+  { key: "depts", name: "Departments" },
+  { key: "status", name: "status" },
+  { key: "options", name: "options" }
 ];
 const rows = [
-  { id: 1, title: "Title 1", description: "first issue", status: "in progress" }
+  {
+    id: 1,
+    title: "Title 1",
+    description: "first issue",
+    depts: "<put checkboxes here>",
+    status: "in progress",
+    options: "<save/cancel button>"
+  }
 ];
 const rowGetter = rowNumber => rows[rowNumber];
 
-class UserIssues extends React.Component {
+class AdminIssues extends React.Component {
   render() {
     return (
       <ReactDataGrid
@@ -36,4 +45,4 @@ class UserIssues extends React.Component {
   }
 }
 
-export default UserIssues;
+export default AdminIssues;
