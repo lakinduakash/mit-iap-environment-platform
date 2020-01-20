@@ -437,13 +437,13 @@ function getLabelsOnIssue(string issueNumber) returns json[] | error {
     }
 }
 
-# The `isUserNameOnIssue` function checks whether the issue is related to a particular user.
+# The `isValidUserOnIssue` function checks whether the issue is related to the given user.
 # 
-# + userName    - Username of the collaborator.
-# + issueNumber - Issue number related to the issue.
-# + return      - Return a **boolean** indicating whether the issue is related to the user or an
-#                 **error** occurred during proccessing.
-function isUserNameOnIssue(string userName, string issueNumber) returns boolean | error {
+# + userName - Name of the user.
+# + issueNumber - Number of the issue.
+# + return - Return a **boolean** indicating whther the issue is related to the user or the
+#           **error** occur.
+function isValidUserOnIssue(string userName, string issueNumber) returns boolean | error {
 
     json[] | error labels = getLabelsOnIssue(issueNumber);
 
@@ -457,5 +457,58 @@ function isUserNameOnIssue(string userName, string issueNumber) returns boolean 
         }
     } else {
         return labels;
+    }
+}
+
+# The `createAFormattedJsonOfComments` function rebuilds a formatted json array of 
+# comments out of the original json array of comments.
+#
+# + comments - Original json array of comments.  
+# + return    - Returns a formatted **json[]** of comments, **error** if a formatted 
+#               json array of comments cannot be rebuilt.
+function createAFormattedJsonOfComments(json[] comments) returns json | error {
+
+    json[] commentDetails = [];
+    foreach json comment in comments {
+        map<json> commentRecord = <map<json>>comment;
+        map<json> user = <map<json>>commentRecord.user;
+        commentDetails[commentDetails.length()] = {
+            "id":check commentRecord.id,
+            "body":check commentRecord.body,
+            "user":check user.login
+        };
+    }
+    return commentDetails;
+}
+
+# The `isValidCommentOfUser` function checks whether a comment with the provided comment id is created by the 
+# given user.
+#
+# + commentId - Comment Id related to the comment. 
+# + userName - Name of the user.
+# + return    - Returns a **boolean** which indicates whether the comment is created by the given user or
+#               returns an **error** if the github response is not in the expected form.
+function isValidCommentOfUser(string commentId, string userName) returns boolean | error {
+
+    string url = "/repos/" + ORGANIZATION_NAME + "/" + REPOSITORY_NAME + "/issues/comments/" + commentId;
+
+    http:Request request = new;
+    request.addHeader("Authorization", ACCESS_TOKEN);
+    http:Response | error githubResponse = githubAPIEndpoint->get(url, request);
+
+    if (githubResponse is http:Response) {
+        if (githubResponse.statusCode == 200) {
+            var jsonPayload = githubResponse.getJsonPayload();
+            if (jsonPayload is json) {
+                map<json> user = <map<json>>jsonPayload;
+                return user.login == userName ? true : false;
+            } else {
+                return error("The payload is not in json format");
+            }
+        } else {
+            return error("The comment id is not valid");
+        }
+    } else {
+        return error("The github response is not in the expected form: http:Response.");
     }
 }
