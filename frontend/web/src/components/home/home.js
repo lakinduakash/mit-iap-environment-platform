@@ -13,6 +13,7 @@ import LoginForm from "./login-signup/LoginForm";
 import SignupForm from "./login-signup/SignupForm";
 import User from "../user_dash/user";
 import Admin from "../admin_dash/admin";
+import Notification from '../Notification/notification';
 
 // import 'semantic-ui-css/semantic.min.css';
 
@@ -30,6 +31,7 @@ const Home = () => {
                     <Route exact path="/signup" component={SignupForm} />
                     <Route exact path="/user-dash" component={User} />
                     <Route exact path="/admin-dash" component={Admin} />
+                    <Route exact path="/notifications" component={Notification} />
 
                 </Switch>
         
