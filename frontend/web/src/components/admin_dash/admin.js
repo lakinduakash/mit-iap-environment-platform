@@ -6,11 +6,9 @@ import Home from "../home/home";
 function Admin() {
   return (
     <Fragment>
-        <Header/>
-            <br/>
-            <br/>
-            Hello Admin!
-        <Footer/>
+      <br />
+      <br />
+      Hello Admin!
     </Fragment>
   );
 }
