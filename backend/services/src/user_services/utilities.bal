@@ -512,3 +512,43 @@ function isValidCommentOfUser(string commentId, string userName) returns boolean
         return error("The github response is not in the expected form: http:Response.");
     }
 }
+
+
+public function createFormattedIssues(json[] issues) returns json[] | error{
+
+    json[] returnedIssues = [];
+    foreach json issue in issues {
+        json labelDetails = check createAFormattedJsonOfLabels(<json[]>issue.labels);
+        returnedIssues[returnedIssues.length()] = {
+            "issueId":check issue.id,
+            "issueNumber":check issue.number,
+            "labels": labelDetails,
+            "issueTitle":check issue.title,
+            "issueBody":check issue.body
+            };
+    }
+
+    return returnedIssues;
+}
+
+public function createFormattedComments( json[] comments) returns json[] | error {
+    
+    json[] returnedComments = [];
+    foreach json comment in comments {
+        json userDetails = check createFormattedUser(<json>comment.user);
+        returnedComments[returnedComments.length()] = {
+            "commentBody":check comment.body,
+            "commentUser":check userDetails.userName
+            };
+    }
+
+    return returnedComments;
+}
+
+function createFormattedUser(json user) returns json | error {
+
+        map<json> userVal = <map<json>>user;
+        json userDetails = {"userName":check userVal.login};
+    
+    return userDetails;
+}
