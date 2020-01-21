@@ -1,4 +1,5 @@
 import React from "react";
+import { withRouter } from "react-router-dom";
 import { Grid, Form, Button, Checkbox } from "semantic-ui-react";
 import "semantic-ui-css/semantic.min.css";
 
@@ -103,6 +104,12 @@ class SignupForm extends React.Component {
             <br></br>
             <Button type="signup" color="teal">
               Sign Up
+            </Button>
+            <Button
+              onClick={() => this.props.history.push("/login")}
+              color="teal"
+            >
+              Back
             </Button>
           </Form>
         </Grid.Column>

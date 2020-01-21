@@ -1,5 +1,4 @@
 import React, { Fragment } from "react";
-
 import {
   Route,
   BrowserRouter as Router,
@@ -10,8 +9,8 @@ import Header from "./header/header";
 import Footer from "./footer/footer";
 import LoginForm from "../home/body/login/login";
 import SignupForm from "../home/body/signup/signup";
-import User from "../home/body/user_dash/user_dash";
-import Admin from "../home/body/admin_dash/admin_dash";
+import User from "./body/dashboard/user_dash/user_dash";
+import Admin from "./body/dashboard/admin_dash/admin_dash";
 
 import "./home.css";
 
