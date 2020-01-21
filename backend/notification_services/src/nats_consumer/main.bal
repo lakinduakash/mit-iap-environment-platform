@@ -1,7 +1,6 @@
 import ballerina/nats;
 import ballerina/log;
 import ballerina/io;
-import ws_server;
 
 nats:Connection connection = new ("nats://34.70.192.249:4222");
 listener nats:Listener natsListener = new (connection);
@@ -11,12 +10,7 @@ listener nats:Listener natsListener = new (connection);
 }
 service natsConsumerService on natsListener {
     resource function onMessage(nats:Message message, string data) {
-        var callers=ws_server:getWebSocketClients();
-
-        io:println("Message recieved: " + data + "Pushing to " + callers.length().toString() + " ws clients");
-        foreach var caller in callers {
-            var res=caller->pushText(data);
-        }
+        io:println("Message recieved: " + data);
     }
 
     resource function onError(nats:Message message, nats:Error err) {

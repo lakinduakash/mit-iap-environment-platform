@@ -5,7 +5,13 @@ import ballerina/http;
 string ping = "ping";
 byte[] pingData = ping.toBytes();
 
-http:WebSocketCaller[] wsClients=[];
+
+public type WsUser record {
+    string user;
+    http:WebSocketCaller wsCaller;
+};
+
+WsUser[] wsUsers=[];
 
 @http:WebSocketServiceConfig {
     path: "/notifications",
@@ -19,8 +25,6 @@ service basic on new http:Listener(9095) {
         io:println("Negotiated Sub protocol: " + caller.getNegotiatedSubProtocol().toString());
         io:println("Is connection open: " + caller.isOpen().toString());
         io:println("Is connection secured: " + caller.isSecure().toString());
-
-        wsClients.push(caller);
     }
     resource function onText(http:WebSocketCaller caller, string text,
                                 boolean finalFrame) {
@@ -41,6 +45,19 @@ service basic on new http:Listener(9095) {
             }
         } else {
             var err = caller->pushText("You said: " + text);
+            WsUser c = {
+                user:text,
+                wsCaller:caller
+                };
+
+            foreach var item in wsUsers {
+                if item.wsCaller.getConnectionId() !== caller.getConnectionId(){
+                    wsUsers.push(c);
+                    break;
+                }
+            }
+
+
             if (err is http:WebSocketError) {
                 log:printError("Error occurred when sending text", err);
             }
@@ -75,15 +92,16 @@ service basic on new http:Listener(9095) {
     }
     resource function onError(http:WebSocketCaller caller, error err) {
         log:printError("Error occurred ", err);
+        wsUsers= wsUsers.filter(item=> item.wsCaller.getConnectionId() !== caller.getConnectionId());
     }
     resource function onClose(http:WebSocketCaller caller, int statusCode,
                                 string reason) {
 
-        wsClients= wsClients.filter(item=> item !== caller);
+        wsUsers= wsUsers.filter(item=> item.wsCaller.getConnectionId() !== caller.getConnectionId() );
         io:println(string `Client left with ${statusCode} because ${reason}`);
     }
 }
 
-public function getWebSocketClients() returns http:WebSocketCaller[] {
-    return wsClients;
+public function getWebSocketClients() returns WsUser[] {
+    return wsUsers;
 }
