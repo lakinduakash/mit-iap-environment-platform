@@ -1,16 +1,5 @@
-import React, { Fragment } from "react";
+import React from "react";
 import ReactDataGrid from "react-data-grid";
-import {
-  Grid,
-  Checkbox,
-  Form,
-  Segment,
-  Message,
-  Button
-} from "semantic-ui-react";
-import Header from "../home/Header/header";
-import Footer from "../home/Footer/footer";
-import Home from "../home/home";
 
 const columns = [
   { key: "id", name: "Issue ID" },
