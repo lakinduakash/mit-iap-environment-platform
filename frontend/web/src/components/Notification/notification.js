@@ -15,6 +15,7 @@ class Notification extends Component {
       // listen to data sent from the websocket server
       const message = evt.data
       this.setState({dataFromServer: message})
+      alert('Notification received : ' + message);
       console.log(message)
       }
 
@@ -57,7 +58,6 @@ class ChildComponent extends Component {
   }
 
   handleSubmit(event) {
-    alert('A message was submitted: ' + this.state.value);
     this.sendMessage(this.state.value);
     event.preventDefault();
   }
