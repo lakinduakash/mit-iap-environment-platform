@@ -13,7 +13,7 @@ class Notification extends Component {
 
       this.ws.onmessage = evt => {
       // listen to data sent from the websocket server
-      const message = JSON.parse(evt.data)
+      const message = evt.data
       this.setState({dataFromServer: message})
       console.log(message)
       }
@@ -35,7 +35,7 @@ export default Notification;
 
 class ChildComponent extends Component {
 
-  sendMessage=()=>{
+  sendMessage=(data)=>{
       const {websocket} = this.props // websocket instance passed as props to the child component.
 
       try {
@@ -44,10 +44,33 @@ class ChildComponent extends Component {
           console.log(error) // catch error
       }
   }
+  constructor(props) {
+    super(props);
+    this.state = {value: ''};
+
+    this.handleChange = this.handleChange.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
+  }
+
+  handleChange(event) {
+    this.setState({value: event.target.value});
+  }
+
+  handleSubmit(event) {
+    alert('A message was submitted: ' + this.state.value);
+    this.sendMessage(this.state.value);
+    event.preventDefault();
+  }
+
   render() {
-      return (
-          <div>
-          </div>
-      );
+    return (
+      <form onSubmit={this.handleSubmit}>
+        <label>
+          Message:
+          <input type="text" value={this.state.value} onChange={this.handleChange} />
+        </label>
+        <input type="submit" value="Send    " />
+      </form>
+    );
   }
 }
