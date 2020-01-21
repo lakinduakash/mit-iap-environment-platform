@@ -7,6 +7,13 @@ byte[] pingData = ping.toBytes();
 
 http:WebSocketCaller[] wsClients=[];
 
+public type WsUser record {
+    string user;
+    http:WebSocketCaller wsCaller;
+};
+
+WsUser[] wsUsers=[];
+
 @http:WebSocketServiceConfig {
     path: "/notifications",
     subProtocols: ["xml", "json"],
