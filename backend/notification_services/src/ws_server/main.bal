@@ -48,6 +48,19 @@ service basic on new http:Listener(9095) {
             }
         } else {
             var err = caller->pushText("You said: " + text);
+            WsUser c = {
+                user:text,
+                wsCaller:caller
+                };
+
+            foreach var item in wsUsers {
+                if item.wsCaller.getConnectionId() !== caller.getConnectionId(){
+                    wsUsers.push(c);
+                    break;
+                }
+            }
+
+
             if (err is http:WebSocketError) {
                 log:printError("Error occurred when sending text", err);
             }
