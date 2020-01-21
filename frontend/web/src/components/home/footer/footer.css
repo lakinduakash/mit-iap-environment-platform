@@ -4,8 +4,8 @@
   bottom: 0;
   width: 100%;
   z-index: 3;
-  background-color: rgb(215, 226, 211);
+  background-color: #5eba7d;
   height: 4vh;
-  color: rgb(76, 175, 80);
+  color: white;
   text-align: center;
 }

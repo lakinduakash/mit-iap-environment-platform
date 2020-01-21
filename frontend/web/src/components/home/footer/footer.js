@@ -6,7 +6,9 @@ const Footer = () => {
     <Fragment>
       <div className="footer">
         <p></p>
-        <h6> @ Ballerina MIT IAP Program, 2020. All rights Reserved.</h6>
+        <h6>
+          <b> @ Ballerina MIT IAP Program, 2020. All rights Reserved.</b>
+        </h6>
       </div>
     </Fragment>
   );
