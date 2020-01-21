@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 class Notification extends Component {
 
   // instance of websocket connection as a class property
-  ws = new WebSocket('wss://echo.websocket.org')
+  ws = new WebSocket('ws://localhost:9095')
 
   componentDidMount() {
       this.ws.onopen = () => {
