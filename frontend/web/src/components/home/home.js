@@ -6,7 +6,12 @@ import App from "../../App";
 // import "./node_modules/bootstrap/dist/css/bootstrap.min.css";
 // import "./node_modules/bootstrap/dist/js/bootstrap.bundle.min";
 
-import { Route, BrowserRouter as Router, Switch } from "react-router-dom";
+import {
+  Route,
+  BrowserRouter as Router,
+  Switch,
+  Redirect
+} from "react-router-dom";
 import Header from "./Header/header";
 import Footer from "./Footer/footer";
 import LoginForm from "./login-signup/LoginForm";
@@ -29,6 +34,7 @@ const Home = () => {
             <Route exact path="/signup" component={SignupForm} />
             <Route exact path="/user-dash" component={User} />
             <Route exact path="/admin-dash" component={Admin} />
+            <Redirect exact from="" to="/login" />
           </Switch>
         </div>
         <Footer />

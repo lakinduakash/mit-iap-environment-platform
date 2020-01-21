@@ -76,6 +76,7 @@ class LoginForm extends React.Component {
                   value={this.state.email}
                 />
                 <Form.Input
+                  type="password"
                   icon="lock"
                   iconPosition="left"
                   placeholder="Password"
