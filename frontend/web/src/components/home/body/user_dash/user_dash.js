@@ -1,8 +1,5 @@
 import React, { Fragment } from "react";
-import Header from "../home/Header/header";
-import Footer from "../home/Footer/footer";
-import Home from "../home/home";
-import UserIssues from "./user_issues";
+import UserIssues from "./grid/user_grid";
 
 function User() {
   return (

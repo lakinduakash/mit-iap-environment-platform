@@ -7,11 +7,6 @@ import {
   Message,
   Button
 } from "semantic-ui-react";
-import Header from "../Header/header";
-import Footer from "../Footer/footer";
-import { Redirect } from "react-router-dom";
-import "semantic-ui-css/semantic.min.css";
-import App from "../../../App";
 
 class LoginForm extends React.Component {
   constructor(props) {
@@ -37,10 +32,10 @@ class LoginForm extends React.Component {
   onLogin = () => {
     //if(userAuthenticated){
     //var id = document.getElementById("Email").value;
-    if (this.state.email == "user") {
+    if (this.state.email === "user") {
       //return  <Redirect  to='/' />
       this.props.history.push("/user-dash");
-    } else if (this.state.email == "admin") {
+    } else if (this.state.email === "admin") {
       this.props.history.push("/admin-dash");
     }
   };
@@ -76,6 +71,7 @@ class LoginForm extends React.Component {
                   value={this.state.email}
                 />
                 <Form.Input
+                  type="password"
                   icon="lock"
                   iconPosition="left"
                   placeholder="Password"
