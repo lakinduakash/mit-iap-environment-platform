@@ -104,6 +104,6 @@ service basic on new http:Listener(9095) {
     }
 }
 
-public function getWebSocketClients() returns http:WebSocketCaller[] {
-    return wsClients;
+public function getWebSocketClients() returns WsUser[] {
+    return wsUsers;
 }
