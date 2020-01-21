@@ -4,18 +4,23 @@
   top: 0;
   padding: 10px;
   width: 100%;
-  height: 4hv;
+  height: 5vh;
   z-index: 3;
-  background-color: #000000;
+  background-color: rgb(215, 226, 211);
   color: rgb(76, 175, 80);
-  text-align: center;
 }
 
 .header-logo {
-  color: rgb(76, 175, 80);
-  vertical-align: middle;
+  display: inline;
+  color: rgb(253, 122, 0);
 }
 
 .header-button {
   float: right;
+}
+
+.header-header {
+  position: fixed;
+  left: 3%;
+  top: 10px;
 }

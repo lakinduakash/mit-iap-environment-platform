@@ -11,7 +11,6 @@ import LoginForm from "../home/body/login/login";
 import SignupForm from "../home/body/signup/signup";
 import User from "./body/dashboard/user_dash/user_dash";
 import Admin from "./body/dashboard/admin_dash/admin_dash";
-
 import "./home.css";
 
 const Home = () => {
