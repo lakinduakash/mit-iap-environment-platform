@@ -1,8 +1,6 @@
 import React, { Fragment } from "react";
-
 import Logo from "../../../asserts/logo.jpeg";
 import "./header.css";
-// import { NavLink } from "react-router-dom";
 
 const Header = () => {
   return (
