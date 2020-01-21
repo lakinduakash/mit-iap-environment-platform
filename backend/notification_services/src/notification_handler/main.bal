@@ -30,15 +30,16 @@ service eventListener on new http:Listener(9090) {
                         category: "Issue Created",
                         description: "New request was created"
                     };
-                    io:println(notification);
+                    sendMessage(notification);
                 } else if (event_action == "edited") {
                     // Issue Edited
-                    Notification notification = {
+                    // Notification for admin
+                    Notification notification_admin = {
                         receiver: "admin",
                         category: "Issue Edited",
-                        description: "New request was created"
+                        description: "Issue was edited"
                     };
-                    io:println(notification);
+                    sendMessage(notification_admin);
                 } else if (event_action == "closed") {
                     // Issue Closed
                     // Notification to the admin
@@ -47,26 +48,55 @@ service eventListener on new http:Listener(9090) {
                         category: "Issue Closed",
                         description: "Request deleted"
                     };
-                    io:println(notification);
+                    sendMessage(notification);
+                    // Notification for user
+                    string username = "";
+                    map<json> | error issue = trap <map<json>>data.issue;
+                    if (issue is map<json>) {
+                        json[] | error labels = trap <json[]>issue.labels;
+                        if (labels is json[]) {
+                            string | error label_name = trap <string>labels[0].name;
+                            if (label_name is string) {
+                                username = label_name;
+                            }
+                        }
+                    }
+                    Notification notification_user = {
+                        receiver: username,
+                        category: "Issue Closed",
+                        description: "Request deleted"
+                    };
+                    sendMessage(notification_user);
                 } else if (event_action == "created") {
                     // Comment Created
+                    // Notification for admin
                     if (data.comment is json) {
                         var comment_body = data.comment.body;
-                        // var username = "";
-                        // if (data.issue.labels is json) {
-                        //     json|error labels = data.issue.labels;
-                        //     if (labels is json) {
-                        //         username = labels[0].name;
-                        //     }
-                        // }
-                        // Send notification to user
-                        Notification notification = {
+                        Notification notification_admin = {
                             receiver: "admin",
                             category: "Comment Created",
                             description: "New comment was added."
                         };
-                        io:println(notification);
+                        sendMessage(notification_admin);
                     }
+                    // Notification for user
+                    string username = "";
+                    map<json> | error issue = trap <map<json>>data.issue;
+                    if (issue is map<json>) {
+                        json[] | error labels = trap <json[]>issue.labels;
+                        if (labels is json[]) {
+                            string | error label_name = trap <string>labels[0].name;
+                            if (label_name is string) {
+                                username = label_name;
+                            }
+                        }
+                    }
+                    Notification notification_user = {
+                        receiver: username,
+                        category: "Issue Edited",
+                        description: "Issue was edited"
+                    };
+                    sendMessage(notification_user);
                 } else if (event_action == "labeled") {
                     // Issue was labeled
                     Notification notification = {
@@ -74,7 +104,7 @@ service eventListener on new http:Listener(9090) {
                         category: "Label Added ",
                         description: "New label was added"
                     };
-                    io:println(notification);
+                    sendMessage(notification);
                 }
             }
         }
@@ -82,3 +112,6 @@ service eventListener on new http:Listener(9090) {
     }
 }
 
+function sendMessage(Notification notification) {
+    io:println(notification);
+}
