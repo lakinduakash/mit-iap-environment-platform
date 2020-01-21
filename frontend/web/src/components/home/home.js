@@ -5,7 +5,7 @@ import {
   Switch,
   Redirect
 } from "react-router-dom";
-import Header from "./header/header";
+import PrimarySearchAppBar from "./header/user_header/user_header";
 import Footer from "./footer/footer";
 import LoginForm from "../home/body/login/login";
 import SignupForm from "../home/body/signup/signup";
@@ -17,7 +17,7 @@ const Home = () => {
   return (
     <Router>
       <Fragment>
-        <Header />
+        <PrimarySearchAppBar />
         <div className="body">
           <Switch>
             {/* <Route exact path="/" component={App} /> */}
