@@ -1,5 +1,4 @@
 import React, { Fragment } from "react";
-
 import {
   Route,
   BrowserRouter as Router,
@@ -19,7 +18,7 @@ const Home = () => {
   return (
     <Router>
       <Fragment>
-        <Header />
+        <PrimarySearchAppBar />
         <div className="body">
           <Switch>
             {/* <Route exact path="/" component={App} /> */}
