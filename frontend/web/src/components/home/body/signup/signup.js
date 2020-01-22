@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { makeStyles, withStyles } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
 import Checkbox from "@material-ui/core/Checkbox";
@@ -7,13 +7,13 @@ import FormGroup from "@material-ui/core/FormGroup";
 import FormHelperText from "@material-ui/core/FormHelperText";
 import FormLabel from "@material-ui/core/FormLabel";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
+import "./signup.css";
 
 const styles = makeStyles(theme => ({
   root: {
     "& > *": {
       margin: theme.spacing(1),
-      width: 200,
-      backgroundColor: "black"
+      width: "50%"
     }
   },
   formControl: {
@@ -24,28 +24,16 @@ const styles = makeStyles(theme => ({
   }
 }));
 
-class SignupForm extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      firstName: "",
-      lastName: "",
-      email: "",
-      phoneNumber: "",
-      address: "",
-      password: "",
-      confirmPassword: ""
-    };
+function SignupForm() {
+  const classes = styles();
 
-    this.handleInputChange.bind(this);
-  }
-
-  handleInputChange = event => {
-    const target = event.target;
-    const name = target.name;
-    const value = target.type === "checkbox" ? target.checked : target.value;
-    this.setState({ [name]: value });
-  };
+  const [firstName, setFirstName] = useState();
+  const [lastName, setLastName] = useState();
+  const [email, setEmail] = useState();
+  const [phoneNumber, setPhoneNumber] = useState();
+  const [address, setAddress] = useState();
+  const [password, setPassword] = useState();
+  const [confirmPassword, setConfirmPassword] = useState();
 
   // render() {
   //   return (
@@ -138,13 +126,10 @@ class SignupForm extends React.Component {
   //   );
   // }
 
-  render() {
-    return (
-      <div className={this.props.classes.root}>
-        <FormControl
-          component="fieldset"
-          className={this.props.classes.formControl}
-        >
+  return (
+    <div>
+      <div className={classes.root}>
+        <FormControl component="fieldset" className={classes.formControl}>
           <FormLabel component="legend" className>
             Sign Up
           </FormLabel>
@@ -156,8 +141,8 @@ class SignupForm extends React.Component {
               name="firstName"
               label="First Name"
               placeholder="First Name"
-              onChange={this.handleInputChange}
-              value={this.state.firstName}
+              onChange={() => setFirstName()}
+              value={firstName}
             />
             <TextField
               variant="outlined"
@@ -166,8 +151,8 @@ class SignupForm extends React.Component {
               name="lastName"
               label="Last Name"
               placeholder="Last Name"
-              onChange={this.handleInputChange}
-              value={this.state.lastName}
+              onChange={() => setLastName()}
+              value={lastName}
             />
             <TextField
               variant="outlined"
@@ -176,8 +161,8 @@ class SignupForm extends React.Component {
               name="email"
               label="Email"
               placeholder="Email"
-              onChange={this.handleInputChange}
-              value={this.state.email}
+              onChange={() => setEmail()}
+              value={email}
             />
             <TextField
               variant="outlined"
@@ -186,8 +171,8 @@ class SignupForm extends React.Component {
               name="phoneNumber"
               label="Phone Number"
               placeholder="Phone Number"
-              onChange={this.handleInputChange}
-              value={this.state.phoneNumber}
+              onChange={() => setPhoneNumber()}
+              value={phoneNumber}
             />
             <TextField
               variant="outlined"
@@ -196,8 +181,8 @@ class SignupForm extends React.Component {
               name="address"
               label="Address"
               placeholder="Address"
-              onChange={this.handleInputChange}
-              value={this.state.address}
+              onChange={() => setAddress()}
+              value={address}
             />
             <TextField
               variant="outlined"
@@ -207,8 +192,8 @@ class SignupForm extends React.Component {
               label="Password"
               placeholder="Password"
               type="password"
-              onChange={this.handleInputChange}
-              value={this.state.password}
+              onChange={() => setPassword()}
+              value={password}
             />
             <TextField
               variant="outlined"
@@ -218,15 +203,12 @@ class SignupForm extends React.Component {
               label="Confirm Password"
               placeholder="Confirm Password"
               type="password"
-              onChange={this.handleInputChange}
-              value={this.state.confirmPassword}
+              onChange={() => setConfirmPassword()}
+              value={confirmPassword}
             />
             <FormControlLabel
               control={
-                <Checkbox
-                  value="remember"
-                  className={this.props.classes.checkbox}
-                />
+                <Checkbox value="remember" className={classes.checkbox} />
               }
               label="Remember me"
             />
@@ -234,8 +216,8 @@ class SignupForm extends React.Component {
           <FormHelperText>Be careful</FormHelperText>
         </FormControl>
       </div>
-    );
-  }
+    </div>
+  );
 }
 
 export default withStyles(styles)(SignupForm);
