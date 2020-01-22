@@ -1,5 +1,6 @@
 import ballerina/http;
 import ballerina/io;
+import ws_server;
 
 type Notification record {
     // string issueCreator?;
@@ -114,4 +115,12 @@ service eventListener on new http:Listener(9090) {
 
 function sendMessage(Notification notification) {
     io:println(notification);
+
+    ws_server:WsUser[] ws = ws_server:getWebSocketClients();
+    foreach ws_server:WsUser item in ws {
+        if(item.user=== notification.receiver){
+            http:WebSocketCaller wc= item.wsCaller;
+            var a= wc->pushText(notification.description);
+        }
+    }
 }
