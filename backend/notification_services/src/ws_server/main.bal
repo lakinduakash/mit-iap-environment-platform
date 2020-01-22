@@ -44,7 +44,9 @@ service basic on new http:Listener(9095) {
                 log:printError("Error occurred when closing connection", result);
             }
         } else {
-            var err = caller->pushText("You said: " + text);
+        
+
+            boolean newUserAdded=false;
             WsUser c = {
                 user:text,
                 wsCaller:caller
@@ -53,14 +55,19 @@ service basic on new http:Listener(9095) {
             foreach var item in wsUsers {
                 if item.wsCaller.getConnectionId() !== caller.getConnectionId(){
                     wsUsers.push(c);
+                    newUserAdded=true;
                     break;
                 }
             }
 
-
-            if (err is http:WebSocketError) {
+            if(newUserAdded){
+                var err = caller->pushText("New user subcribed: " + text);
+                if (err is http:WebSocketError) {
                 log:printError("Error occurred when sending text", err);
+                }
             }
+
+    
         }
     }
     resource function onBinary(http:WebSocketCaller caller, byte[] b) {
