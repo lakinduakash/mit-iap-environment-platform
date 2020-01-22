@@ -1,8 +1,6 @@
 import React, { Fragment } from "react";
-
-import Logo from "../../../asserts/logo.jpeg";
+import Logo from "../../../asserts/images/logo-dash.png";
 import "./header.css";
-// import { NavLink } from "react-router-dom";
 
 const Header = () => {
   return (
@@ -13,11 +11,11 @@ const Header = () => {
         <img
           src={Logo}
           alt="WSO2"
-          width="60"
-          height="60"
+          width="40"
+          height="40"
           className="header-logo"
         />
-        <h2 className="header-logo">
+        <h2 className="header-header">
           <b> Environmental Management Platform</b>
         </h2>
       </div>
