@@ -85,8 +85,8 @@ function SignupForm() {
             name="firstName"
             label="First Name"
             placeholder="First Name"
-            onChange={() => setFirstName()}
-            value={firstName}
+            onChange={e => setFirstName(e.target.value || "")}
+            value={firstName || ""}
             fullWidth
           />
           <TextField
@@ -96,8 +96,8 @@ function SignupForm() {
             name="lastName"
             label="Last Name"
             placeholder="Last Name"
-            onChange={() => setLastName()}
-            value={lastName}
+            onChange={e => setLastName(e.target.value || "")}
+            value={lastName || ""}
             fullWidth
           />
           <TextField
@@ -107,8 +107,8 @@ function SignupForm() {
             name="email"
             label="Email"
             placeholder="Email"
-            onChange={() => setEmail()}
-            value={email}
+            onChange={e => setEmail(e.target.value || "")}
+            value={email || ""}
             fullWidth
           />
           <TextField
@@ -118,8 +118,8 @@ function SignupForm() {
             name="phoneNumber"
             label="Phone Number"
             placeholder="Phone Number"
-            onChange={() => setPhoneNumber()}
-            value={phoneNumber}
+            onChange={e => setPhoneNumber(e.target.value || "")}
+            value={phoneNumber || ""}
             fullWidth
           />
           <TextField
@@ -129,8 +129,8 @@ function SignupForm() {
             name="address"
             label="Address"
             placeholder="Address"
-            onChange={() => setAddress()}
-            value={address}
+            onChange={e => setAddress(e.target.value || "")}
+            value={address || ""}
             fullWidth
           />
           <TextField
@@ -141,8 +141,8 @@ function SignupForm() {
             label="Password"
             placeholder="Password"
             type="password"
-            onChange={() => setPassword()}
-            value={password}
+            onChange={e => setPassword(e.target.value || "")}
+            value={password || ""}
             fullWidth
           />
           <TextField
@@ -153,8 +153,8 @@ function SignupForm() {
             label="Confirm Password"
             placeholder="Confirm Password"
             type="password"
-            onChange={() => setConfirmPassword()}
-            value={confirmPassword}
+            onChange={e => setConfirmPassword(e.target.value || "")}
+            value={confirmPassword || ""}
             fullWidth
           />
           <FormControlLabel
@@ -162,7 +162,7 @@ function SignupForm() {
             label="Remember me"
           />
           <br />
-          <Button type="signup" className={classes.button}>
+          <Button type="submit" className={classes.button}>
             Sign Up
           </Button>
           <Button
