@@ -1,13 +1,10 @@
 import React, { Fragment } from "react";
-import UserIssues from "./grid/user_grid";
+import UserGrid from "./grid/user_grid";
 
 function User() {
   return (
     <Fragment>
-      <br />
-      <br />
-      Hello User!
-      <UserIssues />
+      <UserGrid />
     </Fragment>
   );
 }
