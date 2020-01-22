@@ -20,14 +20,13 @@ class Form extends React.Component {
   }
   axios.get('http://localhost:9090/add/createPoly', this.state)
             .then(function(response){
-                console.log(yala)
-                console.log("holla")
-                yala = response
-                console.log(yala);
+                //console.log(yala)
+                //console.log("holla")
+                yala = response.data
+                //console.log(yala);
             })
   
 }
-
 
 
   
@@ -48,26 +47,52 @@ addCat = (e) => {
     this.setState((prevState) => ({
       cats: [...prevState.cats, {lat:"", long:""}],
     }));
-  }
-
-handleSubmit = (e) => { 
-  var temp =[]
+    var temp =[]
   if (this.state.cats.length>=3){
     for (let index = 0; index < this.state.cats.length; index++) { 
       if(this.state.cats[index].lat!=="" || this.state.cats[index].long !==""){
-        console.log(this.state.cats[index].lat, this.state.cats[index].long)
+       // console.log(this.state.cats[index].lat, this.state.cats[index].long)
         temp.push([this.state.cats[index].lat, this.state.cats[index].long] )
       }
     }
     if (temp.length > 2){
-      console.log("temp", temp)
+      //console.log("temp", temp)
+      this.setState({points:temp})
+      
+    }
+  }
+}
+draw = (e) => { 
+  var temp =[]
+  if (this.state.cats.length>=3){
+    for (let index = 0; index < this.state.cats.length; index++) { 
+      if(this.state.cats[index].lat!=="" || this.state.cats[index].long !==""){
+       // console.log(this.state.cats[index].lat, this.state.cats[index].long)
+        temp.push([this.state.cats[index].lat, this.state.cats[index].long] )
+      }
+    }
+    if (temp.length > 2){
+      //console.log("temp", temp)
       this.setState({points:temp})
       
     }
   console.log("OKK")
 }
+}
+handleSubmit = (e) => { 
   
-  console.log(this.state.points);
+  console.log(yala.data)
+  var l = document.getElementById('landtype').value
+  var t = document.getElementById('timeframe').value
+  var d = document.getElementById('desc').value
+  var x = {points: this.state.points, landtype:l, timeframe:t, description:d}
+  // const link = ""
+  // axios({
+  //   method: 'post',
+  //   url: link,
+  //   data: x
+  // });
+  //aconsole.log(document.getElementById('landtype').value);
   e.preventDefault() 
 }
 render() {
@@ -82,9 +107,10 @@ render() {
       poly = <Polygon  positions = {this.state.points}/>
       error_msg=""
     }
-    //console.log("yala", yala)
+
     return (
       <div>
+        
         {yala.length}
         <Map
           style={{ height: "480px", width: "60%" }}
@@ -101,9 +127,9 @@ render() {
         </Map>
       
       
-      <form onSubmit={this.handleSubmit} onChange={this.handleChange} >
+      <form id = 'form' onSubmit={this.handleSubmit} onChange={this.handleChange} >
         
-        <button onClick={this.addCat}>Add new point</button>
+        <button type = 'button' onClick={this.addCat.bind(this)}>Add new point</button>
         {
           cats.map((val, idx)=> {
             let catId = `cat-${idx}`, ageId = `age-${idx}`
@@ -137,13 +163,12 @@ render() {
         <div>
               {error_msg}
               </div>
-
-        <input type="submit" value="Submit" /> 
+        <button type = 'button' onClick={this.draw.bind(this)}>Check Availability</button>
         <br></br>
         <label>
           <br></br>
             Land Type: 
-            <select>
+            <select id ="landtype">
               <option value="Plantation">Plantation</option>
               <option value="Forestation">Forestation</option>
               <option selected value="Deforestation">Deforestation</option>
@@ -158,7 +183,8 @@ render() {
             Timeframe=""
             type="text"
             value={this.state.fullname}
-            onChange={this.handleInputChange} />
+            onChange={this.handleInputChange} 
+            id = 'timeframe'/>
         </label>
 
         <br></br>
@@ -168,7 +194,8 @@ render() {
             Timeframe=""
             type="text"
             value={this.state.fullname}
-            onChange={this.handleInputChange} />
+            onChange={this.handleInputChange} 
+            id = 'desc'/>
         </label>
         <br></br>
         <label>Attach Files: </label>
