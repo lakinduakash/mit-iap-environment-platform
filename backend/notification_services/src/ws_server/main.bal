@@ -46,26 +46,20 @@ service basic on new http:Listener(9095) {
         } else {
         
 
-            boolean newUserAdded=false;
+            
             WsUser c = {
                 user:text,
                 wsCaller:caller
                 };
 
-            foreach var item in wsUsers {
-                if item.wsCaller.getConnectionId() !== caller.getConnectionId(){
-                    wsUsers.push(c);
-                    newUserAdded=true;
-                    break;
-                }
-            }
+                wsUsers.push(c);
 
-            if(newUserAdded){
+        
                 var err = caller->pushText("New user subcribed: " + text);
                 if (err is http:WebSocketError) {
                 log:printError("Error occurred when sending text", err);
                 }
-            }
+            
 
     
         }
