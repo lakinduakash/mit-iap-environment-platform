@@ -40,7 +40,6 @@ export default function SimpleTable() {
               <th>Details</th>
               <th>Status</th>
               <th>View</th>
-              <th>Comment</th>
             </tr>
           </thead>
           <tbody>
@@ -51,9 +50,6 @@ export default function SimpleTable() {
                 <td>{row.state}</td>
                 <td>
                   <ViewRequest row={row} />
-                </td>
-                <td>
-                  <Comment />
                 </td>
               </tr>
             ))}
