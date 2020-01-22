@@ -1,6 +1,6 @@
 import React from "react";
 import Loader from "react-loader-spinner";
-import "./Loading.css";
+import "./loading.css";
 
 const RenderLoading = () => {
   return (
