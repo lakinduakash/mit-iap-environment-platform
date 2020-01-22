@@ -5,12 +5,14 @@ import {
   Switch,
   Redirect
 } from "react-router-dom";
+
 import PrimarySearchAppBar from "./header/user_header/user_header";
 import Footer from "./footer/footer";
 import LoginForm from "../home/body/login/login";
 import SignupForm from "../home/body/signup/signup";
 import User from "./body/dashboard/user_dash/user_dash";
 import Admin from "./body/dashboard/admin_dash/admin_dash";
+import Notification from "../Notification/notification"
 import "./home.css";
 
 const Home = () => {
@@ -25,6 +27,7 @@ const Home = () => {
             <Route exact path="/signup" component={SignupForm} />
             <Route exact path="/user-dash" component={User} />
             <Route exact path="/admin-dash" component={Admin} />
+            <Route exact path="/notifications" component={Notification} />
             <Redirect exact from="" to="/login" />
           </Switch>
         </div>
