@@ -3,9 +3,9 @@
   left: 0;
   bottom: 0;
   width: 100%;
-  z-index: 3;
+  padding-top: 0.5%;
+  padding-left: 0.5%;
   background-color: #277c2f;
-  height: 4vh;
   color: white;
-  text-align: center;
+  text-align: left;
 }
