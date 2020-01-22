@@ -5,13 +5,14 @@ import {
   Switch,
   Redirect
 } from "react-router-dom";
-import Header from "../home/Header/header";
-import Footer from "../home/Footer/footer";
+
+import PrimarySearchAppBar from "./header/user_header/user_header";
+import Footer from "./footer/footer";
 import LoginForm from "../home/body/login/login";
 import SignupForm from "../home/body/signup/signup";
-import User from "../home/body/user_dash/user_dash";
-import Admin from "../home/body/admin_dash/admin_dash";
-import Notification from "../Notification/notification";
+import User from "./body/dashboard/user_dash/user_dash";
+import Admin from "./body/dashboard/admin_dash/admin_dash";
+import Notification from "../Notification/notification"
 import "./home.css";
 
 const Home = () => {
