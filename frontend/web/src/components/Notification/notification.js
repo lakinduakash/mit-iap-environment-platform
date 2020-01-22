@@ -9,7 +9,7 @@ import Typography from '@material-ui/core/Typography';
 class Notification extends Component {
 
   // instance of websocket connection as a class property
-  ws = new WebSocket('ws://localhost:9095')
+  ws = new WebSocket('ws://localhost:9095/notifications')
   msg = "";
 
   componentDidMount() {
@@ -21,7 +21,7 @@ class Notification extends Component {
       this.ws.onmessage = evt => {
       // listen to data sent from the websocket server
       const message = evt.data
-      msg = message
+      this.msg = message
       this.setState({dataFromServer: message})
       alert('Notification received : ' + message);
       console.log(message)
@@ -86,7 +86,8 @@ class ChildComponent extends Component {
     );
   }
 }
-const useStyles = makeStyles({
+
+const classes = makeStyles({
   card: {
     minWidth: 275,
   },
