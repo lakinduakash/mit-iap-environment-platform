@@ -1,104 +1,3 @@
-// import React from "react";
-// import {
-//   Grid,
-//   Checkbox,
-//   Form,
-//   Segment,
-//   Message,
-//   Button
-// } from "semantic-ui-react";
-
-// class LoginForm extends React.Component {
-//   constructor(props) {
-//     super(props);
-//     this.state = {
-//       email: "",
-//       password: ""
-//     };
-
-//     this.handleInputChange.bind(this);
-//   }
-
-//   handleInputChange = event => {
-//     const target = event.target;
-//     const name = target.name;
-//     const value = target.type === "checkbox" ? target.checked : target.value;
-
-//     this.setState({
-//       [name]: value
-//     });
-//   };
-
-//   onLogin = () => {
-//     //if(userAuthenticated){
-//     //var id = document.getElementById("Email").value;
-//     if (this.state.email === "user") {
-//       //return  <Redirect  to='/' />
-//       this.props.history.push("/user-dash");
-//     } else if (this.state.email === "admin") {
-//       this.props.history.push("/admin-dash");
-//     }
-//   };
-
-//   render() {
-//     return (
-//       <Segment>
-//         <Grid
-//           columns={2}
-//           textAlign="center"
-//           padded
-//           style={{ height: "100vh" }}
-//           verticalAlign="middle"
-//         >
-//           <Grid.Column style={{ maxWidth: 1600 }}>
-//             <Message>
-//               MIT IAP Environment Platform is a service for customers to request
-//               land for private or commercial reasons...
-//             </Message>
-//           </Grid.Column>
-//           <Grid.Column textAlign="left" style={{ maxWidth: 400 }}>
-//             <strong>Log in</strong>
-//             <br />
-//             <br />
-//             <Form>
-//               <Segment stacked>
-//                 <Form.Input
-//                   icon="user"
-//                   iconPosition="left"
-//                   placeholder="Email"
-//                   name="email"
-//                   onChange={this.handleInputChange}
-//                   value={this.state.email}
-//                 />
-//                 <Form.Input
-//                   type="password"
-//                   icon="lock"
-//                   iconPosition="left"
-//                   placeholder="Password"
-//                   name="password"
-//                   onChange={this.handleInputChange}
-//                   value={this.state.password}
-//                 />
-//                 <Checkbox label="Remember password" />
-//                 <br></br>
-//                 <br></br>
-//                 <Button color="teal" type="login" onClick={this.onLogin}>
-//                   Log in
-//                 </Button>
-//               </Segment>
-//             </Form>
-//             <Message>
-//               New to us? <a href="/signup">Sign Up</a>
-//             </Message>
-//           </Grid.Column>
-//         </Grid>
-//       </Segment>
-//     );
-//   }
-// }
-
-// export default LoginForm;
-
 import React from "react";
 import Avatar from "@material-ui/core/Avatar";
 import Button from "@material-ui/core/Button";
@@ -123,16 +22,23 @@ const useStyles = makeStyles(theme => ({
   },
   avatar: {
     margin: theme.spacing(1),
-    backgroundColor: "#5eba7d"
+    backgroundColor: "#277c2f"
   },
   form: {
     width: "100%", // Fix IE 11 issue.
     marginTop: theme.spacing(1)
   },
+  checkbox: {
+    color: "#0d5113"
+  },
   submit: {
+    fontSize: 15,
     margin: theme.spacing(3, 0, 2),
-    background: "#5eba7d",
-    color: "white"
+    background: "#277c2f",
+    color: "white",
+    "&:hover": {
+      backgroundColor: "#0d5113"
+    }
   }
 }));
 
@@ -222,7 +128,7 @@ class LoginForm extends React.Component {
             />
             <FormControlLabel
               control={
-                <Checkbox value="remember" style={{ color: "#5eba7d" }} />
+                <Checkbox value="remember" className={classes.checkbox} />
               }
               label="Remember me"
             />

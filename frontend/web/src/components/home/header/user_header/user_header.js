@@ -15,6 +15,9 @@ const useStyles = makeStyles(theme => ({
   grow: {
     flexGrow: 1
   },
+  appBar: {
+    background: "#277c2f"
+  },
   title: {
     display: "none",
     fontWeight: "bold",
@@ -62,7 +65,7 @@ export default function PrimarySearchAppBar() {
 
   return (
     <div className={classes.grow}>
-      <AppBar position="static" style={{ background: "#5eba7d" }}>
+      <AppBar position="static" className={classes.appBar}>
         <Toolbar>
           <img
             src={Logo}
