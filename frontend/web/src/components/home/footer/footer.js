@@ -5,7 +5,6 @@ const Footer = () => {
   return (
     <Fragment>
       <div className="footer">
-        <p></p>
         <h6>
           <b> @ Ballerina MIT IAP Program, 2020. All rights Reserved.</b>
         </h6>
