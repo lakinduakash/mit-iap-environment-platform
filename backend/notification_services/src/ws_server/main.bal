@@ -16,7 +16,7 @@ WsUser[] wsUsers=[];
 @http:WebSocketServiceConfig {
     path: "/notifications",
     subProtocols: ["xml", "json"],
-    idleTimeoutInSeconds: 120
+    //idleTimeoutInSeconds: 120
 }
 service basic on new http:Listener(9095) {
     resource function onOpen(http:WebSocketCaller caller) {
