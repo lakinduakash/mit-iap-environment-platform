@@ -4,9 +4,6 @@ import UserIssues from "./grid/user_grid";
 function User() {
   return (
     <Fragment>
-      <br />
-      <br />
-      Hello User!
       <UserIssues />
     </Fragment>
   );
