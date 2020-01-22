@@ -1,28 +1,59 @@
 import React, { useState } from "react";
-import { makeStyles, withStyles } from "@material-ui/core/styles";
+import { makeStyles } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
 import Checkbox from "@material-ui/core/Checkbox";
-import FormControl from "@material-ui/core/FormControl";
-import FormGroup from "@material-ui/core/FormGroup";
-import FormHelperText from "@material-ui/core/FormHelperText";
-import FormLabel from "@material-ui/core/FormLabel";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
-import "./signup.css";
+import Button from "@material-ui/core/Button";
+import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
+import Avatar from "@material-ui/core/Avatar";
+import Typography from "@material-ui/core/Typography";
+import CssBaseline from "@material-ui/core/CssBaseline";
+import Container from "@material-ui/core/Container";
+import { useHistory } from "react-router-dom";
+import Box from "@material-ui/core/Box";
+import Link from "@material-ui/core/Link";
 
 const styles = makeStyles(theme => ({
-  root: {
-    "& > *": {
-      margin: theme.spacing(1),
-      width: "50%"
-    }
+  avatar: {
+    margin: theme.spacing(1),
+    backgroundColor: "#277c2f"
   },
-  formControl: {
-    margin: theme.spacing(3)
+  root: {
+    marginTop: theme.spacing(1),
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center"
+  },
+  form: {
+    width: "100%", // Fix IE 11 issue.
+    marginTop: theme.spacing(1)
   },
   checkbox: {
-    color: "#0d5113"
+    color: "#277c2f"
+  },
+  button: {
+    width: "45%",
+    fontSize: 13,
+    backgroundColor: "#277c2f",
+    color: "white",
+    "&:hover": {
+      backgroundColor: "#0d5113"
+    }
   }
 }));
+
+function Copyright() {
+  return (
+    <Typography variant="body2" color="textSecondary" align="center">
+      {"Copyright © "}
+      <Link color="inherit" href="https://material-ui.com/">
+        Environmental Management Platform
+      </Link>{" "}
+      {new Date().getFullYear()}
+      {"."}
+    </Typography>
+  );
+}
 
 function SignupForm() {
   const classes = styles();
@@ -34,190 +65,120 @@ function SignupForm() {
   const [address, setAddress] = useState();
   const [password, setPassword] = useState();
   const [confirmPassword, setConfirmPassword] = useState();
-
-  // render() {
-  //   return (
-  //     <Grid
-  //       textAlign="center"
-  //       style={{ height: "100vh" }}
-  //       verticalAlign="middle"
-  //     >
-  //       <Grid.Column textAlign="left" style={{ maxWidth: 450 }}>
-  //         <br></br>
-  //         <Form>
-  //           <Form.Field>
-  //             <label>First Name</label>
-  //             <input
-  //               placeholder="First Name"
-  //               name="firstName"
-  //               onChange={this.handleInputChange}
-  //               value={this.state.firstName}
-  //             />
-  //           </Form.Field>
-  //           <Form.Field>
-  //             <label>Last Name</label>
-  //             <input
-  //               placeholder="Last Name"
-  //               name="lastName"
-  //               onChange={this.handleInputChange}
-  //               value={this.state.lastName}
-  //             />
-  //           </Form.Field>
-  //           <Form.Field>
-  //             <label>Email</label>
-  //             <input
-  //               placeholder="Email"
-  //               name="email"
-  //               onChange={this.handleInputChange}
-  //               value={this.state.email}
-  //             />
-  //           </Form.Field>
-  //           <Form.Field>
-  //             <label>Phone Number</label>
-  //             <input
-  //               placeholder="Phone Number"
-  //               name="phoneNumber"
-  //               onChange={this.handleInputChange}
-  //               value={this.state.phoneNumber}
-  //             />
-  //           </Form.Field>
-  //           <Form.Field>
-  //             <label>Address</label>
-  //             <input
-  //               placeholder="Address"
-  //               name="address"
-  //               onChange={this.handleInputChange}
-  //               value={this.state.address}
-  //             />
-  //           </Form.Field>
-  //           <Form.Field>
-  //             <label>Password</label>
-  //             <input
-  //               placeholder="Password"
-  //               name="password"
-  //               onChange={this.handleInputChange}
-  //               value={this.state.password}
-  //             />
-  //           </Form.Field>
-  //           <Form.Field>
-  //             <label>Confirm Password</label>
-  //             <input
-  //               placeholder="Confirm Password"
-  //               name="confirmPassword"
-  //               onChange={this.handleInputChange}
-  //               value={this.state.confirmPassword}
-  //             />
-  //           </Form.Field>
-  //           <Checkbox label="I agree to the Terms and Conditions" />
-  //           <br></br>
-  //           <br></br>
-  //           <Button type="signup" color="teal">
-  //             Sign Up
-  //           </Button>
-  //           <Button
-  //             onClick={() => this.props.history.push("/login")}
-  //             color="teal"
-  //           >
-  //             Back
-  //           </Button>
-  //         </Form>
-  //       </Grid.Column>
-  //     </Grid>
-  //   );
-  // }
+  const history = useHistory();
 
   return (
-    <div>
+    <Container component="main" maxWidth="xs">
+      <CssBaseline />
       <div className={classes.root}>
-        <FormControl component="fieldset" className={classes.formControl}>
-          <FormLabel component="legend" className>
+        <Avatar className={classes.avatar}>
+          <LockOutlinedIcon />
+        </Avatar>
+        <Typography component="h1" variant="h5">
+          Sign Up
+        </Typography>
+        <form className={classes.form} noValidate>
+          <TextField
+            variant="outlined"
+            margin="normal"
+            id="firstName"
+            name="firstName"
+            label="First Name"
+            placeholder="First Name"
+            onChange={() => setFirstName()}
+            value={firstName}
+            fullWidth
+          />
+          <TextField
+            variant="outlined"
+            margin="normal"
+            id="lastName"
+            name="lastName"
+            label="Last Name"
+            placeholder="Last Name"
+            onChange={() => setLastName()}
+            value={lastName}
+            fullWidth
+          />
+          <TextField
+            variant="outlined"
+            margin="normal"
+            id="email"
+            name="email"
+            label="Email"
+            placeholder="Email"
+            onChange={() => setEmail()}
+            value={email}
+            fullWidth
+          />
+          <TextField
+            variant="outlined"
+            margin="normal"
+            id="phoneNumber"
+            name="phoneNumber"
+            label="Phone Number"
+            placeholder="Phone Number"
+            onChange={() => setPhoneNumber()}
+            value={phoneNumber}
+            fullWidth
+          />
+          <TextField
+            variant="outlined"
+            margin="normal"
+            id="address"
+            name="address"
+            label="Address"
+            placeholder="Address"
+            onChange={() => setAddress()}
+            value={address}
+            fullWidth
+          />
+          <TextField
+            variant="outlined"
+            margin="normal"
+            id="password"
+            name="password"
+            label="Password"
+            placeholder="Password"
+            type="password"
+            onChange={() => setPassword()}
+            value={password}
+            fullWidth
+          />
+          <TextField
+            variant="outlined"
+            margin="normal"
+            id="confirmPassword"
+            name="confirmPassword"
+            label="Confirm Password"
+            placeholder="Confirm Password"
+            type="password"
+            onChange={() => setConfirmPassword()}
+            value={confirmPassword}
+            fullWidth
+          />
+          <FormControlLabel
+            control={<Checkbox value="remember" className={classes.checkbox} />}
+            label="Remember me"
+          />
+          <br />
+          <Button type="signup" className={classes.button}>
             Sign Up
-          </FormLabel>
-          <FormGroup>
-            <TextField
-              variant="outlined"
-              margin="normal"
-              id="firstName"
-              name="firstName"
-              label="First Name"
-              placeholder="First Name"
-              onChange={() => setFirstName()}
-              value={firstName}
-            />
-            <TextField
-              variant="outlined"
-              margin="normal"
-              id="lastName"
-              name="lastName"
-              label="Last Name"
-              placeholder="Last Name"
-              onChange={() => setLastName()}
-              value={lastName}
-            />
-            <TextField
-              variant="outlined"
-              margin="normal"
-              id="email"
-              name="email"
-              label="Email"
-              placeholder="Email"
-              onChange={() => setEmail()}
-              value={email}
-            />
-            <TextField
-              variant="outlined"
-              margin="normal"
-              id="phoneNumber"
-              name="phoneNumber"
-              label="Phone Number"
-              placeholder="Phone Number"
-              onChange={() => setPhoneNumber()}
-              value={phoneNumber}
-            />
-            <TextField
-              variant="outlined"
-              margin="normal"
-              id="address"
-              name="address"
-              label="Address"
-              placeholder="Address"
-              onChange={() => setAddress()}
-              value={address}
-            />
-            <TextField
-              variant="outlined"
-              margin="normal"
-              id="password"
-              name="password"
-              label="Password"
-              placeholder="Password"
-              type="password"
-              onChange={() => setPassword()}
-              value={password}
-            />
-            <TextField
-              variant="outlined"
-              margin="normal"
-              id="confirmPassword"
-              name="confirmPassword"
-              label="Confirm Password"
-              placeholder="Confirm Password"
-              type="password"
-              onChange={() => setConfirmPassword()}
-              value={confirmPassword}
-            />
-            <FormControlLabel
-              control={
-                <Checkbox value="remember" className={classes.checkbox} />
-              }
-              label="Remember me"
-            />
-          </FormGroup>
-          <FormHelperText>Be careful</FormHelperText>
-        </FormControl>
+          </Button>
+          <Button
+            style={{ marginLeft: "10%" }}
+            onClick={() => history.push("/login")}
+            className={classes.button}
+          >
+            Back
+          </Button>
+        </form>
       </div>
-    </div>
+      <Box mt={8}>
+        <Copyright />
+      </Box>
+    </Container>
   );
 }
 
-export default withStyles(styles)(SignupForm);
+export default SignupForm;
