@@ -124,7 +124,7 @@ service eventListener on new http:Listener(9090) {
                     // Notification for admin
                     Notification notification = {
                         receiver: "admin",
-                        category: "Label Added ",
+                        category: "Label Added",
                         description: "New label was added"
                     };
                     response.statusCode = http:STATUS_OK;
@@ -149,12 +149,14 @@ function sendMessage(Notification notification) {
     io:println(notification);
 
     json|error notificationJson = json.constructFrom(notification);
-    ws_server:WsUser[] ws = ws_server:getWebSocketClients();
-    foreach ws_server:WsUser item in ws {
-        if(item.user=== notification.receiver){
-            http:WebSocketCaller wc= item.wsCaller;
-            var a= wc->pushText(notificationJson.toString());
-        }
+    if (notificationJson is json) {
+        ws_server:WsUser[] ws = ws_server:getWebSocketClients();
+        foreach ws_server:WsUser item in ws {
+            if(item.user=== notification.receiver){
+                http:WebSocketCaller wc= item.wsCaller;
+                var a= wc->pushText(notificationJson.toJsonString());
+            }
+}
     }
 
 }
