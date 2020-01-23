@@ -15,7 +15,6 @@ class LandRequestForm extends React.Component {
     coords: this.props.coords
   }
 }
-llllllllllll
   
 handleChange = (e) => {
     if (["lat", "long"].includes(e.target.className) ) {
