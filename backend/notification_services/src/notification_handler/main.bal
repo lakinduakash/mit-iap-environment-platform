@@ -112,8 +112,8 @@ service eventListener on new http:Listener(9090) {
                     }
                     Notification notification_user = {
                         receiver: username,
-                        category: "Issue Edited",
-                        description: "Issue was edited"
+                        category: "Comment Created",
+                        description: "New comment was added"
                     };
                     response.statusCode = http:STATUS_OK;
                     response.setPayload("Success");
