@@ -106,7 +106,8 @@ handleSubmit = (e) => {
   var l = document.getElementById('landtype').value
   var t = document.getElementById('timeframe').value
   var d = document.getElementById('desc').value
-  var x = {points: this.state.points, landtype:l, timeframe:t, description:d}
+  var x = {points: this.state.points, timeframe:t, description:d}
+  var ret = {Title: l, description:x}
   
 
   // const link = ""
