@@ -130,7 +130,7 @@ service adminService on endPoint {
         if (githubResponse is http:Response) {
             var jsonPayload = githubResponse.getJsonPayload();
             if (jsonPayload is json[]) {
-                json | error formattedLabels = utilities:createAFormattedJsonOfLabels(jsonPayload);
+                json | error formattedLabels = utilities:createAFormattedJsonOfStateLabels(jsonPayload);
                 if (formattedLabels is json) {
                     response.statusCode = http:STATUS_OK;
                     response.setJsonPayload(<@untained>formattedLabels);

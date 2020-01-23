@@ -32,6 +32,15 @@ const AdminView = () => {
       .catch();
   };
 
+  const getLabels = () => {
+    axios
+      .get("http://0.0.0.0:9070/admin-services/get-all-labels")
+      .then(response => {
+        console.log(response.data);
+      })
+      .catch();
+  };
+
   const getComments = () => {
     axios
       .get("http://0.0.0.0:9070/admin-services/get-comments/" + id)
@@ -45,6 +54,7 @@ const AdminView = () => {
 
   useEffect(() => {
     getComments();
+    getLabels();
   }, [loading, id]);
 
   return (
