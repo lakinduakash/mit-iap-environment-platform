@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import Avatar from "@material-ui/core/Avatar";
 import Button from "@material-ui/core/Button";
 import CssBaseline from "@material-ui/core/CssBaseline";
@@ -12,6 +12,7 @@ import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
+import { useHistory } from "react-router-dom";
 
 const useStyles = makeStyles(theme => ({
   paper: {
@@ -55,6 +56,88 @@ function Copyright() {
   );
 }
 
+function LogInForm() {
+  const classes = useStyles();
+  const history = useHistory();
+
+  const [email, setEmail] = useState();
+  const [password, setPassword] = useState();
+
+  return (
+    <Container component="main" maxWidth="xs">
+      <CssBaseline />
+      <div className={classes.paper}>
+        <Avatar className={classes.avatar}>
+          <LockOutlinedIcon />
+        </Avatar>
+        <Typography component="h1" variant="h5">
+          Sign in
+        </Typography>
+        <form className={classes.form} noValidate>
+          <TextField
+            variant="outlined"
+            margin="normal"
+            required
+            fullWidth
+            id="email"
+            label="Email Address"
+            name="email"
+            autoComplete="email"
+            onChange={e => setEmail(e.target.value || "")}
+            value={email || ""}
+            autoFocus
+          />
+          <TextField
+            variant="outlined"
+            margin="normal"
+            required
+            fullWidth
+            name="password"
+            label="Password"
+            type="password"
+            id="password"
+            autoComplete="current-password"
+            onChange={e => setPassword(e.target.value || "")}
+            value={password || ""}
+          />
+          <FormControlLabel
+            control={<Checkbox value="remember" className={classes.checkbox} />}
+            label="Remember me"
+          />
+          <Button
+            type="submit"
+            fullWidth
+            variant="contained"
+            className={classes.submit}
+            onClick={() => {
+              console.log("Email: " + email);
+              if (email === "user") {
+                history.push("/user-dash");
+              } else if (email === "admin") {
+                history.push("/admin-dash");
+              } else {
+                history.push("/user-dash");
+              }
+            }}
+          >
+            Sign In
+          </Button>
+          <Grid container>
+            <Grid item>
+              <Link href="/signup" variant="body2">
+                {"Don't have an account? Sign Up"}
+              </Link>
+            </Grid>
+          </Grid>
+        </form>
+      </div>
+      <Box mt={8}>
+        <Copyright />
+      </Box>
+    </Container>
+  );
+}
+
 class LoginForm extends React.Component {
   constructor(props) {
     super(props);
@@ -62,103 +145,10 @@ class LoginForm extends React.Component {
       email: "",
       password: ""
     };
-
-    this.handleInputChange.bind(this);
-    this.formComponent.bind(this);
   }
 
-  handleInputChange = event => {
-    const target = event.target;
-    const name = target.name;
-    const value = target.type === "checkbox" ? target.checked : target.value;
-
-    this.setState({
-      [name]: value
-    });
-  };
-
-  onLogin = () => {
-    if (this.state.email === "user") {
-      this.props.history.push("/user-dash");
-    } else if (this.state.email === "admin") {
-      this.props.history.push("/admin-dash");
-    } else {
-      this.props.history.push("/user-dash");
-    }
-  };
-
-  formComponent = () => {
-    const classes = useStyles();
-    return (
-      <Container component="main" maxWidth="xs">
-        <CssBaseline />
-        <div className={classes.paper}>
-          <Avatar className={classes.avatar}>
-            <LockOutlinedIcon />
-          </Avatar>
-          <Typography component="h1" variant="h5">
-            Sign in
-          </Typography>
-          <form className={classes.form} noValidate>
-            <TextField
-              variant="outlined"
-              margin="normal"
-              required
-              fullWidth
-              id="email"
-              label="Email Address"
-              name="email"
-              autoComplete="email"
-              onChange={this.handleInputChange}
-              value={this.state.email}
-              autoFocus
-            />
-            <TextField
-              variant="outlined"
-              margin="normal"
-              required
-              fullWidth
-              name="password"
-              label="Password"
-              type="password"
-              id="password"
-              autoComplete="current-password"
-              onChange={this.handleInputChange}
-              value={this.state.password}
-            />
-            <FormControlLabel
-              control={
-                <Checkbox value="remember" className={classes.checkbox} />
-              }
-              label="Remember me"
-            />
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              className={classes.submit}
-              onClick={this.onLogin}
-            >
-              Sign In
-            </Button>
-            <Grid container>
-              <Grid item>
-                <Link href="/signup" variant="body2">
-                  {"Don't have an account? Sign Up"}
-                </Link>
-              </Grid>
-            </Grid>
-          </form>
-        </div>
-        <Box mt={8}>
-          <Copyright />
-        </Box>
-      </Container>
-    );
-  };
-
   render() {
-    return <this.formComponent />;
+    return <LogInForm />;
   }
 }
 
