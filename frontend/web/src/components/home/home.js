@@ -13,7 +13,7 @@ import SignupForm from "../home/body/signup/signup";
 import User from "./body/dashboard/user_dash/user_dash";
 import Admin from "./body/dashboard/admin_dash/admin_dash";
 import Notification from "../Notification/notification";
-import Request from "./body/dashboard/user_dash/request_info/requestInfo";
+import Request from "./body/dashboard/user_dash/request_info/request_info";
 import "./home.css";
 
 const Home = () => {
