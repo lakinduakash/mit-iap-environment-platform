@@ -16,16 +16,14 @@ const Requset = () => {
   const handleSubmit = event => {
     axios
       .post(
-        "http://0.0.0.0:9060/user-services/post-comment/" + id + "/yashod",
+        "http://0.0.0.0:9080/user-services/post-comment/" + id + "/yashod",
         { body: reply }
       )
       .then(response => {
         console.log(response.data);
         setReply("");
         axios
-          .get(
-            "http://0.0.0.0:9060/user-services/get-comments/" + id + "/yashod"
-          )
+          .get("http://0.0.0.0:9080/user-services/get-comments/" + id)
           .then(response => {
             setComments(response.data);
           })
@@ -36,7 +34,7 @@ const Requset = () => {
 
   useEffect(() => {
     axios
-      .get("http://0.0.0.0:9060/user-services/get-comments/" + id + "/yashod")
+      .get("http://0.0.0.0:9080/user-services/get-comments/" + id)
       .then(response => {
         setComments(response.data);
       })
@@ -52,58 +50,65 @@ const Requset = () => {
       >
         Back
       </button>
-      <div className="body-request-info">
-        <h1>Title : {title}</h1>
-        <hr />
-        <h2>Description : {body}</h2>
+      <div class="row">
+        <div class="col-sm-6">
+          <div class="card">
+            <div class="card-header">
+              <h1> {title}</h1>
+            </div>
+            <div class="card-body">
+              <h4>Status of the Request: {state}</h4>
+              <hr />
+              <h4>Description : {body}</h4>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6">
+          <Comment.Group size="large">
+            <Header as="h3" dividing>
+              Process of the Request
+            </Header>
 
-        <h4>Status : {state}</h4>
-        <hr />
-
-        <Comment.Group size="large">
-          <Header as="h3" dividing>
-            Process of the Request
-          </Header>
-
-          {comments != null ? (
-            comments.map(comment => (
-              <Comment key={comment.commentId}>
-                <Comment.Avatar
-                  src={Avatar}
-                  alt="WSO2"
-                  width="40"
-                  height="40"
+            {comments != null ? (
+              comments.map(comment => (
+                <Comment key={comment.commentId}>
+                  <Comment.Avatar
+                    src={Avatar}
+                    alt="WSO2"
+                    width="40"
+                    height="40"
+                  />
+                  <Comment.Content>
+                    <Comment.Author as="a">{comment.user}</Comment.Author>
+                    <Comment.Text>{comment.comment}</Comment.Text>
+                    <Comment.Actions>
+                      <Comment.Action>Reply</Comment.Action>
+                    </Comment.Actions>
+                  </Comment.Content>
+                </Comment>
+              ))
+            ) : (
+              <h3>no</h3>
+            )}
+            <br />
+            <Form>
+              <Form.Field>
+                <input
+                  type="text"
+                  value={reply}
+                  onChange={event => setReply(event.target.value)}
                 />
-                <Comment.Content>
-                  <Comment.Author as="a">{comment.user}</Comment.Author>
-                  <Comment.Text>{comment.comment}</Comment.Text>
-                  <Comment.Actions>
-                    <Comment.Action>Reply</Comment.Action>
-                  </Comment.Actions>
-                </Comment.Content>
-              </Comment>
-            ))
-          ) : (
-            <h3>no</h3>
-          )}
-          <br />
-          <Form>
-            <Form.Field>
-              <input
-                type="text"
-                value={reply}
-                onChange={event => setReply(event.target.value)}
+              </Form.Field>
+              <Button
+                content="Add Reply"
+                labelPosition="left"
+                icon="edit"
+                primary
+                onClick={() => handleSubmit()}
               />
-            </Form.Field>
-            <Button
-              content="Add Reply"
-              labelPosition="left"
-              icon="edit"
-              primary
-              onClick={() => handleSubmit()}
-            />
-          </Form>
-        </Comment.Group>
+            </Form>
+          </Comment.Group>
+        </div>
       </div>
     </Fragment>
   );
