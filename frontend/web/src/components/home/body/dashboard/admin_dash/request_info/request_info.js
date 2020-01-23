@@ -8,9 +8,18 @@ import Avatar from "../../../../../../asserts/images/avatar.png";
 import { Map, CircleMarker, TileLayer, Polygon } from "react-leaflet";
 
 const AdminView = () => {
-  const [id, title, status, body, owner, tags, assignees] = useContext(
-    AdminRequestContext
-  );
+  const [
+    id,
+    title,
+    status,
+    body,
+    owner,
+    tags,
+    assignees,
+    ,
+    ,
+    setStatus
+  ] = useContext(AdminRequestContext);
   const [loading] = useState(null);
   let history = useHistory();
   const [data, setData] = useState(null);
@@ -18,6 +27,7 @@ const AdminView = () => {
   const [reply, setReply] = useState("");
   const [labels, setLabels] = useState(null);
   const [state, setState] = useState();
+  const [newState, setNewState] = useState("");
   const pending = "Pending";
 
   const handleSubmit = event => {
@@ -65,12 +75,24 @@ const AdminView = () => {
       .catch();
   };
 
+  const assignLabel = () => {
+    axios
+      .post("http://0.0.0.0:9070/admin-services/assign-label/" + id, {
+        labelNames: [state]
+      })
+      .then(response => {
+        console.log(response);
+      })
+      .catch();
+  };
+
   const changeState = () => {
     if (status != "") {
       removeLabel();
     }
     if (state != undefined) {
-      console.log(state);
+      assignLabel();
+      setStatus(state);
     }
   };
 
@@ -79,10 +101,11 @@ const AdminView = () => {
     getLabels();
   }, [loading, id]);
 
+  const createNewLabel = () => {};
+
   return (
     <Fragment>
       <br />
-      <p>{state}</p>
       <button
         className="btn btn-info request-button"
         onClick={() => {
@@ -91,6 +114,7 @@ const AdminView = () => {
       >
         Back
       </button>
+      <h2>{newState}</h2>
       <div className="row request-div">
         <div className="col-sm-8 ">
           <div className="card">
@@ -144,9 +168,18 @@ const AdminView = () => {
                             </select>
                             <br />
                             <button
+                              class="btn btn-primary"
+                              data-toggle="modal"
+                              data-target="#myModal2"
+                            >
+                              New Status
+                            </button>
+                            {"  "}
+                            <button
                               onClick={() => changeState()}
                               type="submit"
                               class="btn btn-primary"
+                              data-dismiss="modal"
                             >
                               Submit
                             </button>
@@ -155,9 +188,56 @@ const AdminView = () => {
                       </div>
                     </div>
                   </div>
+                  <div class="modal fade" id="myModal2">
+                    <div class="modal-dialog modal-dialog-centered">
+                      <div class="modal-content">
+                        <div class="modal-body">
+                          <button
+                            type="button"
+                            class="close"
+                            data-dismiss="modal"
+                          >
+                            &times;
+                          </button>
+                          <form class="was-validated">
+                            <div class="form-group">
+                              <label for="uname">State Name:</label>
+                              <input
+                                type="text"
+                                class="form-control"
+                                id="uname"
+                                placeholder="Enter username"
+                                name="uname"
+                                value={newState}
+                                onChange={event => {
+                                  setNewState(event.target.value);
+                                }}
+                                required
+                              />
+                              <div class="valid-feedback">Valid.</div>
+                              <div class="invalid-feedback">
+                                Please fill out this field.
+                              </div>
+                            </div>
+
+                            <button
+                              onClick={() => {
+                                createNewLabel();
+                              }}
+                              type="submit"
+                              class="btn btn-primary"
+                            >
+                              Submit
+                            </button>
+                          </form>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
               <hr />
+
               {data != null ? (
                 <div>
                   <h3>Description : {data.description}</h3>
