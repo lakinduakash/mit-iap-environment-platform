@@ -156,7 +156,6 @@ function sendMessage(Notification notification) {
                 http:WebSocketCaller wc= item.wsCaller;
                 var a= wc->pushText(notificationJson.toJsonString());
             }
-}
+        }
     }
-
 }

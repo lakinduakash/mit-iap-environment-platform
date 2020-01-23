@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Alert from '@material-ui/lab/Alert';
 import AlertTitle from '@material-ui/lab/AlertTitle';
-// import { Alert, AlertTitle } from '@material-ui/lab';
 
 class Notification extends Component {
 
@@ -12,38 +11,38 @@ class Notification extends Component {
 
   componentDidMount() {
       this.ws.onopen = () => {
-      // on connecting, do nothing but log it to the console
-      console.log('connected to websocket server')
+        // on connecting, do nothing but log it to the console
+        console.log('connected to websocket server')
       }
 
       this.ws.onmessage = evt => {
-      // listen to data sent from the websocket server
-      const message = evt.data
+        // listen to data sent from the websocket server
+        const message = evt.data
+        console.log(message);
 
-      // Convert message to json
-      console.log(message);
-      try {
-        var notificationJson = JSON.parse(message);
-        console.log(notificationJson)
-        this.messageList.push(notificationJson);
-        this.setState({dataFromServer: message});
-      } catch (error) {
-        // console.log(error);
-      }
+        // Convert message to json
+        try {
+          var notificationJson = JSON.parse(message);
+          console.log(notificationJson)
+          this.messageList.push(notificationJson);
+          this.setState({dataFromServer: message});
+        } catch (error) {
+          console.log(error);
+        }
 
-      this.ws.onclose = () => {
-      console.log('disconnected')
-      // automatically try to reconnect on connection loss
-
-      }
+        this.ws.onclose = () => {
+          console.log('disconnected')
+          // automatically try to reconnect on connection loss
+        }
     }
 
   }
 
   render(){
-    return (<div>
-       <ChildComponent websocket={this.ws} />
-      < Notification_holder value = {this.messageList} />
+    return (
+      <div>
+        <ChildComponent websocket={this.ws} />
+        <Notification_holder value = {this.messageList} />
       </div>
     )
   }
@@ -107,11 +106,22 @@ const useStyles = makeStyles(theme => ({
 function Notification_holder(notif){
   const classes = useStyles();
   let array = [];
-  var categoryMap = {issueCreated: "Issue Created", issueEdited: "Issue Edited", issueClosed: "Issue Closed", commentCreated: "Comment Created", labelAdded: "Label Added"};
+  var alertSeverity = "";
 
   notif.value.forEach(element => {
+    if (element.category === "Issue Created") {
+      alertSeverity = "success";
+    } else if (element.category === "Issue Edited") {
+      alertSeverity = "info";
+    } else if (element.category === "Issue Closed") {
+      alertSeverity = "error"
+    } else if (element.category === "Comment Created") {
+      alertSeverity = "success"
+    } else if (element.category === "Label Added") {
+      alertSeverity = "warning"
+    }
     array.push(
-      <Alert className={classes.alert} variant="outlined" serverity="info">
+      <Alert className={classes.alert} severity={alertSeverity}>
         <AlertTitle>{element.category}</AlertTitle>
         {element.description}
       </Alert>
@@ -123,22 +133,6 @@ function Notification_holder(notif){
   return (
     <div className={classes.root}>
       {array}
-      <Alert severity="error">
-        <AlertTitle>Error</AlertTitle>
-        This is an error alert — check it out!
-      </Alert>
-      <Alert severity="warning">
-        <AlertTitle>Warning</AlertTitle>
-        This is a warning alert — check it out!
-      </Alert>
-      <Alert severity="info">
-        <AlertTitle>Info</AlertTitle>
-        This is an info alert — check it out!
-      </Alert>
-      <Alert severity="success">
-        <AlertTitle>Success</AlertTitle>
-        This is a success alert — check it out!
-      </Alert>
     </div>
   );
 }
