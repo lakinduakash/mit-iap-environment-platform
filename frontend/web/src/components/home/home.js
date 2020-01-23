@@ -15,10 +15,7 @@ import Admin from "./body/dashboard/admin_dash/admin_dash";
 import Notification from "../Notification/notification";
 import Request from "./body/dashboard/user_dash/request_info/request_info";
 import Form from "../../Form";
-<<<<<<< HEAD
-=======
 import AdminRequest from "./body/dashboard/admin_dash/request_info/request_info";
->>>>>>> 9c88b3321ae56b6c6247089e925e2f501936c0b1
 import "./home.css";
 
 const Home = () => {
