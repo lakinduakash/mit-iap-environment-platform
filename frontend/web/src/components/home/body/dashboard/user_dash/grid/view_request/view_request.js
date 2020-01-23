@@ -1,44 +1,28 @@
-import React, { useEffect } from "react";
-import axios from "axios";
-import { useState } from "react";
+import React, { useContext } from "react";
+import { useHistory } from "react-router-dom";
+import { RequestContext } from "../../../../../../utility/contexts/requestContext";
 
 const View_request = props => {
-  const [comments, setComments] = useState();
-  const [loading, setLoading] = useState(false);
+  let history = useHistory();
+  const [, , , , setId, setTitle, setState, setBody] = useContext(
+    RequestContext
+  );
+
   return (
     <div>
       <button
         type="button"
         className="btn btn-info"
-        data-toggle="modal"
-        data-target="#myModal"
+        onClick={() => {
+          history.push("/user-dash/request");
+          setId(props.row.requestNumber);
+          setTitle(props.row.requsetTitle);
+          setState(props.row.state);
+          setBody(props.row.requestDetails);
+        }}
       >
         View
       </button>
-
-      <div className="modal" id="myModal">
-        <div className="modal-dialog">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h4 className="modal-title">{props.row.requsetTitle}</h4>
-              <button type="button" className="close" data-dismiss="modal">
-                &times;
-              </button>
-            </div>
-            <div className="modal-body">Modal body..</div>
-
-            <div className="modal-footer">
-              <button
-                type="button"
-                className="btn btn-danger"
-                data-dismiss="modal"
-              >
-                Close
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
   );
 };
