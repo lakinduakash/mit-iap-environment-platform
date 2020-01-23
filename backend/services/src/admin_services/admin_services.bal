@@ -96,6 +96,27 @@ service adminService on endPoint {
     }
 
     @http:ResourceConfig {
+        methods: ["DELETE"],
+        path: "/remove-label/{issueNumber}/{label}"
+    }
+    resource function removeLabel(http:Caller caller, http:Request request, string issueNumber, string label) {
+
+        http:Response response = new;
+
+        int status = utilities:removeLabel(<@untainted>issueNumber, <@untainted>label);
+        if (status == http:STATUS_OK) {
+            response.statusCode = status;
+            response.setPayload("Label removed from the request successfully.");
+        } else {
+            log:printInfo("Label was not removed since the request sent was a bad request.");
+            response.statusCode = status;
+            response.setPayload("Label was not removed from the request successfully.");
+        }
+        
+        error? result = caller->respond(response);
+    }
+
+    @http:ResourceConfig {
         methods: ["GET"],
         path: "/get-all-labels"
     }

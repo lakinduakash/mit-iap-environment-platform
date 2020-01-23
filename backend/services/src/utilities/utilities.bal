@@ -592,3 +592,16 @@ public function createFormattedUser(json user) returns json | error {
 
     return userDetails;
 }
+
+public function removeLabel(string issueNumber, string labelName) returns int {
+
+    http:Request request = new;
+    request.addHeader("Authorization", ACCESS_TOKEN);
+    string url = "/repos/" + ORGANIZATION_NAME + "/" + REPOSITORY_NAME + "/issues/" + issueNumber + "/labels/" + labelName;
+    http:Response | error githubResponse = githubAPIEndpoint->delete(url, request);
+    if (githubResponse is http:Response) {
+        return githubResponse.statusCode;
+    } else {
+        return http:STATUS_BAD_REQUEST;
+    }
+}
