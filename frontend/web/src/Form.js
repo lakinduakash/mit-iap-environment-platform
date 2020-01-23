@@ -3,12 +3,12 @@ import BMap from './Map'
 import { Map, CircleMarker, TileLayer, Polygon } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import axios from 'axios'; 
-
 import { polygon } from 'leaflet';
+import * as turf from '@turf/turf'
 
-var yala = [[6.279629, 81.424341], [6.668179, 81.771591], [6.713189,81.716037], [6.610547,81.587634], [6.607818, 81.529269], [6.618731, 81.510730], [6.607136, 81.494937], [6.702619, 81.354861], [6.624188, 81.266284], [6.536876, 81.263538], [6.510270, 81.135135], [6.396327, 81.145993], [6.351289, 81.199551], [6.386092, 81.273022], [6.461831, 81.276455], [6.447503, 81.335507], [6.322626, 81.383572], [6.309318, 81.374131], [6.300446, 81.372929], [6.277241, 81.405201]] 
-
-
+var yala = [[6.279629, 81.424341], [6.668179, 81.771591], [6.713189,81.716037], [6.610547,81.587634], [6.607818, 81.529269], [6.618731, 81.510730], [6.607136, 81.494937], [6.702619, 81.354861], [6.624188, 81.266284], [6.536876, 81.263538], [6.510270, 81.135135], [6.396327, 81.145993], [6.351289, 81.199551], [6.386092, 81.273022], [6.461831, 81.276455], [6.447503, 81.335507], [6.322626, 81.383572], [6.309318, 81.374131], [6.300446, 81.372929], [6.277241, 81.405201],[6.279629, 81.424341]] 
+var polyyala = turf.polygon([yala]);
+var msg="";
 
 class Form extends React.Component {
   constructor(props){
@@ -27,7 +27,6 @@ class Form extends React.Component {
             })
   
 }
-
 
   
 handleChange = (e) => {
@@ -62,9 +61,12 @@ addCat = (e) => {
     }
   }
 }
+
 draw = (e) => { 
   var temp =[]
   if (this.state.cats.length>=3){
+
+
     for (let index = 0; index < this.state.cats.length; index++) { 
       if(this.state.cats[index].lat!=="" || this.state.cats[index].long !==""){
        // console.log(this.state.cats[index].lat, this.state.cats[index].long)
@@ -78,7 +80,26 @@ draw = (e) => {
     }
   console.log("OKK")
 }
+if(temp.length>2){
+  var p = temp
+  p.push(temp[0])
+  console.log(temp, p)
+  //console.log("intersect", temp)
+
+  var intersection = turf.intersect(polyyala, turf.polygon([p]))
+  if(intersection !==null){
+    msg="Not Available: Area given intersects with Protected Area"
+    console.log(msg)
+  }
+  else{
+    console.log("available")
+    msg = "Available"
+  }
+  console.log(intersection)
 }
+
+}
+
 handleSubmit = (e) => { 
   
   console.log(yala.data)
@@ -86,6 +107,8 @@ handleSubmit = (e) => {
   var t = document.getElementById('timeframe').value
   var d = document.getElementById('desc').value
   var x = {points: this.state.points, landtype:l, timeframe:t, description:d}
+  
+
   // const link = ""
   // axios({
   //   method: 'post',
@@ -111,7 +134,7 @@ render() {
     return (
       <div>
         
-        {yala.length}
+        
         <Map
           style={{ height: "480px", width: "60%" }}
 
@@ -153,16 +176,16 @@ render() {
                   value={cats[idx].long} 
                   className="long"
                 />
-                
-              </div>
-              
+              </div> 
             )
-            
-          })
+          })  
         }
-        <div>
+          <div>
+              <br></br>
               {error_msg}
-              </div>
+              <br></br>
+              {msg}
+          </div>
         <button type = 'button' onClick={this.draw.bind(this)}>Check Availability</button>
         <br></br>
         <label>
@@ -203,6 +226,7 @@ render() {
         <br></br>
         <input type="submit" value="Submit Form" />
       </form>
+      
       </div>
       
     )
