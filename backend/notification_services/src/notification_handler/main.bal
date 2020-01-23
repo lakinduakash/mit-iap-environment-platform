@@ -1,9 +1,9 @@
 import ballerina/http;
 import ballerina/io;
 import ws_server;
+import ballerina/log;
 
 type Notification record {
-    // string issueCreator?;
     string receiver;
     string category;
     string description;
@@ -20,36 +20,48 @@ service eventListener on new http:Listener(9090) {
     }
     resource function getEvent(http:Caller caller, http:Request request) {
 
+        http:Response response = new;
         var data = request.getJsonPayload();
         if (data is json) {
             if (data.action is json) {
                 var  event_action = data.action;
                 if (event_action == "opened" ) {
                     // Issue created
+
+                    // Notification for admin
                     Notification notification = {
                         receiver: "admin",
                         category: "Issue Created",
                         description: "New request was created"
                     };
+                    response.statusCode = http:STATUS_OK;
+                    response.setPayload("Success");
                     sendMessage(notification);
                 } else if (event_action == "edited") {
                     // Issue Edited
+
                     // Notification for admin
                     Notification notification_admin = {
                         receiver: "admin",
                         category: "Issue Edited",
                         description: "Issue was edited"
                     };
+                    response.statusCode = http:STATUS_OK;
+                    response.setPayload("Success");
                     sendMessage(notification_admin);
                 } else if (event_action == "closed") {
                     // Issue Closed
+
                     // Notification to the admin
                     Notification notification = {
                         receiver: "admin",
                         category: "Issue Closed",
                         description: "Request deleted"
                     };
+                    response.statusCode = http:STATUS_OK;
+                    response.setPayload("Success");
                     sendMessage(notification);
+
                     // Notification for user
                     string username = "";
                     map<json> | error issue = trap <map<json>>data.issue;
@@ -67,9 +79,12 @@ service eventListener on new http:Listener(9090) {
                         category: "Issue Closed",
                         description: "Request deleted"
                     };
+                    response.statusCode = http:STATUS_OK;
+                    response.setPayload("Success");
                     sendMessage(notification_user);
                 } else if (event_action == "created") {
                     // Comment Created
+
                     // Notification for admin
                     if (data.comment is json) {
                         var comment_body = data.comment.body;
@@ -78,8 +93,11 @@ service eventListener on new http:Listener(9090) {
                             category: "Comment Created",
                             description: "New comment was added."
                         };
+                        response.statusCode = http:STATUS_OK;
+                        response.setPayload("Success");
                         sendMessage(notification_admin);
                     }
+
                     // Notification for user
                     string username = "";
                     map<json> | error issue = trap <map<json>>data.issue;
@@ -97,19 +115,33 @@ service eventListener on new http:Listener(9090) {
                         category: "Issue Edited",
                         description: "Issue was edited"
                     };
+                    response.statusCode = http:STATUS_OK;
+                    response.setPayload("Success");
                     sendMessage(notification_user);
                 } else if (event_action == "labeled") {
                     // Issue was labeled
+
+                    // Notification for admin
                     Notification notification = {
                         receiver: "admin",
                         category: "Label Added ",
                         description: "New label was added"
                     };
+                    response.statusCode = http:STATUS_OK;
+                    response.setPayload("Success");
                     sendMessage(notification);
                 }
+            } else {
+                log:printInfo("Error occured while retrieving the action from the payload");
+                response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
+                response.setPayload("Error occured while retrieving the action from the payload");
             }
+        } else {
+            log:printInfo("Invalid payload type recieved");
+            response.statusCode =  http:STATUS_NOT_ACCEPTABLE;
+            response.setPayload(<@untainted>data.reason());
         }
-    
+        error?respond = caller->respond(response);
     }
 }
 
@@ -123,4 +155,5 @@ function sendMessage(Notification notification) {
             var a= wc->pushText(notification.description);
         }
     }
+
 }
