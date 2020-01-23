@@ -9,10 +9,6 @@ const string ORGANIZATION_NAME = "yashodgayashan";
 const string REPOSITORY_NAME = "ballerina-github-connector";
 const string ACCESS_TOKEN = "Bearer <token>";
 
-// Listner configurations.
-const int USER_SERVICES_PORT = 9080;
-const string BASEPATH = "/github";
-
 http:Client githubAPIEndpoint = new (GITHUB_API_URL);
 
 # The `assignLabel` function will assign the labels to a given issue.
