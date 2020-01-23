@@ -35,7 +35,6 @@ const Admin_grid = () => {
                   type="button"
                   onClick={() => {
                     history.push("/admin-dash/request");
-                    console.log("any");
                   }}
                 >
                   View
