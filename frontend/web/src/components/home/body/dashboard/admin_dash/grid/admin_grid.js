@@ -1,37 +1,48 @@
 import React from "react";
-import ReactDataGrid from "react-data-grid";
+import "./admin_grid.css";
+import { Button } from "@material-ui/core";
 
-const columns = [
-  { key: "id", name: "Issue ID" },
-  { key: "title", name: "Title" },
-  { key: "description", name: "Description" },
-  { key: "depts", name: "Departments" },
-  { key: "status", name: "status" },
-  { key: "options", name: "options" }
-];
-const rows = [
-  {
-    id: 1,
-    title: "Title 1",
-    description: "first issue",
-    depts: "<put checkboxes here>",
-    status: "in progress",
-    options: "<save/cancel button>"
-  }
-];
-const rowGetter = rowNumber => rows[rowNumber];
-
-class AdminIssues extends React.Component {
-  render() {
+function SimpleTable() {
+  const Table = () => {
     return (
-      <ReactDataGrid
-        columns={columns}
-        rowGetter={rowGetter}
-        rowsCount={rows.length}
-        minHeight={500}
-      />
+      <div>
+        <table className="table table-hover table-bordered custom-table">
+          <thead>
+            <tr>
+              <th>Requset Number</th>
+              <th>Request Title</th>
+              <th>Request Description</th>
+              <th>Owner</th>
+              <th>Status</th>
+              <th>Tags</th>
+              <th>Change Tags</th>
+              <th>View</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td>
+                <Button>View</Button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     );
-  }
+  };
+
+  return (
+    <div className="admin-table">
+      <Table />
+    </div>
+  );
 }
 
-export default AdminIssues;
+export default SimpleTable;
