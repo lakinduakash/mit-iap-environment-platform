@@ -1,45 +1,44 @@
 import React, { Fragment } from "react";
-// import ReactDOM from "./node_modules/react-dom";
-// import "./index.css";
-import App from "../../App";
-// import * as serviceWorker from "./serviceWorker";
-// import "./node_modules/bootstrap/dist/css/bootstrap.min.css";
-// import "./node_modules/bootstrap/dist/js/bootstrap.bundle.min";
+import {
+  Route,
+  BrowserRouter as Router,
+  Switch,
+  Redirect
+} from "react-router-dom";
 
-import { Route, BrowserRouter as Router, Switch } from "react-router-dom";
-import Header from "./Header/header";
-import Footer from "./Footer/footer";
-import LoginForm from "./login-signup/LoginForm";
-import SignupForm from "./login-signup/SignupForm";
-import User from "../user_dash/user";
-import Admin from "../admin_dash/admin";
-import LandRequestForm from "../LandRequestForm/land-request-form";
-
-// import 'semantic-ui-css/semantic.min.css';
-
-
+import PrimarySearchAppBar from "./header/user_header/user_header";
+import Footer from "./footer/footer";
+import LoginForm from "../home/body/login/login";
+import SignupForm from "../home/body/signup/signup";
+import User from "./body/dashboard/user_dash/user_dash";
+import Admin from "./body/dashboard/admin_dash/admin_dash";
+import Notification from "../Notification/notification";
+import Request from "./body/dashboard/user_dash/request_info/request_info";
+import Form from "../../Form"
+import "./home.css";
 
 const Home = () => {
-    return (
-        <Router>
-            <Fragment>
-                <Header/>
-
-                <Switch>
-                    {/* <Route exact path="/" component={App} /> */}
-                    <Route exact path="/login" component={LoginForm} />
-                    <Route exact path="/signup" component={SignupForm} />
-                    <Route exact path="/user-dash" component={User} />
-                    <Route exact path="/admin-dash" component={Admin} />
-                    <Route exact path="/land-request-form" component={LandRequestForm} />
-                </Switch>
-        
-                <Footer/>
-            </Fragment>
-        </Router>
-    );
+  return (
+    <Router>
+      <Fragment>
+        <PrimarySearchAppBar />
+        <div className="body">
+          <Switch>
+            {/* <Route exact path="/" component={App} /> */}
+            <Route exact path="/login" component={LoginForm} />
+            <Route exact path="/signup" component={SignupForm} />
+            <Route exact path="/user-dash" component={User} />
+            <Route exact path="/admin-dash" component={Admin} />
+            <Route exact path="/notifications" component={Notification} />
+            <Route exact path="/user-dash/request" component={Request} />
+            <Route exact path="/new-issue" component={Form} />
+            <Redirect exact from="" to="/login" />
+          </Switch>
+        </div>
+        <Footer />
+      </Fragment>
+    </Router>
+  );
 };
 
 export default Home;
-
-
