@@ -133,54 +133,6 @@ service adminService on endPoint {
     }
 
     @http:ResourceConfig {
-        methods: ["PATCH"],
-        path: "/edit-request/{issueNumber}"
-    }
-    resource function editRequest(http:Caller caller, http:Request request, string issueNumber) {
-
-        http:Response response = new;
-        http:Request callBackRequest = new;
-        callBackRequest.addHeader("Authorization", ACCESS_TOKEN);
-        string url = "/repos/" + ORGANIZATION_NAME + "/" + REPOSITORY_NAME + "/issues/" + issueNumber;
-
-        var receivedRequestPayload = request.getJsonPayload();
-        if (receivedRequestPayload is json) {
-            json | error payloadTitle = receivedRequestPayload.title;
-            json | error payloadBody = receivedRequestPayload.body;
-            json | error payloadState = receivedRequestPayload.state;
-            if (payloadTitle is json && payloadBody is json && payloadState is json) {
-                string stringPayloadBody = payloadBody.toJsonString();
-                callBackRequest.setPayload(<@untained>({"title": payloadTitle, "body": stringPayloadBody, "state": payloadState}));
-                http:Response | error githubResponse = githubAPIEndpoint->patch(<@untained>url, callBackRequest);
-                if (githubResponse is http:Response) {
-                    if (githubResponse.statusCode == 200) {
-                        response.statusCode = http:STATUS_OK;
-                        response.setPayload(<@untained>("Updated issue number: " + issueNumber));
-                    } else {
-                        log:printError("Github response status code was not 200 OK.");
-                        response.statusCode = githubResponse.statusCode;
-                        response.setPayload("Issue was not updated succesfully. Please check the issue number");
-                    }
-                } else {
-                    log:printError("Error while obtaining the response from github api services.");
-                    response.statusCode = http:STATUS_NOT_ACCEPTABLE;
-                    response.setPayload(githubResponse.reason());
-                }
-            } else {
-                log:printInfo("Error while obtaining the json payload body/title from the request received.");
-                response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
-                response.setPayload("Error while obtaining the json payload body/title from the request received.");
-            }
-        } else {
-            log:printInfo("Error while obtaining the json payload from the request received.");
-            response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
-            response.setPayload("Error while obtaining the json payload from the request received.");
-        }
-
-        error? respond = caller->respond(response);
-    }
-
-    @http:ResourceConfig {
         methods: ["GET"],
         path: "/get-all-collaborators"
     }
@@ -189,8 +141,6 @@ service adminService on endPoint {
         http:Request callBackRequest = new;
         http:Response response = new;
         string url = "/repos/" + ORGANIZATION_NAME + "/" + REPOSITORY_NAME + "/collaborators";
-
-        // Please change the scope of the access token to make the function work
         callBackRequest.addHeader("Authorization", ACCESS_TOKEN);
         http:Response | error githubResponse = githubAPIEndpoint->get(<@untained>url, callBackRequest);
 
@@ -313,8 +263,6 @@ service adminService on endPoint {
         http:Request callBackRequest = new;
         http:Response response = new;
         string url = "/repos/" + ORGANIZATION_NAME + "/" + REPOSITORY_NAME + "/assignees";
-
-        // Please change the scope of the access token to make the function work
         callBackRequest.addHeader("Authorization", ACCESS_TOKEN);
         http:Response | error githubResponse = githubAPIEndpoint->get(<@untained>url, callBackRequest);
 
@@ -353,8 +301,6 @@ service adminService on endPoint {
         http:Request callBackRequest = new;
         http:Response response = new;
         string url = "/repos/" + ORGANIZATION_NAME + "/" + REPOSITORY_NAME + "/issues/" + issueNumber + "/assignees";
-
-        // Please change the scope of the access token to make the function work
         callBackRequest.addHeader("Authorization", ACCESS_TOKEN);
 
         boolean | error validIssue = utilities:isValidIssue(<@untained>issueNumber);
@@ -428,8 +374,6 @@ service adminService on endPoint {
         http:Request callBackRequest = new;
         http:Response response = new;
         string url = "/repos/" + ORGANIZATION_NAME + "/" + REPOSITORY_NAME + "/issues/" + issueNumber + "/assignees";
-
-        // Please change the scope of the access token to make the function work
         callBackRequest.addHeader("Authorization", ACCESS_TOKEN);
 
         boolean | error validIssue = utilities:isValidIssue(<@untained>issueNumber);
@@ -495,16 +439,52 @@ service adminService on endPoint {
     }
 
     @http:ResourceConfig {
+        methods: ["GET"],
+        path: "/get-comments/{issueNumber}"
+    }
+    resource function getComments(http:Caller caller, http:Request request, string issueNumber) returns @untainted error? {
+
+        http:Request callBackRequest = new;
+        http:Response response = new;
+        string url = "/repos/" + ORGANIZATION_NAME + "/" + REPOSITORY_NAME + "/issues/" + issueNumber + "/comments";
+        callBackRequest.addHeader("Authorization", ACCESS_TOKEN);
+        http:Response | error githubResponse = githubAPIEndpoint->get(<@untained>url, callBackRequest);
+
+        if (githubResponse is http:Response) {
+            var jsonPayload = githubResponse.getJsonPayload();
+            if (jsonPayload is json[]) {
+                json[] | error comments = utilities:createFormattedComments(jsonPayload);
+                if (comments is json[]) {
+                    response.statusCode = http:STATUS_OK;
+                    response.setJsonPayload(<@untained>comments);
+                } else {
+                    log:printInfo("The comments related to issue could not be converted to json.");
+                    response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
+                    response.setPayload(<@untained>comments.reason());
+                }
+            } else {
+                log:printInfo("Invalid json payload received from the response obtained from github.");
+                response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
+                response.setPayload("Invalid payload received from github response.");
+            }
+        } else {
+            log:printInfo("The github response is not in the expected form: http:Response.");
+            response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
+            response.setPayload(<@untained>githubResponse.reason());
+        }
+
+        error? respond = caller->respond(response);
+    }
+
+    @http:ResourceConfig {
         methods: ["POST"],
-        path: "admin/post-comment/{issueNumber}"
+        path: "/post-comment/{issueNumber}"
     }
     resource function postCommentOnIssue(http:Caller caller, http:Request request, string issueNumber) {
 
         http:Request callBackRequest = new;
         http:Response response = new;
         string url = "/repos/" + ORGANIZATION_NAME + "/" + REPOSITORY_NAME + "/issues/" + issueNumber + "/comments";
-
-        // Please change the scope of the access token to make the function work
         callBackRequest.addHeader("Authorization", ACCESS_TOKEN);
 
         boolean | error validIssue = utilities:isValidIssue(<@untained>issueNumber);
@@ -557,15 +537,13 @@ service adminService on endPoint {
 
     @http:ResourceConfig {
         methods: ["PATCH"],
-        path: "admin/edit-comment/{commentId}"
+        path: "/edit-comment/{commentId}"
     }
     resource function editCommentOnIssue(http:Caller caller, http:Request request, string commentId) {
 
         http:Request callBackRequest = new;
         http:Response response = new;
         string url = "/repos/" + ORGANIZATION_NAME + "/" + REPOSITORY_NAME + "/issues/comments/" + commentId;
-
-        // Please change the scope of the access token to make the function work
         callBackRequest.addHeader("Authorization", ACCESS_TOKEN);
 
         boolean | error validComment = utilities:isValidComment(<@untained>commentId);
@@ -618,15 +596,13 @@ service adminService on endPoint {
 
     @http:ResourceConfig {
         methods: ["DELETE"],
-        path: "admin/delete-comment/{commentId}"
+        path: "/delete-comment/{commentId}"
     }
     resource function deleteCommentOnIssue(http:Caller caller, http:Request request, string commentId) {
 
         http:Request callBackRequest = new;
         http:Response response = new;
         string url = "/repos/" + ORGANIZATION_NAME + "/" + REPOSITORY_NAME + "/issues/comments/" + commentId;
-
-        // Please change the scope of the access token to make the function work
         callBackRequest.addHeader("Authorization", ACCESS_TOKEN);
 
         boolean | error validComment = utilities:isValidComment(<@untained>commentId);
@@ -664,57 +640,16 @@ service adminService on endPoint {
 
     @http:ResourceConfig {
         methods: ["GET"],
-        path: "/get-comments/{issueNumber}"
-    }
-    resource function getComments(http:Caller caller, http:Request request, string issueNumber) returns @untainted error? {
-
-        // http:Request request = new;
-        http:Response response = new;
-        string url = "/repos/" + ORGANIZATION_NAME + "/" + REPOSITORY_NAME + "/" + issueNumber + "/comments";
-
-        // request.addHeader("Authorization", ACCESS_TOKEN);
-        // http:Response | error githubResponse = githubAPIEndpoint->get(<@untained>url, request);
-        http:Response | error githubResponse = githubAPIEndpoint->get(<@untained>url);
-
-        if (githubResponse is http:Response) {
-            var jsonPayload = githubResponse.getJsonPayload();
-            if (jsonPayload is json[]) {
-                json[] | error comments = utilities:createFormattedComments(jsonPayload);
-                if (comments is json[]) {
-                    response.statusCode = http:STATUS_OK;
-                    response.setJsonPayload(<@untained>comments);
-                } else {
-                    log:printInfo("The comments related to issue could not be converted to json.");
-                    response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
-                    response.setPayload(<@untained>comments.reason());
-                }
-            } else {
-                log:printInfo("Invalid json payload received from the response obtained from github.");
-                response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
-                response.setPayload("Invalid payload received from github response.");
-            }
-        } else {
-            log:printInfo("The github response is not in the expected form: http:Response.");
-            response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
-            response.setPayload(<@untained>githubResponse.reason());
-        }
-
-        error? respond = caller->respond(response);
-    }
-
-    @http:ResourceConfig {
-        methods: ["GET"],
         path: "/get-all-requests"
     }
     resource function getAllRequests(http:Caller caller, http:Request request) returns @untainted error? {
 
-        // http:Request request = new;
+        http:Request calBackRequest = new;
         http:Response response = new;
         string url = "/repos/" + ORGANIZATION_NAME + "/" + REPOSITORY_NAME + "/issues?state=all";
 
-        // request.addHeader("Authorization", ACCESS_TOKEN);
-        // http:Response | error githubResponse = githubAPIEndpoint->get(<@untained>url, request);
-        http:Response | error githubResponse = githubAPIEndpoint->get(url);
+        calBackRequest.addHeader("Authorization", ACCESS_TOKEN);
+        http:Response | error githubResponse = githubAPIEndpoint->get(<@untained>url, calBackRequest);
 
         if (githubResponse is http:Response) {
             var jsonPayload = githubResponse.getJsonPayload();
@@ -737,6 +672,54 @@ service adminService on endPoint {
             log:printInfo("The github response is not in the expected form: http:Response.");
             response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
             response.setPayload(<@untained>githubResponse.reason());
+        }
+
+        error? respond = caller->respond(response);
+    }
+
+    @http:ResourceConfig {
+        methods: ["PATCH"],
+        path: "/edit-request/{issueNumber}"
+    }
+    resource function editRequest(http:Caller caller, http:Request request, string issueNumber) {
+
+        http:Response response = new;
+        http:Request callBackRequest = new;
+        callBackRequest.addHeader("Authorization", ACCESS_TOKEN);
+        string url = "/repos/" + ORGANIZATION_NAME + "/" + REPOSITORY_NAME + "/issues/" + issueNumber;
+
+        var receivedRequestPayload = request.getJsonPayload();
+        if (receivedRequestPayload is json) {
+            json | error payloadTitle = receivedRequestPayload.title;
+            json | error payloadBody = receivedRequestPayload.body;
+            json | error payloadState = receivedRequestPayload.state;
+            if (payloadTitle is json && payloadBody is json && payloadState is json) {
+                string stringPayloadBody = payloadBody.toJsonString();
+                callBackRequest.setPayload(<@untained>({"title": payloadTitle, "body": stringPayloadBody, "state": payloadState}));
+                http:Response | error githubResponse = githubAPIEndpoint->patch(<@untained>url, callBackRequest);
+                if (githubResponse is http:Response) {
+                    if (githubResponse.statusCode == 200) {
+                        response.statusCode = http:STATUS_OK;
+                        response.setPayload(<@untained>("Updated issue number: " + issueNumber));
+                    } else {
+                        log:printError("Github response status code was not 200 OK.");
+                        response.statusCode = githubResponse.statusCode;
+                        response.setPayload("Issue was not updated succesfully. Please check the issue number");
+                    }
+                } else {
+                    log:printError("Error while obtaining the response from github api services.");
+                    response.statusCode = http:STATUS_NOT_ACCEPTABLE;
+                    response.setPayload(githubResponse.reason());
+                }
+            } else {
+                log:printInfo("Error while obtaining the json payload body/title from the request received.");
+                response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
+                response.setPayload("Error while obtaining the json payload body/title from the request received.");
+            }
+        } else {
+            log:printInfo("Error while obtaining the json payload from the request received.");
+            response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
+            response.setPayload("Error while obtaining the json payload from the request received.");
         }
 
         error? respond = caller->respond(response);
