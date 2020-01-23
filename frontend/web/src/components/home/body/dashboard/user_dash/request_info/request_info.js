@@ -46,6 +46,7 @@ const Requset = () => {
   }, [loading, id]);
   return (
     <Fragment>
+      <br />
       <button
         className="btn btn-info request-button"
         onClick={() => {
@@ -54,34 +55,38 @@ const Requset = () => {
       >
         Back
       </button>
-      <div className="row">
-        <div className="col-sm-6">
+      <div className="row request-div">
+        <div className="col-sm-8 ">
           <div className="card">
             <div className="card-header">
               <h1> {title}</h1>
             </div>
             <div className="card-body">
-              <h4>Status of the Request: {state}</h4>
+              <h3>Status of the Request: {state}</h3>
               <hr />
-              <h4>Description : {body}</h4>
               {data != null ? (
-                <Map
-                  style={{ height: "480px", width: "100%" }}
-                  //zoomed to center on given coords
-                  bounds={data.points}
-                >
-                  <TileLayer url="http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-                  <Polygon //blue polygon for given coords
-                    positions={data.points}
-                  />
-                </Map>
+                <div>
+                  <h3>Description : {data.description}</h3>
+                  <h3>Duration : {data.timeframe}</h3>
+                  <h3>Place</h3>
+                  <Map
+                    style={{ height: "480px", width: "100%" }}
+                    //zoomed to center on given coords
+                    bounds={data.points}
+                  >
+                    <TileLayer url="http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+                    <Polygon //blue polygon for given coords
+                      positions={data.points}
+                    />
+                  </Map>
+                </div>
               ) : (
                 <p>not</p>
               )}
             </div>
           </div>
         </div>
-        <div className="col-sm-6">
+        <div className="col-sm-4 ">
           <Comment.Group size="large">
             <Header as="h3" dividing>
               Process of the Request

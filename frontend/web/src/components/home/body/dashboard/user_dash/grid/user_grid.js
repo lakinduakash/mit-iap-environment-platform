@@ -37,7 +37,19 @@ export default function SimpleTable() {
             {rows.map(row => (
               <tr key={row.requestNumber}>
                 <td>{row.requsetTitle}</td>
-                <td>{row.requestDetails}</td>
+                <td>
+                  {
+                    <ul>
+                      <li>
+                        Duration : {JSON.parse(row.requestDetails).timeframe}
+                      </li>
+                      <li>
+                        Description :{" "}
+                        {JSON.parse(row.requestDetails).description}
+                      </li>
+                    </ul>
+                  }
+                </td>
                 <td>{row.state}</td>
                 <td>
                   <ViewRequest row={row} />
