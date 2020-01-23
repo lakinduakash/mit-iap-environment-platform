@@ -1,12 +1,14 @@
 import React, { Component } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Alert from '@material-ui/lab/Alert';
+import AlertTitle from '@material-ui/lab/AlertTitle';
+// import { Alert, AlertTitle } from '@material-ui/lab';
 
 class Notification extends Component {
 
   // instance of websocket connection as a class property
   ws = new WebSocket('ws://localhost:9095/notifications')
-  messageList = ["Issue created", "Request pending"];
+  messageList = [];
 
   componentDidMount() {
       this.ws.onopen = () => {
@@ -17,9 +19,16 @@ class Notification extends Component {
       this.ws.onmessage = evt => {
       // listen to data sent from the websocket server
       const message = evt.data
-      this.messageList.push(message);
-      this.setState({dataFromServer: message})
-      console.log(message)
+
+      // Convert message to json
+      console.log(message);
+      try {
+        var notificationJson = JSON.parse(message);
+        console.log(notificationJson)
+        this.messageList.push(notificationJson);
+        this.setState({dataFromServer: message});
+      } catch (error) {
+        // console.log(error);
       }
 
       this.ws.onclose = () => {
@@ -27,6 +36,7 @@ class Notification extends Component {
       // automatically try to reconnect on connection loss
 
       }
+    }
 
   }
 
@@ -89,25 +99,46 @@ const useStyles = makeStyles(theme => ({
     }
   },
   alert: {
-    marginLeft:'200px',
-    marginRight:'200px'
+    marginLeft:'600px',
+    marginRight:'600px'
   }
 }));
 
 function Notification_holder(notif){
   const classes = useStyles();
   let array = [];
-  for(let i = 0; i < notif.value.length; i++) {
-    array.push(
-      <Alert className={classes.alert} variant="outlined" severity="info">
-        {notif.value[i]}
-        </Alert>
-    );
-  }
+  var categoryMap = {issueCreated: "Issue Created", issueEdited: "Issue Edited", issueClosed: "Issue Closed", commentCreated: "Comment Created", labelAdded: "Label Added"};
 
-      return (
-        <div className={classes.root}>
-        {array}
-        </div>
-      );
+  notif.value.forEach(element => {
+    array.push(
+      <Alert className={classes.alert} variant="outlined" serverity="info">
+        <AlertTitle>{element.category}</AlertTitle>
+        {element.description}
+      </Alert>
+    );
+    console.log(element);
+  });
+
+
+  return (
+    <div className={classes.root}>
+      {array}
+      <Alert severity="error">
+        <AlertTitle>Error</AlertTitle>
+        This is an error alert — check it out!
+      </Alert>
+      <Alert severity="warning">
+        <AlertTitle>Warning</AlertTitle>
+        This is a warning alert — check it out!
+      </Alert>
+      <Alert severity="info">
+        <AlertTitle>Info</AlertTitle>
+        This is an info alert — check it out!
+      </Alert>
+      <Alert severity="success">
+        <AlertTitle>Success</AlertTitle>
+        This is a success alert — check it out!
+      </Alert>
+    </div>
+  );
 }

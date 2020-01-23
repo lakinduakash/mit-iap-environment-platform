@@ -9,10 +9,6 @@ const string ORGANIZATION_NAME = "yashodgayashan";
 const string REPOSITORY_NAME = "ballerina-github-connector";
 const string ACCESS_TOKEN = "Bearer <token>";
 
-// Listner configurations.
-const int USER_SERVICES_PORT = 9080;
-const string BASEPATH = "/github";
-
 http:Client githubAPIEndpoint = new (GITHUB_API_URL);
 
 # The `assignLabel` function will assign the labels to a given issue.
@@ -183,19 +179,26 @@ public function createAFormattedJsonOfAnIssue(json issue) returns json | error {
 public function extractIssuesRelatedToUser(json[] listOfIssues, string userName) returns json | error {
 
     json[] issues = [];
-    foreach json issue in listOfIssues {
-        map<json> issueRecord = <map<json>>issue;
-        json labelDetails = check createAFormattedJsonOfLabels(<json[]>issueRecord.labels);
+    string state = "";
+    boolean hasState = false;
 
-        if (userNameExists(<json[]>labelDetails, userName)) {
-            json issueInfo = {
-                "issueId":check issueRecord.id,
-                "issueNumber":check issueRecord.number,
-                "labels": labelDetails,
-                "issueTitle":check issueRecord.title,
-                "issueBody":check issueRecord.body
-            };
-            issues[issues.length()] = issueInfo;
+    foreach json issue in listOfIssues {
+        json[] labels = <json[]>issue.labels;
+        foreach json label in labels {
+            if (label.name == userName && label.description == "userName") {
+                hasState = false;
+                foreach json labelName in labels {
+                    if (labelName.description == "state") {
+                        state = <string>labelName.name;
+                        hasState = true;
+                    }
+                }
+                if (hasState) {
+                    issues[issues.length()] = {"requsetTitle":check issue.title, "requestNumber":check issue.number, "requestDetails":check issue.body, "state": state};
+                } else {
+                    issues[issues.length()] = {"requsetTitle":check issue.title, "requestNumber":check issue.number, "requestDetails":check issue.body, "state": "Pending"};
+                }
+            }
         }
     }
 
@@ -545,16 +548,16 @@ public function createFormattedIssues(json[] issues) returns json[] | error {
 
 public function createFormattedComments(json[] comments) returns json[] | error {
 
-    json[] returnedComments = [];
+    json[] formattedComments = [];
     foreach json comment in comments {
-        json userDetails = check createFormattedUser(<json>comment.user);
-        returnedComments[returnedComments.length()] = {
-            "commentBody":check comment.body,
-            "commentUser":check userDetails.userName
+        map<json> user = <map<json>>comment.user;
+        formattedComments[formattedComments.length()] = {
+            "commentId":check comment.id,
+            "user":check user.login,
+            "comment":check comment.body
         };
     }
-
-    return returnedComments;
+    return formattedComments;
 }
 
 public function createFormattedUser(json user) returns json | error {

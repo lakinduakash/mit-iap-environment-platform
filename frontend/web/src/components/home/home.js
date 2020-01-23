@@ -14,7 +14,8 @@ import User from "./body/dashboard/user_dash/user_dash";
 import Admin from "./body/dashboard/admin_dash/admin_dash";
 import Notification from "../Notification/notification";
 import Request from "./body/dashboard/user_dash/request_info/request_info";
-import LandRequestForm from "../LandRequestForm/land-request-form"
+import LandRequestForm from "../LandRequestForm/land-request-form";
+import AdminRequest from "./body/dashboard/admin_dash/request_info/request_info";
 import "./home.css";
 
 const Home = () => {
@@ -31,6 +32,7 @@ const Home = () => {
             <Route exact path="/admin-dash" component={Admin} />
             <Route exact path="/notifications" component={Notification} />
             <Route exact path="/user-dash/request" component={Request} />
+            <Route exact path="/admin-dash/request" component={AdminRequest} />
             <Route exact path="/new-issue" component={LandRequestForm} />
             <Redirect exact from="" to="/login" />
           </Switch>
