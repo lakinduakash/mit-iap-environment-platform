@@ -15,7 +15,6 @@ import Admin from "./body/dashboard/admin_dash/admin_dash";
 import Notification from "../Notification/notification";
 import Request from "./body/dashboard/user_dash/request_info/request_info";
 import LandRequestForm from "../LandRequestForm/land-request-form";
-import Form from "../../Form";
 import AdminRequest from "./body/dashboard/admin_dash/request_info/request_info";
 import "./home.css";
 
