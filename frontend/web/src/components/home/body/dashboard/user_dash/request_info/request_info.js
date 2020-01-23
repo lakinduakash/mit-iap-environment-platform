@@ -5,6 +5,7 @@ import "./request_info.css";
 import axios from "axios";
 import { Button, Comment, Form, Header } from "semantic-ui-react";
 import Avatar from "../../../../../../asserts/images/avatar.png";
+import { Map, CircleMarker, TileLayer, Polygon } from "react-leaflet";
 
 const Requset = () => {
   let history = useHistory();
@@ -50,20 +51,36 @@ const Requset = () => {
       >
         Back
       </button>
-      <div class="row">
-        <div class="col-sm-6">
-          <div class="card">
-            <div class="card-header">
+      <div className="row">
+        <div className="col-sm-6">
+          <div className="card">
+            <div className="card-header">
               <h1> {title}</h1>
             </div>
-            <div class="card-body">
+            <div className="card-body">
               <h4>Status of the Request: {state}</h4>
               <hr />
               <h4>Description : {body}</h4>
+              <Map
+                style={{ height: "480px", width: "100%" }}
+                //zoomed to center on given coords
+                bounds={[
+                  [1.022443, 8.260258],
+                  [5.815325, 8.692459]
+                ]}
+              >
+                <TileLayer url="http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+                <Polygon //blue polygon for given coords
+                  positions={[
+                    [1.022443, 8.260258],
+                    [5.815325, 8.692459]
+                  ]}
+                />
+              </Map>
             </div>
           </div>
         </div>
-        <div class="col-sm-6">
+        <div className="col-sm-6">
           <Comment.Group size="large">
             <Header as="h3" dividing>
               Process of the Request
