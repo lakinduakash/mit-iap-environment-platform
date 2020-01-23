@@ -22,7 +22,6 @@ function SimpleTable() {
               <th>Tags</th>
               <th>Change Tags</th>
               <th>View</th>
-              <th>Comment</th>
             </tr>
           </thead>
           <tbody>
@@ -36,9 +35,6 @@ function SimpleTable() {
               <td></td>
               <td>
                 <Button>View</Button>
-              </td>
-              <td>
-                <Button>Comment</Button>
               </td>
             </tr>
           </tbody>
