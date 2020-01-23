@@ -10,6 +10,7 @@ import { Map, CircleMarker, TileLayer, Polygon } from "react-leaflet";
 
 const Requset = () => {
   let history = useHistory();
+  const [data, setData] = useState(null);
   const [id, title, state, body] = useContext(RequestContext);
   const [loading] = useState(null);
   const [comments, setComments] = useState(null);
@@ -39,6 +40,7 @@ const Requset = () => {
       .get("http://0.0.0.0:9080/user-services/get-comments/" + id)
       .then(response => {
         setComments(response.data);
+        setData(JSON.parse(body));
       })
       .catch();
   }, [loading, id]);
@@ -62,22 +64,20 @@ const Requset = () => {
               <h4>Status of the Request: {state}</h4>
               <hr />
               <h4>Description : {body}</h4>
-              <Map
-                style={{ height: "480px", width: "100%" }}
-                //zoomed to center on given coords
-                bounds={[
-                  [1.022443, 8.260258],
-                  [5.815325, 8.692459]
-                ]}
-              >
-                <TileLayer url="http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-                <Polygon //blue polygon for given coords
-                  positions={[
-                    [1.022443, 8.260258],
-                    [5.815325, 8.692459]
-                  ]}
-                />
-              </Map>
+              {data != null ? (
+                <Map
+                  style={{ height: "480px", width: "100%" }}
+                  //zoomed to center on given coords
+                  bounds={data.points}
+                >
+                  <TileLayer url="http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+                  <Polygon //blue polygon for given coords
+                    positions={data.points}
+                  />
+                </Map>
+              ) : (
+                <p>not</p>
+              )}
             </div>
           </div>
         </div>
