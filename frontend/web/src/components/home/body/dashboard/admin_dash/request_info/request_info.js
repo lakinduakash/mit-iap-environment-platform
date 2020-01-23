@@ -8,7 +8,7 @@ import Avatar from "../../../../../../asserts/images/avatar.png";
 import { Map, CircleMarker, TileLayer, Polygon } from "react-leaflet";
 
 const AdminView = () => {
-  const [id, title, state, body, owner, tags, assignees] = useContext(
+  const [id, title, status, body, owner, tags, assignees] = useContext(
     AdminRequestContext
   );
   const [loading] = useState(null);
@@ -37,6 +37,17 @@ const AdminView = () => {
       .get("http://0.0.0.0:9070/admin-services/get-all-labels")
       .then(response => {
         console.log(response.data);
+      })
+      .catch();
+  };
+
+  const removeLabel = () => {
+    axios
+      .delete(
+        "http://0.0.0.0:9070/admin-services/remove-label/" + id + "/" + status
+      )
+      .then(response => {
+        console.log(response);
       })
       .catch();
   };
@@ -77,9 +88,7 @@ const AdminView = () => {
             <div className="card-body">
               <div className="row ">
                 <div className="col-sm-10">
-                  <h3>
-                    Status of the Request: {state != null ? state : pending}
-                  </h3>
+                  <h3>Status of the Request: {status}</h3>
                 </div>
                 <div className="col-sm-2 ">
                   <button type="button" class="btn btn-info">

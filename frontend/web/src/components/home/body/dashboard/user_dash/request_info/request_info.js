@@ -81,7 +81,7 @@ const Requset = () => {
                   </Map>
                 </div>
               ) : (
-                <p>not</p>
+                <p>Please wait</p>
               )}
             </div>
           </div>

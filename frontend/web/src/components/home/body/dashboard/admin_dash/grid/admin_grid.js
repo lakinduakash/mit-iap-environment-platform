@@ -61,7 +61,7 @@ const Admin_grid = () => {
                   <td>{request.owner}</td>
                   <td>
                     {request.status != "" ? (
-                      <p>request.status</p>
+                      <p>{request.status}</p>
                     ) : (
                       <p>Pending</p>
                     )}

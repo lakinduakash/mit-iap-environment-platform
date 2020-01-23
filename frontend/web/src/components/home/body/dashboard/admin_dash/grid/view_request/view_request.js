@@ -30,7 +30,7 @@ const View_request = props => {
           history.push("/admin-dash/request");
           setId(props.row.requsetNumber);
           setTitle(props.row.requestTitle);
-          setState(props.row.state);
+          setState(props.row.status);
           setBody(props.row.requestBody);
           setOwner(props.row.owner);
           setTags(props.row.tags);
