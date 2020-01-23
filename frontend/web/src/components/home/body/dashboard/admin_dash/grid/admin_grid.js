@@ -67,7 +67,7 @@ const Admin_grid = () => {
                     )}
                   </td>
                   <td>
-                    <View row={requests} />
+                    <View row={request} />
                   </td>
                 </tr>
               ))

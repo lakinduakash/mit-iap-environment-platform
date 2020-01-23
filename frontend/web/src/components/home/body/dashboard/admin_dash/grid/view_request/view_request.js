@@ -28,8 +28,8 @@ const View_request = props => {
         className="btn btn-info"
         onClick={() => {
           history.push("/admin-dash/request");
-          setId(props.row.requestNumber);
-          setTitle(props.row.requsetTitle);
+          setId(props.row.requsetNumber);
+          setTitle(props.row.requestTitle);
           setState(props.row.state);
           setBody(props.row.requestBody);
           setOwner(props.row.owner);
