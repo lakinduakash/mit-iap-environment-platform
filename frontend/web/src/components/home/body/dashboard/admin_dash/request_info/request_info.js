@@ -17,6 +17,7 @@ const AdminView = () => {
   const [comments, setComments] = useState(null);
   const [reply, setReply] = useState("");
   const [labels, setLabels] = useState(null);
+  const [state, setState] = useState();
   const pending = "Pending";
 
   const handleSubmit = event => {
@@ -37,6 +38,7 @@ const AdminView = () => {
       .get("http://0.0.0.0:9070/admin-services/get-all-labels")
       .then(response => {
         console.log(response.data);
+        setLabels(response.data);
       })
       .catch();
   };
@@ -63,6 +65,15 @@ const AdminView = () => {
       .catch();
   };
 
+  const changeState = () => {
+    if (status != "") {
+      removeLabel();
+    }
+    if (state != undefined) {
+      console.log(state);
+    }
+  };
+
   useEffect(() => {
     getComments();
     getLabels();
@@ -71,6 +82,7 @@ const AdminView = () => {
   return (
     <Fragment>
       <br />
+      <p>{state}</p>
       <button
         className="btn btn-info request-button"
         onClick={() => {
@@ -88,12 +100,61 @@ const AdminView = () => {
             <div className="card-body">
               <div className="row ">
                 <div className="col-sm-10">
-                  <h3>Status of the Request: {status}</h3>
+                  <h3>
+                    Status of the Request: {status != "" ? status : pending}
+                  </h3>
                 </div>
                 <div className="col-sm-2 ">
-                  <button type="button" class="btn btn-info">
+                  <button
+                    type="button"
+                    class="btn btn-info"
+                    data-toggle="modal"
+                    data-target="#myModal"
+                  >
                     Change State
                   </button>
+
+                  <div class="modal" id="myModal">
+                    <div class="modal-dialog modal-dialog-centered">
+                      <div class="modal-content">
+                        <div class="modal-body">
+                          <button
+                            type="button"
+                            class="close"
+                            data-dismiss="modal"
+                          >
+                            &times;
+                          </button>
+                          <h3>Change State</h3>
+                          <hr />
+                          <div class="form-group">
+                            <label for="sel1">Select list:</label>
+                            <select
+                              class="form-control"
+                              value={state}
+                              onChange={event => setState(event.target.value)}
+                            >
+                              {labels != null
+                                ? labels.map(label => (
+                                    <option value={label.labelName}>
+                                      {label.labelName}
+                                    </option>
+                                  ))
+                                : null}
+                            </select>
+                            <br />
+                            <button
+                              onClick={() => changeState()}
+                              type="submit"
+                              class="btn btn-primary"
+                            >
+                              Submit
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
               <hr />
