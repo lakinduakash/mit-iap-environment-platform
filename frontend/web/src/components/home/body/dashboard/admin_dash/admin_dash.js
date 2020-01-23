@@ -1,13 +1,12 @@
 import React, { Fragment } from "react";
-import AdminIssues from "./grid/admin_grid";
+import AdminDash from "./grid/admin_grid";
 
 function Admin() {
   return (
     <Fragment>
       <br />
       <br />
-      Hello Admin!
-      <AdminIssues />
+      <AdminDash />
     </Fragment>
   );
 }
