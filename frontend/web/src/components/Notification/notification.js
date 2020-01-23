@@ -6,7 +6,7 @@ class Notification extends Component {
 
   // instance of websocket connection as a class property
   ws = new WebSocket('ws://localhost:9095/notifications')
-  msg = "";
+  messageList = ["Issue created", "Request pending"];
 
   componentDidMount() {
       this.ws.onopen = () => {
@@ -17,9 +17,8 @@ class Notification extends Component {
       this.ws.onmessage = evt => {
       // listen to data sent from the websocket server
       const message = evt.data
-      this.msg = message
+      this.messageList.push(message);
       this.setState({dataFromServer: message})
-      alert('Notification received : ' + message);
       console.log(message)
       }
 
@@ -34,7 +33,7 @@ class Notification extends Component {
   render(){
     return (<div>
        <ChildComponent websocket={this.ws} />
-      < Notification_holder value = {this.msg} />
+      < Notification_holder value = {this.messageList} />
       </div>
     )
   }
@@ -86,19 +85,29 @@ const useStyles = makeStyles(theme => ({
   root: {
     width: '100%',
     '& > * + *': {
-      marginTop: theme.spacing(2),
-    },
+      marginTop: theme.spacing(2)
+    }
   },
+  alert: {
+    marginLeft:'200px',
+    marginRight:'200px'
+  }
 }));
 
 function Notification_holder(notif){
   const classes = useStyles();
+  let array = [];
+  for(let i = 0; i < notif.value.length; i++) {
+    array.push(
+      <Alert className={classes.alert} variant="outlined" severity="info">
+        {notif.value[i]}
+        </Alert>
+    );
+  }
 
       return (
         <div className={classes.root}>
-        <Alert variant="outlined" severity="info">
-        {notif.value}
-        </Alert>
+        {array}
         </div>
       );
 }
