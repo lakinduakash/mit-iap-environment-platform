@@ -5,6 +5,7 @@ import "./request_info.css";
 import axios from "axios";
 import { Button, Comment, Form, Header } from "semantic-ui-react";
 import Avatar from "../../../../../../asserts/images/avatar.png";
+import { Grid } from "@material-ui/core";
 import { Map, CircleMarker, TileLayer, Polygon } from "react-leaflet";
 
 const Requset = () => {
