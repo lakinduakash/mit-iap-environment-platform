@@ -11,7 +11,7 @@ const Requset = () => {
   const [id, title, state, body] = useContext(RequestContext);
   const [loading, setLoading] = useState(null);
   const [comments, setComments] = useState(null);
-  const [reply, setReply] = useState("Hel");
+  const [reply, setReply] = useState("");
 
   var check = false;
   const handleSubmit = event => {
@@ -23,7 +23,14 @@ const Requset = () => {
       .then(response => {
         console.log(response.data);
         setReply("");
-        setLoading(!check);
+        axios
+          .get(
+            "http://0.0.0.0:9060/user-services/get-comments/" + id + "/yashod"
+          )
+          .then(response => {
+            setComments(response.data);
+          })
+          .catch();
       })
       .catch();
   };
@@ -61,7 +68,7 @@ const Requset = () => {
 
           {comments != null ? (
             comments.map(comment => (
-              <Comment>
+              <Comment key={comment.commentId}>
                 <Comment.Avatar
                   src={Avatar}
                   alt="WSO2"
