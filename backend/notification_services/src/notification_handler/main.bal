@@ -1,6 +1,7 @@
 import ballerina/http;
 import ballerina/io;
 import ws_server;
+import ballerina/log;
 
 type Notification record {
     string receiver;
@@ -19,6 +20,7 @@ service eventListener on new http:Listener(9090) {
     }
     resource function getEvent(http:Caller caller, http:Request request) {
 
+        http:Response response = new;
         var data = request.getJsonPayload();
         if (data is json) {
             if (data.action is json) {
@@ -32,6 +34,8 @@ service eventListener on new http:Listener(9090) {
                         category: "Issue Created",
                         description: "New request was created"
                     };
+                    response.statusCode = http:STATUS_OK;
+                    response.setPayload("Success");
                     sendMessage(notification);
                 } else if (event_action == "edited") {
                     // Issue Edited
@@ -42,6 +46,8 @@ service eventListener on new http:Listener(9090) {
                         category: "Issue Edited",
                         description: "Issue was edited"
                     };
+                    response.statusCode = http:STATUS_OK;
+                    response.setPayload("Success");
                     sendMessage(notification_admin);
                 } else if (event_action == "closed") {
                     // Issue Closed
@@ -52,6 +58,8 @@ service eventListener on new http:Listener(9090) {
                         category: "Issue Closed",
                         description: "Request deleted"
                     };
+                    response.statusCode = http:STATUS_OK;
+                    response.setPayload("Success");
                     sendMessage(notification);
 
                     // Notification for user
@@ -71,6 +79,8 @@ service eventListener on new http:Listener(9090) {
                         category: "Issue Closed",
                         description: "Request deleted"
                     };
+                    response.statusCode = http:STATUS_OK;
+                    response.setPayload("Success");
                     sendMessage(notification_user);
                 } else if (event_action == "created") {
                     // Comment Created
@@ -83,6 +93,8 @@ service eventListener on new http:Listener(9090) {
                             category: "Comment Created",
                             description: "New comment was added."
                         };
+                        response.statusCode = http:STATUS_OK;
+                        response.setPayload("Success");
                         sendMessage(notification_admin);
                     }
 
@@ -103,6 +115,8 @@ service eventListener on new http:Listener(9090) {
                         category: "Issue Edited",
                         description: "Issue was edited"
                     };
+                    response.statusCode = http:STATUS_OK;
+                    response.setPayload("Success");
                     sendMessage(notification_user);
                 } else if (event_action == "labeled") {
                     // Issue was labeled
@@ -113,11 +127,21 @@ service eventListener on new http:Listener(9090) {
                         category: "Label Added ",
                         description: "New label was added"
                     };
+                    response.statusCode = http:STATUS_OK;
+                    response.setPayload("Success");
                     sendMessage(notification);
                 }
+            } else {
+                log:printInfo("Error occured while retrieving the action from the payload");
+                response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
+                response.setPayload("Error occured while retrieving the action from the payload");
             }
+        } else {
+            log:printInfo("Invalid payload type recieved");
+            response.statusCode =  http:STATUS_NOT_ACCEPTABLE;
+            response.setPayload(<@untainted>data.reason());
         }
-    
+        error?respond = caller->respond(response);
     }
 }
 
@@ -131,4 +155,5 @@ function sendMessage(Notification notification) {
             var a= wc->pushText(notification.description);
         }
     }
+
 }
