@@ -1,37 +1,57 @@
 import React from "react";
-import ReactDataGrid from "react-data-grid";
+// import Loading from "../../../../../utility/loading/loading";
+// import axios from "axios";
+// import ViewRequest from "./view_request/view_request";
+// import Comment from "./comment/comment";
 
-const columns = [
-  { key: "id", name: "Issue ID" },
-  { key: "title", name: "Title" },
-  { key: "description", name: "Description" },
-  { key: "depts", name: "Departments" },
-  { key: "status", name: "status" },
-  { key: "options", name: "options" }
-];
-const rows = [
-  {
-    id: 1,
-    title: "Title 1",
-    description: "first issue",
-    depts: "<put checkboxes here>",
-    status: "in progress",
-    options: "<save/cancel button>"
-  }
-];
-const rowGetter = rowNumber => rows[rowNumber];
+import "./admin_grid.css";
+import { Button } from "@material-ui/core";
 
-class AdminIssues extends React.Component {
-  render() {
+function SimpleTable() {
+  const Table = () => {
     return (
-      <ReactDataGrid
-        columns={columns}
-        rowGetter={rowGetter}
-        rowsCount={rows.length}
-        minHeight={500}
-      />
+      <div>
+        <table className="table table-hover table-bordered custom-table">
+          <thead>
+            <tr>
+              <th>Requset Number</th>
+              <th>Request Title</th>
+              <th>Request Description</th>
+              <th>Owner</th>
+              <th>Status</th>
+              <th>Tags</th>
+              <th>Change Tags</th>
+              <th>View</th>
+              <th>Comment</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td>
+                <Button>View</Button>
+              </td>
+              <td>
+                <Button>Comment</Button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     );
-  }
+  };
+
+  return (
+    <div className="admin-table">
+      <Table />
+    </div>
+  );
 }
 
-export default AdminIssues;
+export default SimpleTable;
