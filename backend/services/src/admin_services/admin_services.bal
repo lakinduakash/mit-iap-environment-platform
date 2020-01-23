@@ -25,7 +25,7 @@ service adminService on endPoint {
         http:Response response = new;
         var jsonPayload = request.getJsonPayload();
 
-        if jsonPayload is json {
+        if (jsonPayload is json) {
             json | error labelName = jsonPayload.labelName;
             json | error labelDescription = jsonPayload.labelDescription;
             if (labelName is json && labelDescription is json) {
@@ -35,19 +35,19 @@ service adminService on endPoint {
                     response.statusCode = statusCode;
                     response.setPayload(status[1]);
                 } else {
-                    log:printError("Integer conversion error as the retrived status code from the github is invalid. Check createLabel function");
+                    log:printError("Integer conversion error as the retrived status code from the github is invalid.");
                     response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
-                    response.setPayload("Internal server error occured.");
+                    response.setPayload(statusCode.reason());
                 }
             } else {
-                log:printError("Invalid json payload received from the response.");
-                response.statusCode = http:STATUS_NOT_ACCEPTABLE;
-                response.setPayload("Not acceptable payload");
+                log:printError("Could not extract labelName or labelDescription from the received json payload.");
+                response.statusCode = http:STATUS_BAD_REQUEST;
+                response.setPayload("Could not extract labelName or labelDescription from the request.");
             }
         } else {
-            log:printError("Invalid payload type received from the response.");
-            response.statusCode = http:STATUS_NOT_ACCEPTABLE;
-            response.setPayload("Not acceptable payload type");
+            log:printError("Invalid json payload type received from the request.");
+            response.statusCode = http:STATUS_BAD_REQUEST;
+            response.setPayload("Invalid json payload type was received by the server.");
         }
 
         error? respond = caller->respond(response);
@@ -64,7 +64,7 @@ service adminService on endPoint {
 
         if (jsonPayload is json) {
             json | error labels = jsonPayload.labelNames;
-            if labels is json {
+            if (labels is json) {
                 json[] | error labelArray = trap <json[]>labels;
                 if (labelArray is json[]) {
                     string[] status = utilities:assignLabel(<@untainted>issueNumber, <@untainted>utilities:toStringArray(labelArray));
@@ -73,37 +73,37 @@ service adminService on endPoint {
                         response.statusCode = statusCode;
                         response.setPayload(status[1]);
                     } else {
-                        log:printError("Integer conversion error as the retrived status code from the github is invalid. Check createLabel function");
+                        log:printError("Integer conversion error as the retrived status code from the github is invalid.");
                         response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
-                        response.setPayload("Internal server error occured.");
+                        response.setPayload(statusCode.reason());
                     }
                 } else {
-                    log:printError("Invalid json payload received from the response.");
+                    log:printError("Could not convert the labels from a json to json[].");
                     response.statusCode = http:STATUS_NOT_ACCEPTABLE;
-                    response.setPayload("Not acceptable payload");
+                    response.setPayload("Error while converting labels to a json array.");
                 }
             } else {
-                log:printError("Invalid json payload received from the response.");
-                response.statusCode = http:STATUS_NOT_ACCEPTABLE;
-                response.setPayload("Not acceptable payload");
+                log:printError("Could not extract labels from the received json payload.");
+                response.statusCode = http:STATUS_BAD_REQUEST;
+                response.setPayload(<@untained>labels.reason());
             }
         } else {
-            log:printError("Invalid payload type received from the response.");
-            response.statusCode = http:STATUS_NOT_ACCEPTABLE;
-            response.setPayload("Not acceptable payload type");
+            log:printError("Invalid json payload type received from the request.");
+            response.statusCode = http:STATUS_BAD_REQUEST;
+            response.setPayload("Invalid json payload type was received by the server.");
         }
         error? respond = caller->respond(response);
     }
 
     @http:ResourceConfig {
         methods: ["DELETE"],
-        path: "/remove-label/{issueNumber}/{label}"
+        path: "/remove-label/{issueNumber}/{labelName}"
     }
-    resource function removeLabel(http:Caller caller, http:Request request, string issueNumber, string label) {
+    resource function removeLabel(http:Caller caller, http:Request request, string issueNumber, string labelName) {
 
         http:Response response = new;
 
-        int status = utilities:removeLabel(<@untainted>issueNumber, <@untainted>label);
+        int status = utilities:removeLabel(<@untainted>issueNumber, <@untainted>labelName);
         if (status == http:STATUS_OK) {
             response.statusCode = status;
             response.setPayload("Label removed from the request successfully.");
@@ -135,18 +135,18 @@ service adminService on endPoint {
                     response.statusCode = http:STATUS_OK;
                     response.setJsonPayload(<@untained>formattedLabels);
                 } else {
-                    log:printInfo("Error occured during the process of rebuiliding the list of labels");
+                    log:printInfo("Error occured during the process of rebuiliding the list of labels.");
                     response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
                     response.setJsonPayload(<@untained>formattedLabels.reason());
                 }
             } else {
                 log:printInfo("Invalid json payload received from the response obtained from github.");
-                response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
+                response.statusCode = http:STATUS_BAD_REQUEST;
                 response.setPayload("Invalid json payload received from github response.");
             }
         } else {
             log:printInfo("The github response is not in the expected form: http:Response.");
-            response.statusCode = http:STATUS_NOT_ACCEPTABLE;
+            response.statusCode = http:STATUS_BAD_REQUEST;
             response.setPayload(<@untained>githubResponse.reason());
         }
 
@@ -173,18 +173,18 @@ service adminService on endPoint {
                     response.statusCode = http:STATUS_OK;
                     response.setPayload(<@untained>collaboratorDetails);
                 } else {
-                    log:printInfo("Error occured during the process of rebuiliding the list of collaborators");
+                    log:printInfo("Error occured during the process of rebuiliding the list of collaborators.");
                     response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
                     response.setPayload(<@untained>collaboratorDetails.reason());
                 }
             } else {
                 log:printInfo("Invalid json payload received from the response obtained from github.");
-                response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
+                response.statusCode = http:STATUS_BAD_REQUEST;
                 response.setPayload("Invalid json payload received from github response.");
             }
         } else {
             log:printInfo("The github response is not in the expected form: http:Response.");
-            response.statusCode = http:STATUS_NOT_ACCEPTABLE;
+            response.statusCode = http:STATUS_BAD_REQUEST;
             response.setPayload(<@untained>githubResponse.reason());
         }
 
@@ -207,7 +207,7 @@ service adminService on endPoint {
             if (!isACollaborator) {
                 http:Response | error githubResponse = githubAPIEndpoint->get(<@untained>url, callBackRequest);
                 if (githubResponse is http:Response) {
-                    if (githubResponse.statusCode == 201) {
+                    if (githubResponse.statusCode == http:STATUS_CREATED) {
                         response.statusCode = githubResponse.statusCode;
                         response.setPayload("Collaborator added successfully.");
                     } else {
@@ -216,17 +216,17 @@ service adminService on endPoint {
                     }
                 } else {
                     log:printInfo("The github response is not in the expected form: http:Response.");
-                    response.statusCode = http:STATUS_NOT_ACCEPTABLE;
+                    response.statusCode = http:STATUS_BAD_REQUEST;
                     response.setPayload(githubResponse.reason());
                 }
             } else {
-                log:printInfo("The user is already a collaborator in the repository");
+                log:printInfo("The user is already a collaborator in the repository.");
                 response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
-                response.setPayload("The user is already a collaborator");
+                response.setPayload("The user is already a collaborator.");
             }
         } else {
-            log:printInfo("Error occurred while checking whether the collaborator already exists");
-            response.statusCode = http:STATUS_NOT_ACCEPTABLE;
+            log:printInfo("Error occurred while checking whether the collaborator already exists.");
+            response.statusCode = http:STATUS_BAD_REQUEST;
             response.setPayload(isACollaborator.reason());
         }
 
@@ -249,7 +249,7 @@ service adminService on endPoint {
             if (isACollaborator) {
                 http:Response | error githubResponse = githubAPIEndpoint->get(<@untained>url, callBackRequest);
                 if (githubResponse is http:Response) {
-                    if (githubResponse.statusCode == 204) {
+                    if (githubResponse.statusCode == http:STATUS_NO_CONTENT) {
                         response.statusCode = githubResponse.statusCode;
                         response.setPayload("Collaborator removed successfully.");
                     } else {
@@ -258,17 +258,17 @@ service adminService on endPoint {
                     }
                 } else {
                     log:printInfo("The github response is not in the expected form: http:Response.");
-                    response.statusCode = http:STATUS_NOT_ACCEPTABLE;
+                    response.statusCode = http:STATUS_BAD_REQUEST;
                     response.setPayload(githubResponse.reason());
                 }
             } else {
-                log:printInfo("The user is not a collaborator in the repository");
+                log:printInfo("The user is not a collaborator in the repository.");
                 response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
-                response.setPayload("The user is not a collaborator");
+                response.setPayload("The user is not a collaborator.");
             }
         } else {
-            log:printInfo("Error occurred while checking whether the collaborator already exists");
-            response.statusCode = http:STATUS_NOT_ACCEPTABLE;
+            log:printInfo("Error occurred while checking whether the collaborator already exists.");
+            response.statusCode = http:STATUS_BAD_REQUEST;
             response.setPayload(isACollaborator.reason());
         }
 
@@ -295,18 +295,18 @@ service adminService on endPoint {
                     response.statusCode = http:STATUS_OK;
                     response.setPayload(<@untained>assigneeDetails);
                 } else {
-                    log:printInfo("Error occured during the process of rebuiliding the list of assignees");
+                    log:printInfo("Error occured during the process of rebuiliding the list of assignees.");
                     response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
                     response.setPayload(<@untained>assigneeDetails.reason());
                 }
             } else {
                 log:printInfo("Invalid json payload received from the response obtained from github.");
-                response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
+                response.statusCode = http:STATUS_BAD_REQUEST;
                 response.setPayload("Invalid json payload received from github response.");
             }
         } else {
             log:printInfo("The github response is not in the expected form: http:Response.");
-            response.statusCode = http:STATUS_NOT_ACCEPTABLE;
+            response.statusCode = http:STATUS_BAD_REQUEST;
             response.setPayload(<@untained>githubResponse.reason());
         }
 
@@ -337,7 +337,7 @@ service adminService on endPoint {
                                 callBackRequest.setPayload(<@untained>receivedRequestPayload);
                                 http:Response | error githubResponse = githubAPIEndpoint->post(<@untained>url, callBackRequest);
                                 if (githubResponse is http:Response) {
-                                    if (githubResponse.statusCode == 201) {
+                                    if (githubResponse.statusCode == http:STATUS_CREATED) {
                                         response.statusCode = githubResponse.statusCode;
                                         response.setPayload("Assignees added successfully.");
                                     } else {
@@ -348,14 +348,14 @@ service adminService on endPoint {
                                     }
                                 } else {
                                     log:printInfo("The github response is not in the expected form: http:Response.");
-                                    response.statusCode = http:STATUS_NOT_ACCEPTABLE;
+                                    response.statusCode = http:STATUS_BAD_REQUEST;
                                     response.setPayload(githubResponse.reason());
                                 }
                             } else {
                                 log:printInfo("One or more of the assignees passed cannot be assigned because" +
                                 "they do not have the relevant permissions required.");
                                 response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
-                                response.setPayload("One or more of the assignees passed cannot be assigned");
+                                response.setPayload("One or more of the assignees passed cannot be assigned.");
                             }
                         } else {
                             log:printInfo("Error occurred while checking the validity of the assignees");
@@ -363,14 +363,14 @@ service adminService on endPoint {
                             response.setPayload(validOperation.reason());
                         }
                     } else {
-                        log:printInfo("Invalid payload content extracted.");
-                        response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
+                        log:printInfo("Invalid payload content extracted from the received request.");
+                        response.statusCode = http:STATUS_BAD_REQUEST;
                         response.setPayload(<@untained>payloadContent.reason());
                     }
                 } else {
-                    log:printInfo("Invalid json payload extracted.");
-                    response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
-                    response.setPayload("Invalid json payload extracted.");
+                    log:printInfo("Invalid json payload extracted from the received request.");
+                    response.statusCode = http:STATUS_BAD_REQUEST;
+                    response.setPayload("Invalid json payload extracted from the received request.");
                 }
             } else {
                 log:printInfo("Issue with the given issue number does not exist.");
@@ -378,8 +378,8 @@ service adminService on endPoint {
                 response.setPayload("Issue with the given issue number does not exist.");
             }
         } else {
-            log:printInfo("Error occurred while checking the validity of the issue");
-            response.statusCode = http:STATUS_NOT_ACCEPTABLE;
+            log:printInfo("Error occurred while checking the validity of the issue.");
+            response.statusCode = http:STATUS_BAD_REQUEST;
             response.setPayload(validIssue.reason());
         }
 
@@ -410,7 +410,7 @@ service adminService on endPoint {
                                 callBackRequest.setPayload(<@untained>receivedRequestPayload);
                                 http:Response | error githubResponse = githubAPIEndpoint->delete(<@untained>url, callBackRequest);
                                 if (githubResponse is http:Response) {
-                                    if (githubResponse.statusCode == 200) {
+                                    if (githubResponse.statusCode == http:STATUS_OK) {
                                         response.statusCode = githubResponse.statusCode;
                                         response.setPayload("Assignees removed successfully.");
                                     } else {
@@ -421,7 +421,7 @@ service adminService on endPoint {
                                     }
                                 } else {
                                     log:printInfo("The github response is not in the expected form: http:Response.");
-                                    response.statusCode = http:STATUS_NOT_ACCEPTABLE;
+                                    response.statusCode = http:STATUS_BAD_REQUEST;
                                     response.setPayload(githubResponse.reason());
                                 }
                             } else {
@@ -436,14 +436,14 @@ service adminService on endPoint {
                             response.setPayload(validOperation.reason());
                         }
                     } else {
-                        log:printInfo("Invalid payload content extracted.");
-                        response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
+                        log:printInfo("Invalid payload content extracted from the received request.");
+                        response.statusCode = http:STATUS_BAD_REQUEST;
                         response.setPayload(<@untained>payloadContent.reason());
                     }
                 } else {
-                    log:printInfo("Invalid json payload extracted.");
-                    response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
-                    response.setPayload("Invalid json payload extracted.");
+                    log:printInfo("Invalid json payload extracted from the received request.");
+                    response.statusCode = http:STATUS_BAD_REQUEST;
+                    response.setPayload("Invalid json payload extracted from the received request.");
                 }
             } else {
                 log:printInfo("Issue with the given issue number does not exist.");
@@ -451,8 +451,8 @@ service adminService on endPoint {
                 response.setPayload("Issue with the given issue number does not exist.");
             }
         } else {
-            log:printInfo("Error occurred while checking the validity of the issue");
-            response.statusCode = http:STATUS_NOT_ACCEPTABLE;
+            log:printInfo("Error occurred while checking the validity of the issue.");
+            response.statusCode = http:STATUS_BAD_REQUEST;
             response.setPayload(validIssue.reason());
         }
 
@@ -485,12 +485,12 @@ service adminService on endPoint {
                 }
             } else {
                 log:printInfo("Invalid json payload received from the response obtained from github.");
-                response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
+                response.statusCode = http:STATUS_BAD_REQUEST;
                 response.setPayload("Invalid payload received from github response.");
             }
         } else {
             log:printInfo("The github response is not in the expected form: http:Response.");
-            response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
+            response.statusCode = http:STATUS_BAD_REQUEST;
             response.setPayload(<@untained>githubResponse.reason());
         }
 
@@ -518,7 +518,7 @@ service adminService on endPoint {
                         callBackRequest.setPayload(<@untained>receivedRequestPayload);
                         http:Response | error githubResponse = githubAPIEndpoint->post(<@untained>url, callBackRequest);
                         if (githubResponse is http:Response) {
-                            if (githubResponse.statusCode == 201) {
+                            if (githubResponse.statusCode == http:STATUS_CREATED) {
                                 response.statusCode = githubResponse.statusCode;
                                 response.setPayload("Comment added successfully.");
                             } else {
@@ -529,18 +529,18 @@ service adminService on endPoint {
                             }
                         } else {
                             log:printInfo("The github response is not in the expected form: http:Response.");
-                            response.statusCode = http:STATUS_NOT_ACCEPTABLE;
+                            response.statusCode = http:STATUS_BAD_REQUEST;
                             response.setPayload(githubResponse.reason());
                         }
                     } else {
-                        log:printInfo("Invalid payload content extracted.");
-                        response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
+                        log:printInfo("Invalid payload content extracted from the received request.");
+                        response.statusCode = http:STATUS_BAD_REQUEST;
                         response.setPayload(<@untained>payloadContent.reason());
                     }
                 } else {
-                    log:printInfo("Invalid json payload extracted.");
-                    response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
-                    response.setPayload("Invalid json payload extracted.");
+                    log:printInfo("Invalid json payload extracted from the received request.");
+                    response.statusCode = http:STATUS_BAD_REQUEST;
+                    response.setPayload("Invalid json payload extracted from the received request.");
                 }
             } else {
                 log:printInfo("Issue with the given issue number does not exist.");
@@ -548,8 +548,8 @@ service adminService on endPoint {
                 response.setPayload("Issue with the given issue number does not exist.");
             }
         } else {
-            log:printInfo("Error occurred while checking the validity of the issue");
-            response.statusCode = http:STATUS_NOT_ACCEPTABLE;
+            log:printInfo("Error occurred while checking the validity of the issue.");
+            response.statusCode = http:STATUS_BAD_REQUEST;
             response.setPayload(validIssue.reason());
         }
 
@@ -577,7 +577,7 @@ service adminService on endPoint {
                         callBackRequest.setPayload(<@untained>receivedRequestPayload);
                         http:Response | error githubResponse = githubAPIEndpoint->patch(<@untained>url, callBackRequest);
                         if (githubResponse is http:Response) {
-                            if (githubResponse.statusCode == 200) {
+                            if (githubResponse.statusCode == http:STATUS_OK) {
                                 response.statusCode = githubResponse.statusCode;
                                 response.setPayload("Comment updated successfully.");
                             } else {
@@ -588,18 +588,18 @@ service adminService on endPoint {
                             }
                         } else {
                             log:printInfo("The github response is not in the expected form: http:Response.");
-                            response.statusCode = http:STATUS_NOT_ACCEPTABLE;
+                            response.statusCode = http:STATUS_BAD_REQUEST;
                             response.setPayload(githubResponse.reason());
                         }
                     } else {
-                        log:printInfo("Invalid payload content extracted.");
-                        response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
+                        log:printInfo("Invalid payload content extracted from the received request.");
+                        response.statusCode = http:STATUS_BAD_REQUEST;
                         response.setPayload(<@untained>payloadContent.reason());
                     }
                 } else {
-                    log:printInfo("Invalid json payload extracted.");
-                    response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
-                    response.setPayload("Invalid json payload extracted.");
+                    log:printInfo("Invalid json payload extracted from the received request.");
+                    response.statusCode = http:STATUS_BAD_REQUEST;
+                    response.setPayload("Invalid json payload extracted from the received request.");
                 }
             } else {
                 log:printInfo("Comment with the given comment id does not exist.");
@@ -607,8 +607,8 @@ service adminService on endPoint {
                 response.setPayload("Comment with the given comment id does not exist.");
             }
         } else {
-            log:printInfo("Error occurred while checking the validity of the comment");
-            response.statusCode = http:STATUS_NOT_ACCEPTABLE;
+            log:printInfo("Error occurred while checking the validity of the comment.");
+            response.statusCode = http:STATUS_BAD_REQUEST;
             response.setPayload(validComment.reason());
         }
 
@@ -631,7 +631,7 @@ service adminService on endPoint {
             if (validComment) {
                 http:Response | error githubResponse = githubAPIEndpoint->delete(<@untained>url, callBackRequest);
                 if (githubResponse is http:Response) {
-                    if (githubResponse.statusCode == 204) {
+                    if (githubResponse.statusCode == http:STATUS_NO_CONTENT) {
                         response.statusCode = githubResponse.statusCode;
                         response.setPayload("Comment deleted successfully.");
                     } else {
@@ -642,7 +642,7 @@ service adminService on endPoint {
                     }
                 } else {
                     log:printInfo("The github response is not in the expected form: http:Response.");
-                    response.statusCode = http:STATUS_NOT_ACCEPTABLE;
+                    response.statusCode = http:STATUS_BAD_REQUEST;
                     response.setPayload(githubResponse.reason());
                 }
             } else {
@@ -651,8 +651,8 @@ service adminService on endPoint {
                 response.setPayload("Comment with the given comment id does not exist.");
             }
         } else {
-            log:printInfo("Error occurred while checking the validity of the comment");
-            response.statusCode = http:STATUS_NOT_ACCEPTABLE;
+            log:printInfo("Error occurred while checking the validity of the comment.");
+            response.statusCode = http:STATUS_BAD_REQUEST;
             response.setPayload(validComment.reason());
         }
 
@@ -686,12 +686,12 @@ service adminService on endPoint {
                 }
             } else {
                 log:printInfo("Invalid json payload received from the response obtained from github.");
-                response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
+                response.statusCode = http:STATUS_BAD_REQUEST;
                 response.setPayload("Invalid payload received from github response.");
             }
         } else {
             log:printInfo("The github response is not in the expected form: http:Response.");
-            response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
+            response.statusCode = http:STATUS_BAD_REQUEST;
             response.setPayload(<@untained>githubResponse.reason());
         }
 
@@ -719,7 +719,7 @@ service adminService on endPoint {
                 callBackRequest.setPayload(<@untained>({"title": payloadTitle, "body": stringPayloadBody, "state": payloadState}));
                 http:Response | error githubResponse = githubAPIEndpoint->patch(<@untained>url, callBackRequest);
                 if (githubResponse is http:Response) {
-                    if (githubResponse.statusCode == 200) {
+                    if (githubResponse.statusCode == http:STATUS_OK) {
                         response.statusCode = http:STATUS_OK;
                         response.setPayload(<@untained>("Updated issue number: " + issueNumber));
                     } else {
@@ -728,18 +728,18 @@ service adminService on endPoint {
                         response.setPayload("Issue was not updated succesfully. Please check the issue number");
                     }
                 } else {
-                    log:printError("Error while obtaining the response from github api services.");
-                    response.statusCode = http:STATUS_NOT_ACCEPTABLE;
+                    log:printError("The github response is not in the expected form: http:Response.");
+                    response.statusCode = http:STATUS_BAD_REQUEST;
                     response.setPayload(githubResponse.reason());
                 }
             } else {
                 log:printInfo("Error while obtaining the json payload body/title from the request received.");
-                response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
+                response.statusCode = http:STATUS_BAD_REQUEST;
                 response.setPayload("Error while obtaining the json payload body/title from the request received.");
             }
         } else {
             log:printInfo("Error while obtaining the json payload from the request received.");
-            response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
+            response.statusCode = http:STATUS_BAD_REQUEST;
             response.setPayload("Error while obtaining the json payload from the request received.");
         }
 
