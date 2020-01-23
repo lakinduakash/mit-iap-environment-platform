@@ -10,7 +10,7 @@ export default function SimpleTable() {
 
   useEffect(() => {
     axios
-      .get("http://0.0.0.0:9060/user-services/get-requests/yashod")
+      .get("http://0.0.0.0:9080/user-services/get-requests/yashod")
       .then(function(response) {
         setRows(response.data);
       })
@@ -22,6 +22,8 @@ export default function SimpleTable() {
   const Test = () => {
     return (
       <div>
+        <h3>Requests</h3>
+        <br />
         <table className="table table-hover table-bordered custom-table">
           <thead>
             <tr>

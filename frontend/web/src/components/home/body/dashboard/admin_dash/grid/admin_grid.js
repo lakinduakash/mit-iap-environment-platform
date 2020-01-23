@@ -1,8 +1,10 @@
 import React from "react";
 import "./admin_grid.css";
+import { useHistory } from "react-router-dom";
 import { Button } from "@material-ui/core";
 
-function SimpleTable() {
+const Admin_grid = () => {
+  let history = useHistory();
   const Table = () => {
     return (
       <div>
@@ -29,7 +31,15 @@ function SimpleTable() {
               <td></td>
               <td></td>
               <td>
-                <Button>View</Button>
+                <Button
+                  type="button"
+                  onClick={() => {
+                    history.push("/admin-dash/request");
+                    console.log("any");
+                  }}
+                >
+                  View
+                </Button>
               </td>
             </tr>
           </tbody>
@@ -43,6 +53,5 @@ function SimpleTable() {
       <Table />
     </div>
   );
-}
-
-export default SimpleTable;
+};
+export default Admin_grid;

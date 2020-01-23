@@ -6,4 +6,4 @@ const string ACCESS_TOKEN = "Bearer <token>";
 
 // Listner configurations.
 const int ADMIN_SERVICES_PORT = 9070;
-const string BASEPATH = "/github";
+const string BASEPATH = "/admin-services";
