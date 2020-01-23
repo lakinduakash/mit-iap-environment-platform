@@ -1,9 +1,4 @@
 import React from "react";
-// import Loading from "../../../../../utility/loading/loading";
-// import axios from "axios";
-// import ViewRequest from "./view_request/view_request";
-// import Comment from "./comment/comment";
-
 import "./admin_grid.css";
 import { Button } from "@material-ui/core";
 
