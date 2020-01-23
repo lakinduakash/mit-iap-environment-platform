@@ -1,23 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { makeStyles } from "@material-ui/core/styles";
 import Loading from "../../../../../utility/loading/loading";
 import axios from "axios";
 import ViewRequest from "./view_request/view_request";
-import Comment from "./comment/comment";
-
 import "./user_grid.css";
 
-const useStyles = makeStyles({
-  table: {
-    minWidth: 650
-  }
-});
-
 export default function SimpleTable() {
-  const classes = useStyles();
-
   const [rows, setRows] = useState(null);
-  const [loading, setLoading] = useState(null);
+  const [loading] = useState(null);
 
   useEffect(() => {
     axios
