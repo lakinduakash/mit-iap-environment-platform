@@ -18,17 +18,16 @@ service userService on endPoint {
 
     @http:ResourceConfig {
         methods: ["GET"],
-        path: "/get-request-for-user/{userName}/{issueNumber}"
+        path: "/get-request/{userName}/{issueNumber}"
     }
-    resource function getRequestRelatedToUser(http:Caller caller, http:Request request, string userName, string issueNumber) {
+    resource function getRequest(http:Caller caller, http:Request request, string userName, string issueNumber) {
 
-        // http:Request callBackRequest = new;
+        http:Request callBackRequest = new;
         http:Response response = new;
         string url = "/repos/" + ORGANIZATION_NAME + "/" + REPOSITORY_NAME + "/issues/" + issueNumber;
 
-        // callBackRequest.addHeader("Authorization", ACCESS_TOKEN);
-        // http:Response | error githubResponse = githubAPIEndpoint->get(<@untained>url, callBackRequest);
-        http:Response | error githubResponse = githubAPIEndpoint->get(<@untained>url);
+        callBackRequest.addHeader("Authorization", ACCESS_TOKEN);
+        http:Response | error githubResponse = githubAPIEndpoint->get(<@untained>url, callBackRequest);
 
         if (githubResponse is http:Response) {
             json | error jsonPayload = githubResponse.getJsonPayload();
@@ -64,17 +63,16 @@ service userService on endPoint {
 
     @http:ResourceConfig {
         methods: ["GET"],
-        path: "/get-requests-for-user/{userName}"
+        path: "/get-requests/{userName}"
     }
-    resource function getRequestsRelatedToUser(http:Caller caller, http:Request request, string userName) {
+    resource function getRequests(http:Caller caller, http:Request request, string userName) {
 
-        // http:Request callBackRequest = new;
+        http:Request callBackRequest = new;
         http:Response response = new;
         string url = "/repos/" + ORGANIZATION_NAME + "/" + REPOSITORY_NAME + "/issues?state=all";
 
-        // callBackRequest.addHeader("Authorization", ACCESS_TOKEN);
-        // http:Response | error githubResponse = githubAPIEndpoint->get(<@untained>url, callBackRequest);
-        http:Response | error githubResponse = githubAPIEndpoint->get(url);
+        callBackRequest.addHeader("Authorization", ACCESS_TOKEN);
+        http:Response | error githubResponse = githubAPIEndpoint->get(<@untained>url, callBackRequest);
 
         if (githubResponse is http:Response) {
             var jsonPayload = githubResponse.getJsonPayload();
@@ -122,9 +120,9 @@ service userService on endPoint {
                 callBackRequest.setPayload(<@untained>({"title": payloadTitle, "body": stringPayloadBody}));
                 http:Response | error githubResponse = githubAPIEndpoint->post(url, callBackRequest);
                 if (githubResponse is http:Response && githubResponse.statusCode == 201) {
-                    string[] createLabelResult = utilities:createLabel(<@untained>userName, "Name of the user.");
+                    string[] createLabelResult = utilities:createLabel(<@untained>userName, "userName");
                     int | error createLabelResultCode = ints:fromString(createLabelResult[0]);
-                    if (createLabelResultCode is int && createLabelResultCode == 201) {
+                    if (createLabelResultCode is int && (createLabelResultCode == 201 || createLabelResultCode == 422)) {
                         json | error githubResponsePayload = githubResponse.getJsonPayload();
                         if (githubResponsePayload is json) {
                             string issueNumber = githubResponsePayload.number.toString();
@@ -168,16 +166,53 @@ service userService on endPoint {
     }
 
     @http:ResourceConfig {
-        methods: ["POST"],
-        path: "user/post-comment/{issueNumber}/{userName}"
+        methods: ["GET"],
+        path: "/get-comments/{issueNumber}"
     }
-    resource function postCommentOnIssueByUser(http:Caller caller, http:Request request, string issueNumber, string userName) {
+    resource function getComments(http:Caller caller, http:Request request, string issueNumber) returns @untainted error? {
 
         http:Request callBackRequest = new;
         http:Response response = new;
         string url = "/repos/" + ORGANIZATION_NAME + "/" + REPOSITORY_NAME + "/issues/" + issueNumber + "/comments";
 
-        // Please change the scope of the access token to make the function work
+        callBackRequest.addHeader("Authorization", ACCESS_TOKEN);
+        http:Response | error githubResponse = githubAPIEndpoint->get(<@untained>url, callBackRequest);
+
+        if (githubResponse is http:Response) {
+            var jsonPayload = githubResponse.getJsonPayload();
+            if (jsonPayload is json[]) {
+                json[] | error comments = utilities:createFormattedComments(jsonPayload);
+                if (comments is json[]) {
+                    response.statusCode = http:STATUS_OK;
+                    response.setJsonPayload(<@untained>comments);
+                } else {
+                    log:printInfo("The comments related to issue could not be converted to json.");
+                    response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
+                    response.setPayload(<@untained>comments.reason());
+                }
+            } else {
+                log:printInfo("Invalid json payload received from the response obtained from github.");
+                response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
+                response.setPayload("Invalid payload received from github response.");
+            }
+        } else {
+            log:printInfo("The github response is not in the expected form: http:Response.");
+            response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
+            response.setPayload(<@untained>githubResponse.reason());
+        }
+
+        error? respond = caller->respond(response);
+    }
+
+    @http:ResourceConfig {
+        methods: ["POST"],
+        path: "/post-comment/{issueNumber}/{userName}"
+    }
+    resource function postCommentOnIssue(http:Caller caller, http:Request request, string issueNumber, string userName) {
+
+        http:Request callBackRequest = new;
+        http:Response response = new;
+        string url = "/repos/" + ORGANIZATION_NAME + "/" + REPOSITORY_NAME + "/issues/" + issueNumber + "/comments";
         callBackRequest.addHeader("Authorization", ACCESS_TOKEN);
 
         boolean | error validIssue = utilities:isValidIssue(<@untained>issueNumber);
@@ -243,15 +278,13 @@ service userService on endPoint {
 
     @http:ResourceConfig {
         methods: ["PATCH"],
-        path: "user/edit-comment/{commentId}/{userName}/{issueNumber}"
+        path: "/edit-comment/{commentId}/{userName}/{issueNumber}"
     }
-    resource function editCommentOnIssueByUser(http:Caller caller, http:Request request, string commentId, string userName, string issueNumber) {
+    resource function editCommentOnIssue(http:Caller caller, http:Request request, string commentId, string userName, string issueNumber) {
 
         http:Request callBackRequest = new;
         http:Response response = new;
         string url = "/repos/" + ORGANIZATION_NAME + "/" + REPOSITORY_NAME + "/issues/comments/" + commentId;
-
-        // Please change the scope of the access token to make the function work
         callBackRequest.addHeader("Authorization", ACCESS_TOKEN);
 
         boolean | error validComment = utilities:isValidCommentOfUser(<@untained>commentId, <@untainted>userName);
@@ -316,17 +349,14 @@ service userService on endPoint {
 
     @http:ResourceConfig {
         methods: ["DELETE"],
-        path: "user/delete-comment/{commentId}/{userName}/{issueNumber}"
+        path: "/delete-comment/{commentId}/{userName}/{issueNumber}"
     }
-    resource function deleteCommentOnIssueByUser(http:Caller caller, http:Request request, string commentId, string userName, string issueNumber) {
+    resource function deleteCommentOnIssue(http:Caller caller, http:Request request, string commentId, string userName, string issueNumber) {
 
         http:Request callBackRequest = new;
         http:Response response = new;
         string url = "/repos/" + ORGANIZATION_NAME + "/" + REPOSITORY_NAME + "/issues/comments/" + commentId;
-
-        // Please change the scope of the access token to make the function work
         callBackRequest.addHeader("Authorization", ACCESS_TOKEN);
-
 
         boolean | error validComment = utilities:isValidCommentOfUser(<@untained>commentId, <@untainted>userName);
         boolean | error validUser = utilities:isValidUserOnIssue(<@untainted>userName, <@untainted>issueNumber);

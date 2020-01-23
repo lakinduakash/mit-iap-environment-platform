@@ -10,11 +10,10 @@ import { Grid } from "@material-ui/core";
 const Requset = () => {
   let history = useHistory();
   const [id, title, state, body] = useContext(RequestContext);
-  const [loading, setLoading] = useState(null);
+  const [loading] = useState(null);
   const [comments, setComments] = useState(null);
   const [reply, setReply] = useState("");
 
-  var check = false;
   const handleSubmit = event => {
     axios
       .post(
@@ -43,7 +42,7 @@ const Requset = () => {
         setComments(response.data);
       })
       .catch();
-  }, [loading]);
+  }, [loading, id]);
   return (
     <Fragment>
       <button
@@ -88,6 +87,7 @@ const Requset = () => {
           ) : (
             <h3>no</h3>
           )}
+          <br />
           <Form>
             <Form.Field>
               <input
