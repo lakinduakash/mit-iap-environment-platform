@@ -10,6 +10,7 @@ import Menu from "@material-ui/core/Menu";
 import AccountCircle from "@material-ui/icons/AccountCircle";
 import NotificationsIcon from "@material-ui/icons/Notifications";
 import Logo from "../../../../asserts/images/logo-dash.png";
+import { useHistory } from "react-router-dom";
 
 const useStyles = makeStyles(theme => ({
   grow: {
@@ -37,6 +38,7 @@ const useStyles = makeStyles(theme => ({
 export default function PrimarySearchAppBar() {
   const classes = useStyles();
   const [anchorEl, setAnchorEl] = React.useState(null);
+  let history = useHistory();
 
   const isMenuOpen = Boolean(anchorEl);
 
@@ -59,7 +61,7 @@ export default function PrimarySearchAppBar() {
       open={isMenuOpen}
       onClose={handleMenuClose}
     >
-      <MenuItem onClick={handleMenuClose}>Logout</MenuItem>
+      <MenuItem onClick={() => history.push("/")}>Logout</MenuItem>
     </Menu>
   );
 
