@@ -3,7 +3,6 @@ import ballerina/io;
 import ws_server;
 
 type Notification record {
-    // string issueCreator?;
     string receiver;
     string category;
     string description;
@@ -26,6 +25,8 @@ service eventListener on new http:Listener(9090) {
                 var  event_action = data.action;
                 if (event_action == "opened" ) {
                     // Issue created
+
+                    // Notification for admin
                     Notification notification = {
                         receiver: "admin",
                         category: "Issue Created",
@@ -34,6 +35,7 @@ service eventListener on new http:Listener(9090) {
                     sendMessage(notification);
                 } else if (event_action == "edited") {
                     // Issue Edited
+
                     // Notification for admin
                     Notification notification_admin = {
                         receiver: "admin",
@@ -43,6 +45,7 @@ service eventListener on new http:Listener(9090) {
                     sendMessage(notification_admin);
                 } else if (event_action == "closed") {
                     // Issue Closed
+
                     // Notification to the admin
                     Notification notification = {
                         receiver: "admin",
@@ -50,6 +53,7 @@ service eventListener on new http:Listener(9090) {
                         description: "Request deleted"
                     };
                     sendMessage(notification);
+
                     // Notification for user
                     string username = "";
                     map<json> | error issue = trap <map<json>>data.issue;
@@ -70,6 +74,7 @@ service eventListener on new http:Listener(9090) {
                     sendMessage(notification_user);
                 } else if (event_action == "created") {
                     // Comment Created
+
                     // Notification for admin
                     if (data.comment is json) {
                         var comment_body = data.comment.body;
@@ -80,6 +85,7 @@ service eventListener on new http:Listener(9090) {
                         };
                         sendMessage(notification_admin);
                     }
+
                     // Notification for user
                     string username = "";
                     map<json> | error issue = trap <map<json>>data.issue;
@@ -100,6 +106,8 @@ service eventListener on new http:Listener(9090) {
                     sendMessage(notification_user);
                 } else if (event_action == "labeled") {
                     // Issue was labeled
+
+                    // Notification for admin
                     Notification notification = {
                         receiver: "admin",
                         category: "Label Added ",
