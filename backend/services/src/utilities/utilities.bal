@@ -531,19 +531,44 @@ public function isValidCommentOfUser(string commentId, string userName) returns 
 
 public function createFormattedIssues(json[] issues) returns json[] | error {
 
-    json[] returnedIssues = [];
+    json[] formattedIssues = [];
+    string userName = "";
+    string status = "";
+    json[] labelArray = [];
+    string[] assigneeArray = [];
+
     foreach json issue in issues {
-        json labelDetails = check createAFormattedJsonOfLabels(<json[]>issue.labels);
-        returnedIssues[returnedIssues.length()] = {
-            "issueId":check issue.id,
-            "issueNumber":check issue.number,
-            "labels": labelDetails,
-            "issueTitle":check issue.title,
-            "issueBody":check issue.body
+        json[] labels = <json[]>issue.labels;
+        foreach json label in labels {
+            if (label.description == "userName") {
+                userName = <string>label.name;
+            } else if (label.description == "state") {
+                status = <string>label.name;
+            } else {
+                labelArray[labelArray.length()] = {"name":check label.name, "body":check label.description};
+            }
+        }
+        json[] assignees = <json[]>issue.assignees;
+        foreach json assignee in assignees {
+            assigneeArray[assigneeArray.length()] = <string>assignee.login;
+        }
+        json request = {
+            "requsetNumber":check issue.number,
+            "requestTitle":check issue.title,
+            "requestBody":check issue.body,
+            "owner": userName,
+            "status": status,
+            "tags": labelArray,
+            "assignees": assigneeArray
         };
+        userName = "";
+        status = "";
+        labelArray = [];
+        assigneeArray = [];
+        formattedIssues[formattedIssues.length()] = request;
     }
 
-    return returnedIssues;
+    return formattedIssues;
 }
 
 public function createFormattedComments(json[] comments) returns json[] | error {
