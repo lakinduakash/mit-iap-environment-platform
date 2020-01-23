@@ -3,6 +3,7 @@ import "./admin_grid.css";
 import { useHistory } from "react-router-dom";
 import { Button } from "@material-ui/core";
 import axios from "axios";
+import View from "./view_request/view_request";
 
 const Admin_grid = () => {
   let history = useHistory();
@@ -66,14 +67,7 @@ const Admin_grid = () => {
                     )}
                   </td>
                   <td>
-                    <button
-                      className="btn btn-info"
-                      onClick={() => {
-                        history.push("/admin-dash/request");
-                      }}
-                    >
-                      View
-                    </button>
+                    <View row={requests} />
                   </td>
                 </tr>
               ))

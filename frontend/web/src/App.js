@@ -2,19 +2,21 @@ import React, { Fragment } from "react";
 import "./App.css";
 import Home from "./components/home/home";
 import RequestProvider from "./components/utility/contexts/requestContext";
+import AdminRequestProvider from "./components/utility/contexts/adminRequestContext";
 
 function App() {
   return (
     <Fragment>
       <RequestProvider>
-        <Home />
+        <AdminRequestProvider>
+          <Home />
+        </AdminRequestProvider>
       </RequestProvider>
     </Fragment>
   );
 }
 
 export default App;
-
 
 // const position = [51.505, -0.09]
 // const map = (
