@@ -112,8 +112,8 @@ service eventListener on new http:Listener(9090) {
                     }
                     Notification notification_user = {
                         receiver: username,
-                        category: "Issue Edited",
-                        description: "Issue was edited"
+                        category: "Comment Created",
+                        description: "New comment was added"
                     };
                     response.statusCode = http:STATUS_OK;
                     response.setPayload("Success");
@@ -124,7 +124,7 @@ service eventListener on new http:Listener(9090) {
                     // Notification for admin
                     Notification notification = {
                         receiver: "admin",
-                        category: "Label Added ",
+                        category: "Label Added",
                         description: "New label was added"
                     };
                     response.statusCode = http:STATUS_OK;
@@ -148,12 +148,14 @@ service eventListener on new http:Listener(9090) {
 function sendMessage(Notification notification) {
     io:println(notification);
 
-    ws_server:WsUser[] ws = ws_server:getWebSocketClients();
-    foreach ws_server:WsUser item in ws {
-        if(item.user=== notification.receiver){
-            http:WebSocketCaller wc= item.wsCaller;
-            var a= wc->pushText(notification.description);
+    json|error notificationJson = json.constructFrom(notification);
+    if (notificationJson is json) {
+        ws_server:WsUser[] ws = ws_server:getWebSocketClients();
+        foreach ws_server:WsUser item in ws {
+            if(item.user=== notification.receiver){
+                http:WebSocketCaller wc= item.wsCaller;
+                var a= wc->pushText(notificationJson.toJsonString());
+            }
         }
     }
-
 }
