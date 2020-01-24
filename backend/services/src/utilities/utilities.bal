@@ -605,3 +605,19 @@ public function removeLabel(string issueNumber, string labelName) returns int {
         return http:STATUS_BAD_REQUEST;
     }
 }
+
+public function createAFormattedJsonOfStateLabels(json[] labels) returns json | error {
+
+    json[] labelDetails = [];
+    foreach json label in labels {
+        map<json> labelRecord = <map<json>>label;
+        json description = check labelRecord.description;
+        if (description == "state") {
+            labelDetails[labelDetails.length()] = {
+                "labelName":check labelRecord.name,
+                "labelDescription":check labelRecord.description
+            };
+        }
+    }
+    return labelDetails;
+}
