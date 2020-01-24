@@ -5,6 +5,8 @@ import axios from 'axios';
 import { polygon } from 'leaflet';
 import * as turf from '@turf/turf'
 
+
+
 var yala = [[6.279629, 81.424341], [6.668179, 81.771591], [6.713189,81.716037], [6.610547,81.587634], [6.607818, 81.529269], [6.618731, 81.510730], [6.607136, 81.494937], [6.702619, 81.354861], [6.624188, 81.266284], [6.536876, 81.263538], [6.510270, 81.135135], [6.396327, 81.145993], [6.351289, 81.199551], [6.386092, 81.273022], [6.461831, 81.276455], [6.447503, 81.335507], [6.322626, 81.383572], [6.309318, 81.374131], [6.300446, 81.372929], [6.277241, 81.405201],[6.279629, 81.424341]] 
 var polyyala = turf.polygon([yala]);
 var msg="";
@@ -77,7 +79,7 @@ draw = (e) => {
       this.setState({points:temp})
       
     }
-  console.log("OKK")
+  console.log("OK")
 }
 if(temp.length>2){
   var p = temp
@@ -124,7 +126,7 @@ render() {
     let error_msg;
     let poly;
     if(this.state.points.length<3){
-      error_msg = "\nNeed at least 3 points"
+      error_msg = "Add at least 3 points and click on check availability"
     }
     else{
       poly = <Polygon  positions = {this.state.points}/>
@@ -132,103 +134,186 @@ render() {
     }
 
     return (
-      <div>
         
-        
-        <Map
-          style={{ height: "480px", width: "60%" }}
+            <div className="form-group">                            
+                    <form id = 'form' onSubmit={this.handleSubmit} onChange={this.handleChange} >
+                        <div className="row"> 
+                            <div className="col-sm-6 p-5" style={{ marginTop:"15px", borderRight: "2px solid #CCC" }}>                                 
+                                <Map
+                                    style={{ height: "480px", width: "100%", marginBottom: "15px" }}
 
-          //zoomed to center on given coords
-          bounds = {this.state.points}>
-          <TileLayer url="http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"/>
+                                    //zoomed to center on given coords
+                                    bounds = {this.state.points}>
+                                    <TileLayer url="http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"/>
 
-          <Polygon //red polygons for national parks 
-            positions = {yala}
-            color = 'red'
-          />
-          {poly}}
-        </Map>
-      
-      
-      <form id = 'form' onSubmit={this.handleSubmit} onChange={this.handleChange} >
-        
-        <button type = 'button' onClick={this.addCat.bind(this)}>Add new point</button>
-        {
-          cats.map((val, idx)=> {
-            let catId = `cat-${idx}`, ageId = `age-${idx}`
-            return (
-              <div key={idx}>
-                <label htmlFor={catId}>Lat</label>
-                <input
-                  type="text"
-                  name={catId}
-                  data-id={idx}
-                  id={catId}
-                  value={cats[idx].lat} 
-                  className="lat"
-                />
-                <label htmlFor={ageId}>Long</label>
-                <input
-                  type="text"
-                  name={ageId}
-                  data-id={idx}
-                  id={ageId}
-                  value={cats[idx].long} 
-                  className="long"
-                />
-              </div> 
-            )
-          })  
-        }
-          <div>
-              <br></br>
-              {error_msg}
-              <br></br>
-              {msg}
-          </div>
-        <button type = 'button' onClick={this.draw.bind(this)}>Check Availability</button>
-        <br></br>
-        <label>
-          <br></br>
-            Land Type: 
-            <select id ="landtype">
-              <option value="Plantation">Plantation</option>
-              <option value="Forestation">Forestation</option>
-              <option selected value="Deforestation">Deforestation</option>
-              <option value="Hotel">Hotel</option>
-            </select>
-        </label>
+                                    <Polygon //red polygons for national parks 
+                                        positions = {yala}
+                                        color = 'red'
+                                    />
+                                    {poly}}
+                                </Map>                                
+                                <h3>Please enter the exact co-ordinates (in clockwise order) for the land area you wish to request</h3>
+                                <br></br>
+                                {
+                                cats.map((val, idx)=> {
+                                    let catId = `cat-${idx}`, ageId = `age-${idx}`
+                                    return (
+                                    <div key={idx} className="row" style={{marginBottom:"20px"}}>
+                                        <div className="col-sm-4">
+                                            <label htmlFor={catId}>Latitude </label>
+                                            <input
+                                                type="text"
+                                                name={catId}
+                                                data-id={idx}
+                                                id={catId}
+                                                value={cats[idx].lat} 
+                                                className="lat"
+                                                style={{
+                                                    height: "calc(1.5em + .75rem + 2px)",
+                                                    padding: ".375rem .75rem",
+                                                    fontSize: "1rem",
+                                                    fontWeight: "400",
+                                                    lineHeight: "1.5",
+                                                    color: "#495057",
+                                                    backgroundColor: "#fff",
+                                                    backgroundClip: "padding-box",
+                                                    border: "1px solid #ced4da",
+                                                    borderRadius: ".25rem",
+                                                    transition: "border-color .15s ease-in-out,box-shadow .15s ease-in-out",
+                                                    marginLeft:"10px"                                                
+                                                }}
+                                            />
+                                        </div>
+                                        <div className="col-sm-4">
+                                            <label htmlFor={ageId}>Longitude </label>
+                                            <input
+                                                type="text"
+                                                name={ageId}
+                                                data-id={idx}
+                                                id={ageId}
+                                                value={cats[idx].long} 
+                                                className="long"
+                                                style={{
+                                                    height: "calc(1.5em + .75rem + 2px)",
+                                                    padding: ".375rem .75rem",
+                                                    fontSize: "1rem",
+                                                    fontWeight: "400",
+                                                    lineHeight: "1.5",
+                                                    color: "#495057",
+                                                    backgroundColor: "#fff",
+                                                    backgroundClip: "padding-box",
+                                                    border: "1px solid #ced4da",
+                                                    borderRadius: ".25rem",
+                                                    transition: "border-color .15s ease-in-out,box-shadow .15s ease-in-out",
+                                                    marginLeft:"10px"                                                
+                                                }}
+                                            />
+                                        </div>
+                                        <div className="col-sm-4">
+                                            <button type = 'button' onClick={this.addCat.bind(this)} className="btn btn-primary" style={{width: "100%"}}>Add new point</button>
+                                        </div>
+                                    </div> 
+                                    )
+                                })  
+                                }
+                                <br></br>
+                                <div className="row">
+                                    <div className="col-sm-3">
+                                        <br></br>
+                                        {error_msg}
+                                        <span style={{color: "#28a745", fontSize: "20px", paddingTop: "10px"}}>{msg}</span>  
+                                    </div> 
+                                    <div className="col-sm-9"> 
+                                        <br/>                        
+                                        <button type = 'button' onClick={this.draw.bind(this)} class="btn btn-success" style={{width: "100%"}}>Check Availability</button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div className="col-sm-6 p-5" style={{fontSize: "20px"}}>
+                                <br></br>
+                                <h1 style={{fontSize: "40px", marginBottom:"50px"}}>Land Request Form</h1>
+                                <div className="form-group row">
+                                    <div className="col-sm-2">
+                                        <label>
+                                        <br></br>
+                                            Land Type: 
+                                        </label>
+                                    </div>
+                                    <div className="col-sm-8" style={{marginTop: "12px"}}>
+                                        <select className="form-control" id ="landtype">
+                                        <option value="Plantation">Plantation</option>
+                                        <option value="Forestation">Forestation</option>
+                                        <option selected value="Deforestation">Deforestation</option>
+                                        <option value="Hotel">Hotel</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <br></br>                    
 
-        <br></br>
-        <label>
-            Timeframe: 
-            <input
-            Timeframe=""
-            type="text"
-            value={this.state.fullname}
-            onChange={this.handleInputChange} 
-            id = 'timeframe'/>
-        </label>
+                                <div className="form-group row">
+                                    <div className="col-sm-2">
+                                        <label>
+                                            <br></br>
+                                            Description: 
+                                        </label>
+                                    </div>
+                                    <div className="col-sm-8" style={{marginTop: "12px"}}>
+                                        <input
+                                        Timeframe=""
+                                        type="text"
+                                        value={this.state.fullname}
+                                        onChange={this.handleInputChange} 
+                                        id = 'desc'
+                                        className="form-control"
+                                        />
+                                    </div>
+                                </div>
+                                <br></br>
 
-        <br></br>
-        <label>
-            Description: 
-            <input
-            Timeframe=""
-            type="text"
-            value={this.state.fullname}
-            onChange={this.handleInputChange} 
-            id = 'desc'/>
-        </label>
-        <br></br>
-        <label>Attach Files: </label>
-        <input type="file" />
-        <br></br>
-        <input type="submit" value="Submit Form" />
-      </form>
-      
-      </div>
-      
+                                <div className="form-group row">
+                                    <div className="col-sm-2">
+                                        <label>
+                                            <br></br>
+                                            Timeframe: 
+                                        </label>
+                                    </div>
+                                    <div className="col-sm-8" style={{marginTop: "12px"}}>
+                                        <input
+                                        Timeframe=""
+                                        type="text"
+                                        value={this.state.fullname}
+                                        onChange={this.handleInputChange} 
+                                        id = 'timeframe'
+                                        className="form-control"
+                                        />
+                                    </div>
+                                </div>
+                                <br></br>
+
+                                <div className="form-group row" style={{marginTop: "15px"}}>
+                                    <div className="col-sm-2">    
+                                        <label>Attach Files: </label>
+                                    </div>
+                                    <div className="col-sm-8"  style={{fontSize: "15px"}}>
+                                        <input type="file" className="form-control-file"  />
+                                    </div>
+                                </div>
+                                <br></br>
+
+                                <div className="form-group row" style={{marginTop: "125px"}}>
+                                    <div className="col-sm-5 col-xs-12">
+                                        <input type="submit" id="draft" value="Save Draft" className="btn btn-secondary float-right" style={{width: "80%"}} />
+                                    </div>
+                                    <div className="col-sm-6 col-xs-12">
+                                        <input type="submit" id="submit" value="Submit Form" className="btn btn-success" style={{width: "65%"}} />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                
+            </div>      
     )
   }
 }
