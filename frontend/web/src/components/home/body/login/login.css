@@ -1,0 +1,10 @@
+.background {
+  background-image: url("./background.png");
+  background-repeat: no-repeat;
+  background-size: cover;
+  height: 830px;
+}
+
+.form-background {
+  background-color: white;
+}
