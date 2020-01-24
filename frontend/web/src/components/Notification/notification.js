@@ -13,6 +13,11 @@ class Notification extends Component {
       this.ws.onopen = () => {
         // on connecting, do nothing but log it to the console
         console.log('connected to websocket server')
+        try {
+          this.ws.send("admin") //send data to the server
+        } catch (error) {
+          console.log(error) // catch error
+        }
       }
 
       this.ws.onmessage = evt => {
@@ -40,8 +45,7 @@ class Notification extends Component {
 
   render(){
     return (
-      <div>
-        <ChildComponent websocket={this.ws} />
+      <div style={{marginTop: "50px"}}>
         <Notification_holder value = {this.messageList} />
       </div>
     )
