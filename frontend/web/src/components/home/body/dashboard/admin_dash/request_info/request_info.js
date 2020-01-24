@@ -75,10 +75,10 @@ const AdminView = () => {
       .catch();
   };
 
-  const assignLabel = () => {
+  const assignLabel = val => {
     axios
       .post("http://0.0.0.0:9070/admin-services/assign-label/" + id, {
-        labelNames: [state]
+        labelNames: [val]
       })
       .then(response => {
         console.log(response);
@@ -91,7 +91,7 @@ const AdminView = () => {
       removeLabel();
     }
     if (state != undefined) {
-      assignLabel();
+      assignLabel(state);
       setStatus(state);
     }
   };
@@ -101,7 +101,27 @@ const AdminView = () => {
     getLabels();
   }, [loading, id]);
 
-  const createNewLabel = () => {};
+  const createNewLabel = () => {
+    axios
+      .post("http://0.0.0.0:9070/admin-services/create-label", {
+        labelName: newState,
+        labelDescription: "state"
+      })
+      .then(response => {
+        console.log(response);
+      })
+      .catch();
+    history.push("/admin-dash");
+  };
+
+  const createNewLabelAndApply = () => {
+    createNewLabel();
+    if (status != "") {
+      removeLabel();
+    }
+    setStatus(newState);
+    assignLabel(status);
+  };
 
   return (
     <Fragment>
@@ -115,6 +135,7 @@ const AdminView = () => {
         Back
       </button>
       <h2>{newState}</h2>
+      <h2>{state}</h2>
       <div className="row request-div">
         <div className="col-sm-8 ">
           <div className="card">
@@ -152,7 +173,7 @@ const AdminView = () => {
                           <h3>Change State</h3>
                           <hr />
                           <div class="form-group">
-                            <label for="sel1">Select list:</label>
+                            <label>Select list:</label>
                             <select
                               class="form-control"
                               value={state}
@@ -228,6 +249,16 @@ const AdminView = () => {
                               class="btn btn-primary"
                             >
                               Submit
+                            </button>
+                            {"  "}
+                            <button
+                              onClick={() => {
+                                createNewLabelAndApply();
+                              }}
+                              type="submit"
+                              class="btn btn-primary"
+                            >
+                              Submit and apply
                             </button>
                           </form>
                         </div>

@@ -35,7 +35,7 @@ export default function SimpleTable() {
                 history.push("/new-issue");
               }}
             >
-              <i class="fas fa-plus"></i>
+              <i className="fas fa-plus"></i>
             </button>
           </div>
         </div>
