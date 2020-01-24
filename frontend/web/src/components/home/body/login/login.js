@@ -13,6 +13,7 @@ import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 import { useHistory } from "react-router-dom";
+import "./login.css";
 
 const useStyles = makeStyles(theme => ({
   paper: {
@@ -64,7 +65,7 @@ function LogInForm() {
   const [password, setPassword] = useState();
 
   return (
-    <Container component="main" maxWidth="xs">
+    <Container component="main" maxWidth="xs" className="form-background">
       <CssBaseline />
       <div className={classes.paper}>
         <Avatar className={classes.avatar}>
@@ -148,7 +149,12 @@ class LoginForm extends React.Component {
   }
 
   render() {
-    return <LogInForm />;
+    return (
+      <div className="background">
+        <p>.</p>
+        <LogInForm />
+      </div>
+    );
   }
 }
 
