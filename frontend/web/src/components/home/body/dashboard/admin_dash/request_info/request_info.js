@@ -5,21 +5,12 @@ import { useHistory } from "react-router-dom";
 import axios from "axios";
 import { Button, Comment, Form, Header } from "semantic-ui-react";
 import Avatar from "../../../../../../asserts/images/avatar.png";
-import { Map, CircleMarker, TileLayer, Polygon } from "react-leaflet";
+import { Map, TileLayer, Polygon } from "react-leaflet";
 
 const AdminView = () => {
-  const [
-    id,
-    title,
-    status,
-    body,
-    owner,
-    tags,
-    assignees,
-    ,
-    ,
-    setStatus
-  ] = useContext(AdminRequestContext);
+  const [id, title, status, body, , , , , , setStatus] = useContext(
+    AdminRequestContext
+  );
   const [loading] = useState(null);
   let history = useHistory();
   const [data, setData] = useState(null);
@@ -87,10 +78,10 @@ const AdminView = () => {
   };
 
   const changeState = () => {
-    if (status != "") {
+    if (status !== "") {
       removeLabel();
     }
-    if (state != undefined) {
+    if (state !== undefined) {
       assignLabel(state);
       setStatus(state);
     }
@@ -114,15 +105,6 @@ const AdminView = () => {
     history.push("/admin-dash");
   };
 
-  const createNewLabelAndApply = () => {
-    createNewLabel();
-    if (status != "") {
-      removeLabel();
-    }
-    setStatus(newState);
-    assignLabel(status);
-  };
-
   return (
     <Fragment>
       <br />
@@ -134,8 +116,6 @@ const AdminView = () => {
       >
         Back
       </button>
-      <h2>{newState}</h2>
-      <h2>{state}</h2>
       <div className="row request-div">
         <div className="col-sm-8 ">
           <div className="card">
@@ -146,42 +126,45 @@ const AdminView = () => {
               <div className="row ">
                 <div className="col-sm-10">
                   <h3>
-                    Status of the Request: {status != "" ? status : pending}
+                    Status of the Request: {status !== "" ? status : pending}
                   </h3>
                 </div>
                 <div className="col-sm-2 ">
                   <button
                     type="button"
-                    class="btn btn-info"
+                    className="btn btn-info"
                     data-toggle="modal"
                     data-target="#myModal"
                   >
                     Change State
                   </button>
 
-                  <div class="modal" id="myModal">
-                    <div class="modal-dialog modal-dialog-centered">
-                      <div class="modal-content">
-                        <div class="modal-body">
+                  <div className="modal" id="myModal">
+                    <div className="modal-dialog modal-dialog-centered">
+                      <div className="modal-content">
+                        <div className="modal-body">
                           <button
                             type="button"
-                            class="close"
+                            className="close"
                             data-dismiss="modal"
                           >
                             &times;
                           </button>
                           <h3>Change State</h3>
                           <hr />
-                          <div class="form-group">
+                          <div className="form-group">
                             <label>Select list:</label>
                             <select
-                              class="form-control"
+                              className="form-control"
                               value={state}
                               onChange={event => setState(event.target.value)}
                             >
                               {labels != null
                                 ? labels.map(label => (
-                                    <option value={label.labelName}>
+                                    <option
+                                      key={label.labelName}
+                                      value={label.labelName}
+                                    >
                                       {label.labelName}
                                     </option>
                                   ))
@@ -189,7 +172,7 @@ const AdminView = () => {
                             </select>
                             <br />
                             <button
-                              class="btn btn-primary"
+                              className="btn btn-primary"
                               data-toggle="modal"
                               data-target="#myModal2"
                             >
@@ -199,7 +182,7 @@ const AdminView = () => {
                             <button
                               onClick={() => changeState()}
                               type="submit"
-                              class="btn btn-primary"
+                              className="btn btn-primary"
                               data-dismiss="modal"
                             >
                               Submit
@@ -209,23 +192,23 @@ const AdminView = () => {
                       </div>
                     </div>
                   </div>
-                  <div class="modal fade" id="myModal2">
-                    <div class="modal-dialog modal-dialog-centered">
-                      <div class="modal-content">
-                        <div class="modal-body">
+                  <div className="modal fade" id="myModal2">
+                    <div className="modal-dialog modal-dialog-centered">
+                      <div className="modal-content">
+                        <div className="modal-body">
                           <button
                             type="button"
-                            class="close"
+                            className="close"
                             data-dismiss="modal"
                           >
                             &times;
                           </button>
-                          <form class="was-validated">
-                            <div class="form-group">
-                              <label for="uname">State Name:</label>
+                          <form className="was-validated">
+                            <div className="form-group">
+                              <label>State Name:</label>
                               <input
                                 type="text"
-                                class="form-control"
+                                className="form-control"
                                 id="uname"
                                 placeholder="Enter username"
                                 name="uname"
@@ -235,8 +218,8 @@ const AdminView = () => {
                                 }}
                                 required
                               />
-                              <div class="valid-feedback">Valid.</div>
-                              <div class="invalid-feedback">
+                              <div className="valid-feedback">Valid.</div>
+                              <div className="invalid-feedback">
                                 Please fill out this field.
                               </div>
                             </div>
@@ -246,19 +229,9 @@ const AdminView = () => {
                                 createNewLabel();
                               }}
                               type="submit"
-                              class="btn btn-primary"
+                              className="btn btn-primary"
                             >
                               Submit
-                            </button>
-                            {"  "}
-                            <button
-                              onClick={() => {
-                                createNewLabelAndApply();
-                              }}
-                              type="submit"
-                              class="btn btn-primary"
-                            >
-                              Submit and apply
                             </button>
                           </form>
                         </div>

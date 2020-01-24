@@ -123,9 +123,11 @@ service adminService on endPoint {
     resource function getAllLabels(http:Caller caller, http:Request request) {
 
         http:Response response = new;
+        http:Request callBackRequest = new;
         string url = "/repos/" + ORGANIZATION_NAME + "/" + REPOSITORY_NAME + "/labels";
+        callBackRequest.addHeader("Authorization", ACCESS_TOKEN);
 
-        http:Response | error githubResponse = githubAPIEndpoint->get(url);
+        http:Response | error githubResponse = githubAPIEndpoint->get(url,callBackRequest);
 
         if (githubResponse is http:Response) {
             var jsonPayload = githubResponse.getJsonPayload();

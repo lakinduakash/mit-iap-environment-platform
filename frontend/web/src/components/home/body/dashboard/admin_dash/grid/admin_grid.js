@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from "react";
 import "./admin_grid.css";
-import { useHistory } from "react-router-dom";
-import { Button } from "@material-ui/core";
 import axios from "axios";
 import View from "./view_request/view_request";
+import Loading from "../../../../../utility/loading/loading";
 
 const Admin_grid = () => {
-  let history = useHistory();
   const [loading] = useState(null);
   const [requests, setRequests] = useState();
 
@@ -41,14 +39,14 @@ const Admin_grid = () => {
                   <td>{request.requestTitle}</td>
                   <td>
                     <ul>
-                      {JSON.parse(request.requestBody).timeframe != "" ? (
+                      {JSON.parse(request.requestBody).timeframe !== "" ? (
                         <li>
                           Duration - {JSON.parse(request.requestBody).timeframe}
                         </li>
                       ) : (
                         <p></p>
                       )}
-                      {JSON.parse(request.requestBody).description != "" ? (
+                      {JSON.parse(request.requestBody).description !== "" ? (
                         <li>
                           Description -{" "}
                           {JSON.parse(request.requestBody).description}
@@ -60,7 +58,7 @@ const Admin_grid = () => {
                   </td>
                   <td>{request.owner}</td>
                   <td>
-                    {request.status != "" ? (
+                    {request.status !== "" ? (
                       <p>{request.status}</p>
                     ) : (
                       <p>Pending</p>
@@ -82,7 +80,7 @@ const Admin_grid = () => {
 
   return (
     <div className="admin-table">
-      <Table />
+      {requests == null ? <Loading /> : <Table />}
     </div>
   );
 };
