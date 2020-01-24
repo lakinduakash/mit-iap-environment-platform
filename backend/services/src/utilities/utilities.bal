@@ -531,19 +531,44 @@ public function isValidCommentOfUser(string commentId, string userName) returns 
 
 public function createFormattedIssues(json[] issues) returns json[] | error {
 
-    json[] returnedIssues = [];
+    json[] formattedIssues = [];
+    string userName = "";
+    string status = "";
+    json[] labelArray = [];
+    string[] assigneeArray = [];
+
     foreach json issue in issues {
-        json labelDetails = check createAFormattedJsonOfLabels(<json[]>issue.labels);
-        returnedIssues[returnedIssues.length()] = {
-            "issueId":check issue.id,
-            "issueNumber":check issue.number,
-            "labels": labelDetails,
-            "issueTitle":check issue.title,
-            "issueBody":check issue.body
+        json[] labels = <json[]>issue.labels;
+        foreach json label in labels {
+            if (label.description == "userName") {
+                userName = <string>label.name;
+            } else if (label.description == "state") {
+                status = <string>label.name;
+            } else {
+                labelArray[labelArray.length()] = {"name":check label.name, "body":check label.description};
+            }
+        }
+        json[] assignees = <json[]>issue.assignees;
+        foreach json assignee in assignees {
+            assigneeArray[assigneeArray.length()] = <string>assignee.login;
+        }
+        json request = {
+            "requsetNumber":check issue.number,
+            "requestTitle":check issue.title,
+            "requestBody":check issue.body,
+            "owner": userName,
+            "status": status,
+            "tags": labelArray,
+            "assignees": assigneeArray
         };
+        userName = "";
+        status = "";
+        labelArray = [];
+        assigneeArray = [];
+        formattedIssues[formattedIssues.length()] = request;
     }
 
-    return returnedIssues;
+    return formattedIssues;
 }
 
 public function createFormattedComments(json[] comments) returns json[] | error {
@@ -566,4 +591,33 @@ public function createFormattedUser(json user) returns json | error {
     json userDetails = {"userName":check userVal.login};
 
     return userDetails;
+}
+
+public function removeLabel(string issueNumber, string labelName) returns int {
+
+    http:Request request = new;
+    request.addHeader("Authorization", ACCESS_TOKEN);
+    string url = "/repos/" + ORGANIZATION_NAME + "/" + REPOSITORY_NAME + "/issues/" + issueNumber + "/labels/" + labelName;
+    http:Response | error githubResponse = githubAPIEndpoint->delete(url, request);
+    if (githubResponse is http:Response) {
+        return githubResponse.statusCode;
+    } else {
+        return http:STATUS_BAD_REQUEST;
+    }
+}
+
+public function createAFormattedJsonOfStateLabels(json[] labels) returns json | error {
+
+    json[] labelDetails = [];
+    foreach json label in labels {
+        map<json> labelRecord = <map<json>>label;
+        json description = check labelRecord.description;
+        if (description == "state") {
+            labelDetails[labelDetails.length()] = {
+                "labelName":check labelRecord.name,
+                "labelDescription":check labelRecord.description
+            };
+        }
+    }
+    return labelDetails;
 }

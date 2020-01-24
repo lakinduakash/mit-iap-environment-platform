@@ -109,7 +109,12 @@ handleSubmit = (e) => {
   var d = document.getElementById('desc').value
   var x = {points: this.state.points, timeframe:t, description:d}
   var ret = {Title: l, description:x}
-  
+  const link = "http://localhost:9080/github/post-request/shikharjag"
+  axios({
+    method: 'post',
+    url: link,
+    data: ret
+  });
 
   // const link = ""
   // axios({
@@ -209,13 +214,14 @@ render() {
                                                 }}
                                             />
                                         </div>
-                                        <div className="col-sm-4">
-                                            <button type = 'button' onClick={this.addCat.bind(this)} className="btn btn-primary" style={{width: "100%"}}>Add new point</button>
-                                        </div>
+                                        
                                     </div> 
                                     )
                                 })  
                                 }
+                                <div className="col-sm-4">
+                                            <button type = 'button' onClick={this.addCat.bind(this)} className="btn btn-primary" style={{width: "100%"}}>Add new point</button>
+                                        </div>
                                 <br></br>
                                 <div className="row">
                                     <div className="col-sm-3">
@@ -318,3 +324,4 @@ render() {
   }
 }
 export default LandRequestForm;
+
