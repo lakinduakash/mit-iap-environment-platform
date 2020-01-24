@@ -5,11 +5,11 @@ import "./request_info.css";
 import axios from "axios";
 import { Button, Comment, Form, Header } from "semantic-ui-react";
 import Avatar from "../../../../../../asserts/images/avatar.png";
-import { Grid } from "@material-ui/core";
-import { Map, CircleMarker, TileLayer, Polygon } from "react-leaflet";
+import { Map, TileLayer, Polygon } from "react-leaflet";
 
 const Requset = () => {
   let history = useHistory();
+  const [data, setData] = useState(null);
   const [id, title, state, body] = useContext(RequestContext);
   const [loading] = useState(null);
   const [comments, setComments] = useState(null);
@@ -39,11 +39,13 @@ const Requset = () => {
       .get("http://0.0.0.0:9080/user-services/get-comments/" + id)
       .then(response => {
         setComments(response.data);
+        setData(JSON.parse(body));
       })
       .catch();
   }, [loading, id]);
   return (
     <Fragment>
+      <br />
       <button
         className="btn btn-info request-button"
         onClick={() => {
@@ -52,36 +54,38 @@ const Requset = () => {
       >
         Back
       </button>
-      <div className="row">
-        <div className="col-sm-6">
+      <div className="row request-div">
+        <div className="col-sm-8 ">
           <div className="card">
             <div className="card-header">
               <h1> {title}</h1>
             </div>
             <div className="card-body">
-              <h4>Status of the Request: {state}</h4>
+              <h3>Status of the Request: {state}</h3>
               <hr />
-              <h4>Description : {body}</h4>
-              <Map
-                style={{ height: "480px", width: "100%" }}
-                //zoomed to center on given coords
-                bounds={[
-                  [1.022443, 8.260258],
-                  [5.815325, 8.692459]
-                ]}
-              >
-                <TileLayer url="http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-                <Polygon //blue polygon for given coords
-                  positions={[
-                    [1.022443, 8.260258],
-                    [5.815325, 8.692459]
-                  ]}
-                />
-              </Map>
+              {data != null ? (
+                <div>
+                  <h3>Description : {data.description}</h3>
+                  <h3>Duration : {data.timeframe}</h3>
+                  <h3>Place</h3>
+                  <Map
+                    style={{ height: "480px", width: "100%" }}
+                    //zoomed to center on given coords
+                    bounds={data.points}
+                  >
+                    <TileLayer url="http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+                    <Polygon //blue polygon for given coords
+                      positions={data.points}
+                    />
+                  </Map>
+                </div>
+              ) : (
+                <p>Please wait</p>
+              )}
             </div>
           </div>
         </div>
-        <div className="col-sm-6">
+        <div className="col-sm-4 ">
           <Comment.Group size="large">
             <Header as="h3" dividing>
               Process of the Request

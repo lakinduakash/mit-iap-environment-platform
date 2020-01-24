@@ -4,6 +4,8 @@ import UserGrid from "./grid/user_grid";
 function User() {
   return (
     <Fragment>
+      <br />
+      <br />
       <UserGrid />
     </Fragment>
   );
