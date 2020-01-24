@@ -1,39 +1,48 @@
 import React, { Component } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Alert from '@material-ui/lab/Alert';
+import AlertTitle from '@material-ui/lab/AlertTitle';
 
 class Notification extends Component {
 
   // instance of websocket connection as a class property
   ws = new WebSocket('ws://localhost:9095/notifications')
-  messageList = ["Issue created", "Request pending"];
+  messageList = [];
 
   componentDidMount() {
       this.ws.onopen = () => {
-      // on connecting, do nothing but log it to the console
-      console.log('connected to websocket server')
+        // on connecting, do nothing but log it to the console
+        console.log('connected to websocket server')
       }
 
       this.ws.onmessage = evt => {
-      // listen to data sent from the websocket server
-      const message = evt.data
-      this.messageList.push(message);
-      this.setState({dataFromServer: message})
-      console.log(message)
-      }
+        // listen to data sent from the websocket server
+        const message = evt.data
+        console.log(message);
 
-      this.ws.onclose = () => {
-      console.log('disconnected')
-      // automatically try to reconnect on connection loss
+        // Convert message to json
+        try {
+          var notificationJson = JSON.parse(message);
+          console.log(notificationJson)
+          this.messageList.push(notificationJson);
+          this.setState({dataFromServer: message});
+        } catch (error) {
+          console.log(error);
+        }
 
-      }
+        this.ws.onclose = () => {
+          console.log('disconnected')
+          // automatically try to reconnect on connection loss
+        }
+    }
 
   }
 
   render(){
-    return (<div>
-       <ChildComponent websocket={this.ws} />
-      < Notification_holder value = {this.messageList} />
+    return (
+      <div>
+        <ChildComponent websocket={this.ws} />
+        <Notification_holder value = {this.messageList} />
       </div>
     )
   }
@@ -89,25 +98,41 @@ const useStyles = makeStyles(theme => ({
     }
   },
   alert: {
-    marginLeft:'200px',
-    marginRight:'200px'
+    marginLeft:'600px',
+    marginRight:'600px'
   }
 }));
 
 function Notification_holder(notif){
   const classes = useStyles();
   let array = [];
-  for(let i = 0; i < notif.value.length; i++) {
-    array.push(
-      <Alert className={classes.alert} variant="outlined" severity="info">
-        {notif.value[i]}
-        </Alert>
-    );
-  }
+  var alertSeverity = "";
 
-      return (
-        <div className={classes.root}>
-        {array}
-        </div>
-      );
+  notif.value.forEach(element => {
+    if (element.category === "Issue Created") {
+      alertSeverity = "success";
+    } else if (element.category === "Issue Edited") {
+      alertSeverity = "info";
+    } else if (element.category === "Issue Closed") {
+      alertSeverity = "error"
+    } else if (element.category === "Comment Created") {
+      alertSeverity = "success"
+    } else if (element.category === "Label Added") {
+      alertSeverity = "warning"
+    }
+    array.push(
+      <Alert className={classes.alert} severity={alertSeverity}>
+        <AlertTitle>{element.category}</AlertTitle>
+        {element.description}
+      </Alert>
+    );
+    console.log(element);
+  });
+
+
+  return (
+    <div className={classes.root}>
+      {array}
+    </div>
+  );
 }
