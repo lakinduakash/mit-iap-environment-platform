@@ -12,7 +12,7 @@ import LoginForm from "../home/body/login/login";
 import SignupForm from "../home/body/signup/signup";
 import User from "./body/dashboard/user_dash/user_dash";
 import Admin from "./body/dashboard/admin_dash/admin_dash";
-import Notification from "../notification/notification";
+import Notification from "./header/notification/notification";
 import Request from "./body/dashboard/user_dash/request_info/request_info";
 import LandRequestForm from "./body/request_form/land-request-form";
 import AdminRequest from "./body/dashboard/admin_dash/request_info/request_info";
