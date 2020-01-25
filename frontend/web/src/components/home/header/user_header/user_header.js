@@ -83,7 +83,9 @@ export default function PrimarySearchAppBar() {
           <div className={classes.sectionDesktop}>
             <IconButton aria-label="show new notifications" color="inherit">
               <Badge badgeContent={0} color="secondary">
-                <NotificationsIcon />
+                <NotificationsIcon
+                  onClick={() => history.push("/notifications")}
+                />
               </Badge>
             </IconButton>
             <IconButton
