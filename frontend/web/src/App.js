@@ -1,8 +1,8 @@
 import React, { Fragment } from "react";
 import "./App.css";
 import Home from "./components/home/home";
-import RequestProvider from "./components/utility/contexts/requestContext";
-import AdminRequestProvider from "./components/utility/contexts/adminRequestContext";
+import RequestProvider from "./components/utility/contexts/request_context";
+import AdminRequestProvider from "./components/utility/contexts/admin_request_context";
 
 function App() {
   return (
