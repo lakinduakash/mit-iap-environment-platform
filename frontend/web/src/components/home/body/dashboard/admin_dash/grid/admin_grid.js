@@ -3,8 +3,10 @@ import "./admin_grid.css";
 import axios from "axios";
 import View from "./view_request/view_request";
 import Loading from "../../../../../utility/loading/loading";
+import { useHistory } from "react-router-dom";
 
 const Admin_grid = () => {
+  const history = useHistory();
   const [loading] = useState(null);
   const [requests, setRequests] = useState();
 
@@ -80,6 +82,18 @@ const Admin_grid = () => {
 
   return (
     <div className="admin-table">
+      <div className="float-md-right">
+        <button
+          className="btn btn-info"
+          onClick={() => {
+            history.push("/admin-dash/management-panel");
+          }}
+        >
+          Management Panel
+        </button>
+      </div>
+      <br />
+      <br />
       {requests == null ? <Loading /> : <Table />}
     </div>
   );
