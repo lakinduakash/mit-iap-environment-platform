@@ -256,7 +256,7 @@ const AdminView = () => {
                           <br />
                           <button
                             onClick={() => changeTempAssginee()}
-                            type="submit"
+                            type="button"
                             className="btn btn-primary"
                             data-dismiss="modal"
                           >
@@ -372,8 +372,9 @@ const AdminView = () => {
                               onClick={() => {
                                 createNewLabel();
                               }}
-                              type="submit"
+                              type="button"
                               className="btn btn-primary"
+                              data-dismiss="modal"
                             >
                               Submit
                             </button>
