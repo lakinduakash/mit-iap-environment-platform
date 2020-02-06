@@ -1,49 +1,72 @@
-import React, { Fragment, useContext, useEffect, useState } from "react";
-import { useHistory } from "react-router-dom";
-import { RequestContext } from "../../../../../utility/contexts/request_context";
-import "./request_info.css";
-import axios from "axios";
+import React, { Fragment, useContext, useState, useEffect } from "react";
+import { AuthorityRequestContext } from "../../../../../utility/contexts/authority_request_context";
 import { Button, Comment, Form, Header } from "semantic-ui-react";
 import Avatar from "../../../../../../asserts/images/avatar.png";
 import { Map, TileLayer, Polygon } from "react-leaflet";
+import axios from "axios";
+import { useHistory } from "react-router-dom";
 
-const Requset = () => {
+const AuthorityView = () => {
   let history = useHistory();
   const [data, setData] = useState(null);
-  const [id, title, state, body] = useContext(RequestContext);
   const [loading] = useState(null);
   const [comments, setComments] = useState(null);
   const [reply, setReply] = useState("");
+  const [
+    id,
+    title,
+    status,
+    body,
+    owner,
+    tags,
+    assignees,
+    ,
+    ,
+    setStatus,
+    ,
+    ,
+    setAssignees
+  ] = useContext(AuthorityRequestContext);
 
-  const handleSubmit = event => {
-    axios
-      .post(
-        "http://0.0.0.0:9080/user-services/post-comment/" + id + "/yashod",
-        { body: reply }
-      )
-      .then(response => {
-        console.log(response.data);
-        setReply("");
-        axios
-          .get("http://0.0.0.0:9080/user-services/get-comments/" + id)
-          .then(response => {
-            console.log(response.data);
-            setComments(response.data);
-          })
-          .catch();
-      })
-      .catch();
+  const wait = ms => {
+    var start = new Date().getTime();
+    var end = start;
+    while (end < start + ms) {
+      end = new Date().getTime();
+    }
   };
 
   useEffect(() => {
     axios
-      .get("http://0.0.0.0:9080/user-services/get-comments/" + id)
+      .get("http://0.0.0.0:9060/authority-services/get-comments/" + id)
       .then(response => {
         setComments(response.data);
         setData(JSON.parse(body));
       })
       .catch();
   }, [loading, id]);
+
+  const handleSubmit = event => {
+    axios
+      .post("http://0.0.0.0:9060/authority-services/post-comment/" + id, {
+        body: reply
+      })
+      .then(response => {
+        console.log(response.data);
+        setReply("");
+        wait(2500);
+        axios
+          .get("http://0.0.0.0:9060/authority-services/get-comments/" + id)
+          .then(response => {
+            console.log(response.data);
+            setComments(response.data);
+            setData(JSON.parse(body));
+          })
+          .catch();
+      })
+      .catch();
+  };
+
   return (
     <Fragment>
       <br />
@@ -62,7 +85,10 @@ const Requset = () => {
               <h1> {title}</h1>
             </div>
             <div className="card-body">
-              <h3>Status of the Request: {state}</h3>
+              <h3>Owner : {owner}</h3>
+              <h3>
+                Status of the Request: {status !== null ? status : "Pending"}
+              </h3>
               <hr />
               {data != null ? (
                 <div>
@@ -137,4 +163,4 @@ const Requset = () => {
   );
 };
 
-export default Requset;
+export default AuthorityView;

@@ -5,7 +5,6 @@ function Admin() {
   return (
     <Fragment>
       <br />
-      <br />
       <AdminDash />
     </Fragment>
   );
