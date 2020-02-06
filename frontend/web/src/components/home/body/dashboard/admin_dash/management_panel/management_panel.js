@@ -38,6 +38,15 @@ const ManagementPanel = () => {
       .catch();
   };
 
+  const removeCollaborator = val => {
+    axios
+      .delete("http://0.0.0.0:9070/admin-services/remove-collaborator/" + val)
+      .then(response => {
+        console.log(response.data);
+      })
+      .catch();
+  };
+
   const getCollaborators = () => {
     axios
       .get("http://0.0.0.0:9070/admin-services/get-all-collaborators")
@@ -131,13 +140,35 @@ const ManagementPanel = () => {
               </div>
               <div className="card-body">
                 <h4>List of Authorities</h4>
-                <ul>
-                  {collaborators !== undefined
-                    ? collaborators.map((collaborator, index) => (
-                        <li key={index}>{collaborator.name}</li>
-                      ))
-                    : null}
-                </ul>
+
+                {collaborators !== undefined ? (
+                  <table className="table table-hover">
+                    <thead>
+                      <tr>
+                        <th>Authority</th>
+                        <th>Remove</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {collaborators.map((collaborator, index) => (
+                        <tr key={index}>
+                          <td>{collaborator.name}</td>
+                          <td>
+                            <button
+                              type="button"
+                              className="btn btn-danger"
+                              onClick={() =>
+                                removeCollaborator(collaborator.name)
+                              }
+                            >
+                              Remove
+                            </button>
+                          </td>
+                        </tr>
+                      ))}{" "}
+                    </tbody>{" "}
+                  </table>
+                ) : null}
               </div>
             </div>
           </div>
