@@ -1,7 +1,15 @@
-import ballerina/io;
+import ballerina/http;
 
-# Prints `Hello World`.
+http:Client githubAPIEndpoint = new (GITHUB_API_URL);
 
-public function main() {
-    io:println("Hello World!");
+listener http:Listener endPoint = new (AUTHORITY_SERVICES_PORT);
+
+@http:ServiceConfig {
+    basePath: BASEPATH,
+    cors: {
+        allowOrigins: ["*"]
+    }
+}
+
+service adminService on endPoint {
 }
