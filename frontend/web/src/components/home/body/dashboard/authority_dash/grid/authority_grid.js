@@ -1,20 +1,21 @@
-import React, { useState, useEffect } from "react";
-import "./admin_grid.css";
+import React, { Fragment, useEffect, useState } from "react";
 import axios from "axios";
-import View from "./view_request/view_request";
-import Loading from "../../../../../utility/loading/loading";
+import "./authority_grid.css";
 import { useHistory } from "react-router-dom";
+import Loading from "../../../../../utility/loading/loading";
+import View from "./view_request/view_request";
 
-const Admin_grid = () => {
+const AuthorityGrid = () => {
   const history = useHistory();
   const [loading] = useState(null);
   const [requests, setRequests] = useState();
 
   useEffect(() => {
     axios
-      .get("http://0.0.0.0:9070/admin-services/get-all-requests")
+      .get("http://0.0.0.0:9060/authority-services/get-requests/deshankoswatte")
       .then(function(response) {
         setRequests(response.data);
+        console.log(response.data);
       })
       .catch(function(error) {
         console.log(error);
@@ -79,23 +80,15 @@ const Admin_grid = () => {
       </div>
     );
   };
-
   return (
-    <div className="admin-table">
-      <div className="float-md-right">
-        <button
-          className="btn btn-info"
-          onClick={() => {
-            history.push("/admin-dash/management-panel");
-          }}
-        >
-          Management Panel
-        </button>
+    <Fragment>
+      <div className="authority-table">
+        <br />
+        <br />
+        {requests == null ? <Loading /> : <Table />}
       </div>
-      <br />
-      <br />
-      {requests == null ? <Loading /> : <Table />}
-    </div>
+    </Fragment>
   );
 };
-export default Admin_grid;
+
+export default AuthorityGrid;
