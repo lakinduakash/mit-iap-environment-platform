@@ -127,12 +127,12 @@ service authorityService on endPoint {
         if (githubResponse is http:Response) {
             var jsonPayload = githubResponse.getJsonPayload();
             if (jsonPayload is json[]) {
-                json | error issues = jsonPayload;
+                json | error issues = utilities:extractIssuesRelatedToAuthority(jsonPayload, authorityName);
                 if (issues is json) {
                     response.statusCode = http:STATUS_OK;
                     response.setJsonPayload(<@untained>issues);
                 } else {
-                    log:printInfo("The issues related to user could not be converted to json.");
+                    log:printInfo("The issues related to authority could not be converted to json.");
                     response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
                     response.setPayload(<@untained>issues.reason());
                 }
