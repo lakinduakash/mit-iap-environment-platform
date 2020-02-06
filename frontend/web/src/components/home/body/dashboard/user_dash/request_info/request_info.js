@@ -27,6 +27,7 @@ const Requset = () => {
         axios
           .get("http://0.0.0.0:9080/user-services/get-comments/" + id)
           .then(response => {
+            console.lo;
             setComments(response.data);
           })
           .catch();
