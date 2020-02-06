@@ -100,7 +100,6 @@ const ManagementPanel = () => {
                     <thead>
                       <tr>
                         <th>Status</th>
-                        <th>Edit</th>
                         <th>Delete</th>
                       </tr>
                     </thead>
@@ -109,13 +108,8 @@ const ManagementPanel = () => {
                         <tr key={index}>
                           <td>{label.labelName}</td>
                           <td>
-                            <button type="button" className="btn btn-warning">
-                              Edit
-                            </button>
-                          </td>
-                          <td>
                             <button type="button" className="btn btn-danger">
-                              Delete
+                              Remove
                             </button>
                           </td>
                         </tr>
@@ -129,7 +123,7 @@ const ManagementPanel = () => {
           <div className="col-sm-6 ">
             <div className="card">
               <div className="card-header">
-                Authorities{" "}
+                Authorities
                 <button
                   className="btn btn-info float-md-right"
                   data-toggle="modal"
@@ -165,8 +159,8 @@ const ManagementPanel = () => {
                             </button>
                           </td>
                         </tr>
-                      ))}{" "}
-                    </tbody>{" "}
+                      ))}
+                    </tbody>
                   </table>
                 ) : null}
               </div>

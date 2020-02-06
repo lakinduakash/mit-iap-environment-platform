@@ -16,6 +16,8 @@ import Request from "./body/dashboard/user_dash/request_info/request_info";
 import LandRequestForm from "./body/request_form/land-request-form";
 import AdminRequest from "./body/dashboard/admin_dash/request_info/request_info";
 import ManagementPanel from "./body/dashboard/admin_dash/management_panel/management_panel";
+import Authority from "./body/dashboard/authority_dash/authority_dash";
+import AuthorityRequest from "./body/dashboard/authority_dash/request_info/request_info";
 import "./home.css";
 
 const Home = () => {
@@ -27,6 +29,12 @@ const Home = () => {
           <Switch>
             <Route exact path="/login" component={LoginForm} />
             <Route exact path="/signup" component={SignupForm} />
+            <Route exact path="/authority-dash" component={Authority} />
+            <Route
+              exact
+              path="/authority-dash/request"
+              component={AuthorityRequest}
+            />
             <Route exact path="/user-dash" component={User} />
             <Route exact path="/admin-dash" component={Admin} />
             <Route exact path="/user-dash/request" component={Request} />

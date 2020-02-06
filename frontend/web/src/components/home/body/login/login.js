@@ -116,6 +116,8 @@ function LogInForm() {
                 history.push("/user-dash");
               } else if (email === "admin") {
                 history.push("/admin-dash");
+              } else if (email === "authority") {
+                history.push("/authority-dash");
               } else {
                 history.push("/user-dash");
               }
