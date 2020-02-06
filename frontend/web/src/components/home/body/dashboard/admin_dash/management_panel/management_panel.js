@@ -62,9 +62,9 @@ const ManagementPanel = () => {
         </button>
         <div className="row ">
           <div className="col-sm-6 ">
-            <div class="card">
-              <div class="card-header">Status</div>
-              <div class="card-body">
+            <div className="card">
+              <div className="card-header">
+                Status
                 <button
                   className="btn btn-info float-md-right"
                   data-toggle="modal"
@@ -73,15 +73,35 @@ const ManagementPanel = () => {
                   Add Status
                 </button>
               </div>
+              <div className="card-body">
+                <h4>List of Status</h4>
+                <ul>
+                  {labels !== undefined
+                    ? labels.map((label, index) => (
+                        <li key={index}>{label.labelName}</li>
+                      ))
+                    : null}
+                </ul>
+              </div>
             </div>
           </div>
           <div className="col-sm-6 ">
-            <div class="card">
-              <div class="card-header">Authorities</div>
-              <div class="card-body">
+            <div className="card">
+              <div className="card-header">
+                Authorities{" "}
                 <button className="btn btn-info float-md-right">
                   Add authority
                 </button>
+              </div>
+              <div className="card-body">
+                <h4>List of Authorities</h4>
+                <ul>
+                  {collaborators !== undefined
+                    ? collaborators.map((collaborator, index) => (
+                        <li key={index}>{collaborator.name}</li>
+                      ))
+                    : null}
+                </ul>
               </div>
             </div>
           </div>{" "}
