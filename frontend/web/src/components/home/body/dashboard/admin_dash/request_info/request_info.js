@@ -8,18 +8,41 @@ import Avatar from "../../../../../../asserts/images/avatar.png";
 import { Map, TileLayer, Polygon } from "react-leaflet";
 
 const AdminView = () => {
-  const [id, title, status, body, , , , , , setStatus] = useContext(
-    AdminRequestContext
-  );
+  const [
+    id,
+    title,
+    status,
+    body,
+    owner,
+    tags,
+    assignees,
+    ,
+    ,
+    setStatus,
+    ,
+    ,
+    setAssignees
+  ] = useContext(AdminRequestContext);
   const [loading] = useState(null);
   let history = useHistory();
   const [data, setData] = useState(null);
+  const [collaborators, setCollaborators] = useState(null);
   const [comments, setComments] = useState(null);
   const [reply, setReply] = useState("");
   const [labels, setLabels] = useState(null);
   const [state, setState] = useState();
+  const [tempAssignee, setTempAssignee] = useState();
   const [newState, setNewState] = useState("");
   const pending = "Pending";
+  const noOne = "No Authority";
+
+  const wait = ms => {
+    var start = new Date().getTime();
+    var end = start;
+    while (end < start + ms) {
+      end = new Date().getTime();
+    }
+  };
 
   const handleSubmit = event => {
     axios
@@ -27,9 +50,17 @@ const AdminView = () => {
         body: reply
       })
       .then(response => {
-        console.log(response.data);
         setReply("");
-        getComments();
+        console.log(response.data);
+        wait(3000);
+        axios
+          .get("http://0.0.0.0:9080/user-services/get-comments/" + id)
+          .then(response => {
+            setComments(response.data);
+            setData(JSON.parse(body));
+            console.log(response.data);
+          })
+          .catch();
       })
       .catch();
   };
@@ -66,6 +97,16 @@ const AdminView = () => {
       .catch();
   };
 
+  const getCollaborators = () => {
+    axios
+      .get("http://0.0.0.0:9070/admin-services/get-all-collaborators")
+      .then(response => {
+        setCollaborators(response.data);
+        console.log(response.data);
+      })
+      .catch();
+  };
+
   const assignLabel = val => {
     axios
       .post("http://0.0.0.0:9070/admin-services/assign-label/" + id, {
@@ -73,6 +114,17 @@ const AdminView = () => {
       })
       .then(response => {
         console.log(response);
+      })
+      .catch();
+  };
+
+  const assignAssignee = val => {
+    axios
+      .post("http://0.0.0.0:9070/admin-services/add-assignees/" + id, {
+        assignees: [val]
+      })
+      .then(response => {
+        console.log(response.data);
       })
       .catch();
   };
@@ -87,9 +139,19 @@ const AdminView = () => {
     }
   };
 
+  const changeTempAssginee = () => {
+    if (tempAssignee !== undefined) {
+      console.log(tempAssignee);
+      setAssignees([tempAssignee]);
+      assignAssignee(tempAssignee);
+    }
+  };
+
   useEffect(() => {
+    console.log(assignees);
     getComments();
     getLabels();
+    getCollaborators();
   }, [loading, id]);
 
   const createNewLabel = () => {
@@ -102,7 +164,6 @@ const AdminView = () => {
         console.log(response);
       })
       .catch();
-    history.push("/admin-dash");
   };
 
   return (
@@ -125,19 +186,110 @@ const AdminView = () => {
             <div className="card-body">
               <div className="row ">
                 <div className="col-sm-10">
+                  <h3>Authorities of the Request:</h3>
+                  <ul>
+                    {assignees !== null ? (
+                      assignees.length !== 0 ? (
+                        assignees.map(assignee => <li>{assignee}</li>)
+                      ) : tempAssignee !== undefined ? null : (
+                        <p>{noOne}</p>
+                      )
+                    ) : (
+                      pending
+                    )}
+                    {tempAssignee !== undefined ? (
+                      <li>{tempAssignee}</li>
+                    ) : (
+                      <p></p>
+                    )}
+                  </ul>
+                </div>
+                <div className="col-sm-2 ">
+                  <div
+                    class="btn-group"
+                    role="group"
+                    aria-label="Basic example"
+                  >
+                    <button
+                      type="button"
+                      className="btn btn-info"
+                      data-toggle="modal"
+                      data-target="#myModal3"
+                    >
+                      Add assignees
+                    </button>
+                  </div>
+                </div>
+                <div className="modal" id="myModal3">
+                  <div className="modal-dialog modal-dialog-centered">
+                    <div className="modal-content">
+                      <div className="modal-body">
+                        <button
+                          type="button"
+                          className="close"
+                          data-dismiss="modal"
+                        >
+                          &times;
+                        </button>
+                        <h3>Add Authority</h3>
+                        <hr />
+                        <div className="form-group">
+                          <label>Available authority:</label>
+                          <select
+                            className="form-control"
+                            value={tempAssignee}
+                            onChange={event =>
+                              setTempAssignee(event.target.value)
+                            }
+                          >
+                            {collaborators != null
+                              ? collaborators.map(assignee => (
+                                  <option
+                                    key={assignee.id}
+                                    value={assignee.name}
+                                  >
+                                    {assignee.name}
+                                  </option>
+                                ))
+                              : null}
+                          </select>
+                          <br />
+                          <button
+                            onClick={() => changeTempAssginee()}
+                            type="button"
+                            className="btn btn-primary"
+                            data-dismiss="modal"
+                          >
+                            Submit
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <br />
+              <div className="row ">
+                <div className="col-sm-10">
                   <h3>
                     Status of the Request: {status !== "" ? status : pending}
                   </h3>
                 </div>
                 <div className="col-sm-2 ">
-                  <button
-                    type="button"
-                    className="btn btn-info"
-                    data-toggle="modal"
-                    data-target="#myModal"
+                  <div
+                    class="btn-group"
+                    role="group"
+                    aria-label="Basic example"
                   >
-                    Change State
-                  </button>
+                    <button
+                      type="button"
+                      className="btn btn-info"
+                      data-toggle="modal"
+                      data-target="#myModal"
+                    >
+                      Change State
+                    </button>
+                  </div>
 
                   <div className="modal" id="myModal">
                     <div className="modal-dialog modal-dialog-centered">
@@ -172,14 +324,6 @@ const AdminView = () => {
                             </select>
                             <br />
                             <button
-                              className="btn btn-primary"
-                              data-toggle="modal"
-                              data-target="#myModal2"
-                            >
-                              New Status
-                            </button>
-                            {"  "}
-                            <button
                               onClick={() => changeState()}
                               type="submit"
                               className="btn btn-primary"
@@ -210,7 +354,7 @@ const AdminView = () => {
                                 type="text"
                                 className="form-control"
                                 id="uname"
-                                placeholder="Enter username"
+                                placeholder="Enter state name"
                                 name="uname"
                                 value={newState}
                                 onChange={event => {
@@ -228,8 +372,9 @@ const AdminView = () => {
                               onClick={() => {
                                 createNewLabel();
                               }}
-                              type="submit"
+                              type="button"
                               className="btn btn-primary"
+                              data-dismiss="modal"
                             >
                               Submit
                             </button>
@@ -241,7 +386,6 @@ const AdminView = () => {
                 </div>
               </div>
               <hr />
-
               {data != null ? (
                 <div>
                   <h3>Description : {data.description}</h3>

@@ -181,6 +181,7 @@ service adminService on endPoint {
                 }
             } else {
                 log:printInfo("Invalid json payload received from the response obtained from github.");
+                log:printInfo(jsonPayload.toString());
                 response.statusCode = http:STATUS_BAD_REQUEST;
                 response.setPayload("Invalid json payload received from github response.");
             }
