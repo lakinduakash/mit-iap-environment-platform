@@ -210,6 +210,36 @@ public function extractIssuesRelatedToUser(json[] listOfIssues, string userName)
 
 }
 
+# The `extractIssuesRelatedToAuthority` function extracts all the issues related to a specific authority.
+#
+# + listOfIssues - All the issues related to a specific repsitory. 
+# + authorityName- Authority name of the authority. 
+# + return       - Returns a formatted **json[]** of issues related to the authority, **error** 
+#                  if a formatted json array of issues cannot be rebuilt or the length of
+#                  the json array length is zero.
+public function extractIssuesRelatedToAuthority(json[] listOfIssues, string authorityName) returns json | error {
+
+    json[] | error requests = createFormattedIssues(listOfIssues);
+    json[] requestList = [];
+    if (requests is json[]) {
+        foreach json request in requests {
+            string[] assignees = <string[]>request.assignees;
+            foreach string assignee in assignees {
+                if (assignee == authorityName) {
+                    requestList[requestList.length()] = request;
+                }
+            }
+        }
+        if (requestList.length() > 0) {
+            return requestList;
+        } else {
+            return error("Request for the specified authority cannot be found.");
+        }
+    } else {
+        return error("The Issue raise when formatting the request.");
+    }
+}
+
 # The `userNameExists` function checks if the username exists inside the labels of the issue.
 #
 # + labels   - Labels of the issue.
