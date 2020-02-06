@@ -6,6 +6,7 @@ import { useHistory } from "react-router-dom";
 const ManagementPanel = () => {
   const history = useHistory();
   const [newState, setNewState] = useState();
+  const [newAuthority, setNewAuthority] = useState();
   const [collaborators, setCollaborators] = useState();
   const [labels, setLabels] = useState();
   const [loading] = useState();
@@ -21,6 +22,16 @@ const ManagementPanel = () => {
         labelName: newState,
         labelDescription: "state"
       })
+      .then(response => {
+        console.log(response.data);
+      })
+      .catch();
+  };
+  const createNewAuthority = () => {
+    axios
+      .put(
+        "http://0.0.0.0:9070/admin-services/add-collaborator/" + newAuthority
+      )
       .then(response => {
         console.log(response.data);
       })
@@ -75,13 +86,34 @@ const ManagementPanel = () => {
               </div>
               <div className="card-body">
                 <h4>List of Status</h4>
-                <ul>
-                  {labels !== undefined
-                    ? labels.map((label, index) => (
-                        <li key={index}>{label.labelName}</li>
-                      ))
-                    : null}
-                </ul>
+                {labels !== undefined ? (
+                  <table className="table table-hover">
+                    <thead>
+                      <tr>
+                        <th>Status</th>
+                        <th>Edit</th>
+                        <th>Delete</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {labels.map((label, index) => (
+                        <tr key={index}>
+                          <td>{label.labelName}</td>
+                          <td>
+                            <button type="button" className="btn btn-warning">
+                              Edit
+                            </button>
+                          </td>
+                          <td>
+                            <button type="button" className="btn btn-danger">
+                              Delete
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                ) : null}
               </div>
             </div>
           </div>
@@ -89,7 +121,11 @@ const ManagementPanel = () => {
             <div className="card">
               <div className="card-header">
                 Authorities{" "}
-                <button className="btn btn-info float-md-right">
+                <button
+                  className="btn btn-info float-md-right"
+                  data-toggle="modal"
+                  data-target="#myModal1"
+                >
                   Add authority
                 </button>
               </div>
@@ -104,7 +140,7 @@ const ManagementPanel = () => {
                 </ul>
               </div>
             </div>
-          </div>{" "}
+          </div>
           <div className="modal fade" id="myModal2">
             <div className="modal-dialog modal-dialog-centered">
               <div className="modal-content">
@@ -136,6 +172,49 @@ const ManagementPanel = () => {
                     <button
                       onClick={() => {
                         createNewLabel();
+                      }}
+                      type="button"
+                      className="btn btn-primary"
+                      data-dismiss="modal"
+                    >
+                      Submit
+                    </button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="modal fade" id="myModal1">
+            <div className="modal-dialog modal-dialog-centered">
+              <div className="modal-content">
+                <div className="modal-body">
+                  <button type="button" className="close" data-dismiss="modal">
+                    &times;
+                  </button>
+                  <form className="was-validated">
+                    <div className="form-group">
+                      <label>Authority Name:</label>
+                      <input
+                        type="text"
+                        className="form-control"
+                        id="uname"
+                        placeholder="Enter authority name"
+                        name="uname"
+                        value={newAuthority}
+                        onChange={event => {
+                          setNewAuthority(event.target.value);
+                        }}
+                        required
+                      />
+                      <div className="valid-feedback">Valid.</div>
+                      <div className="invalid-feedback">
+                        Please fill out this field.
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={() => {
+                        createNewAuthority();
                       }}
                       type="button"
                       className="btn btn-primary"
