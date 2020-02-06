@@ -18,7 +18,10 @@ const AdminView = () => {
     assignees,
     ,
     ,
-    setStatus
+    setStatus,
+    ,
+    ,
+    setAssignees
   ] = useContext(AdminRequestContext);
   const [loading] = useState(null);
   let history = useHistory();
@@ -28,6 +31,7 @@ const AdminView = () => {
   const [reply, setReply] = useState("");
   const [labels, setLabels] = useState(null);
   const [state, setState] = useState();
+  const [tempAssignee, setTempAssignee] = useState();
   const [newState, setNewState] = useState("");
   const pending = "Pending";
   const noOne = "No Authority";
@@ -114,6 +118,17 @@ const AdminView = () => {
       .catch();
   };
 
+  const assignAssignee = val => {
+    axios
+      .post("http://0.0.0.0:9070/admin-services/add-assignees/" + id, {
+        assignees: [val]
+      })
+      .then(response => {
+        console.log(response.data);
+      })
+      .catch();
+  };
+
   const changeState = () => {
     if (status !== "") {
       removeLabel();
@@ -121,6 +136,14 @@ const AdminView = () => {
     if (state !== undefined) {
       assignLabel(state);
       setStatus(state);
+    }
+  };
+
+  const changeTempAssginee = () => {
+    if (tempAssignee !== undefined) {
+      console.log(tempAssignee);
+      setAssignees([tempAssignee]);
+      assignAssignee(tempAssignee);
     }
   };
 
@@ -163,14 +186,23 @@ const AdminView = () => {
             <div className="card-body">
               <div className="row ">
                 <div className="col-sm-10">
-                  <h3>
-                    Authorities of the Request:
-                    {assignees !== null
-                      ? assignees.length !== 0
-                        ? assignees
-                        : pending
-                      : pending}
-                  </h3>
+                  <h3>Authorities of the Request:</h3>
+                  <ul>
+                    {assignees !== null ? (
+                      assignees.length !== 0 ? (
+                        assignees.map(assignee => <li>{assignee}</li>)
+                      ) : tempAssignee !== undefined ? null : (
+                        <p>{noOne}</p>
+                      )
+                    ) : (
+                      pending
+                    )}
+                    {tempAssignee !== undefined ? (
+                      <li>{tempAssignee}</li>
+                    ) : (
+                      <p></p>
+                    )}
+                  </ul>
                 </div>
                 <div className="col-sm-2 ">
                   <div
@@ -182,10 +214,57 @@ const AdminView = () => {
                       type="button"
                       className="btn btn-info"
                       data-toggle="modal"
-                      data-target="#myModal"
+                      data-target="#myModal3"
                     >
                       Add assignees
                     </button>
+                  </div>
+                </div>
+                <div className="modal" id="myModal3">
+                  <div className="modal-dialog modal-dialog-centered">
+                    <div className="modal-content">
+                      <div className="modal-body">
+                        <button
+                          type="button"
+                          className="close"
+                          data-dismiss="modal"
+                        >
+                          &times;
+                        </button>
+                        <h3>Add Authority</h3>
+                        <hr />
+                        <div className="form-group">
+                          <label>Available authority:</label>
+                          <select
+                            className="form-control"
+                            value={tempAssignee}
+                            onChange={event =>
+                              setTempAssignee(event.target.value)
+                            }
+                          >
+                            {collaborators != null
+                              ? collaborators.map(assignee => (
+                                  <option
+                                    key={assignee.id}
+                                    value={assignee.name}
+                                  >
+                                    {assignee.name}
+                                  </option>
+                                ))
+                              : null}
+                          </select>
+                          <br />
+                          <button
+                            onClick={() => changeTempAssginee()}
+                            type="submit"
+                            className="btn btn-primary"
+                            data-dismiss="modal"
+                          >
+                            Submit
+                          </button>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
