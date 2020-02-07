@@ -1,6 +1,4 @@
 import ballerina/http;
-import ballerina/io;
-import ballerina/lang.'int as ints;
 import ballerina/stringutils;
 
 // Client APIs' section.
@@ -10,53 +8,6 @@ const string REPOSITORY_NAME = "ballerina-github-connector";
 const string ACCESS_TOKEN = "Bearer <token>";
 
 http:Client githubAPIEndpoint = new (GITHUB_API_URL);
-
-# The `assignLabel` function will assign the labels to a given issue.
-#
-# + issueNumber - Issue number which the given labels should be assigned to.
-# + labels      - Array of labels which should be assigned to the issue.
-# + return      - Returns a **string[]** which includes the status code and the message.
-public function assignLabel(string issueNumber, string[] labels) returns string[] {
-
-    string url = "/repos/" + ORGANIZATION_NAME + "/" + REPOSITORY_NAME + "/issues/" + issueNumber + "/labels";
-
-    http:Request request = new;
-    request.addHeader("Authorization", ACCESS_TOKEN);
-    request.setJsonPayload({"labels": labels});
-    http:Response | error githubResponse = githubAPIEndpoint->post(url, request);
-
-    if (githubResponse is http:Response) {
-        io:println(githubResponse.getJsonPayload());
-        return getStatus(githubResponse);
-    } else {
-        io:println(githubResponse.reason());
-        return getNotFoundStatus();
-    }
-}
-
-# The `checkLabel` function is used to check whether the given label is available or not.
-# 
-# + labelName - Name of the label.
-# + return    - Returns a **string[]** which indicates the status.
-public function checkLabel(string labelName) returns @untainted string[] {
-
-    string url = "/repos/" + ORGANIZATION_NAME + "/" + REPOSITORY_NAME + "/labels/" + labelName;
-
-    http:Request request = new;
-    request.addHeader("Authorization", ACCESS_TOKEN);
-    http:Response | error githubResponse = githubAPIEndpoint->get(url, request);
-
-    if (githubResponse is http:Response) {
-        return getStatus(githubResponse);
-    } else {
-        return getNotFoundStatus();
-    }
-}
-
-
-public function checkLabels(string labelName) returns @untainted string[] {
-    return [];
-}
 
 # The `toStringArray` function will convert a json array into string array.
 # 
@@ -69,49 +20,6 @@ public function toStringArray(json[] inputArray) returns string[] {
         outputArray[outputArray.length()] = item.toString();
     }
     return outputArray;
-}
-
-# The `createLabel` function will create a label in a specified git repository.
-# 
-# + labelName        - Name of the label.
-# + labelDescription - Description of the label.
-# + return           - Returns a **json** which indicates the status.
-public function createLabel(string labelName, string labelDescription) returns string[] {
-
-    json requestPayLoad = {
-        "name": labelName,
-        "description": labelDescription,
-        "color": "f29513"
-    };
-    string url = "/repos/" + ORGANIZATION_NAME + "/" + REPOSITORY_NAME + "/labels";
-
-    http:Request request = new;
-    request.addHeader("Authorization", ACCESS_TOKEN);
-    request.setJsonPayload(requestPayLoad);
-
-    http:Response | error response = githubAPIEndpoint->post(url, request);
-    if (response is http:Response) {
-        return getStatus(response);
-    } else {
-        return getNotFoundStatus();
-    }
-}
-
-# The `createLabelIfNotExists` function creates a label if the relevant label is not yet available.
-# 
-# + labelName        - Name of the label.
-# + labelDescription - Description of the label.
-# + return           - Returns a **string[]** which indicates the status.
-public function createLabelIfNotExists(string labelName, string labelDescription) returns string[] {
-
-    string[] status = checkLabel(labelName);
-    int | error statusCode = ints:fromString(status[0]);
-
-    if (statusCode is int && statusCode == http:STATUS_OK) {
-        return [status[0], "Already exists."];
-    } else {
-        return createLabel(labelName, labelDescription);
-    }
 }
 
 # The `getNotFoundStatus` function returns the not found status and the code as a string[]
@@ -255,25 +163,6 @@ public function userNameExists(json[] labels, string userName) returns boolean {
     return false;
 }
 
-# The `createAFormattedJsonOfLabels` function rebuilds a formatted json array of labels out 
-# of the original json array of labels.
-# 
-# + labels - Original json array of labels.  
-# + return - Returns a formatted **json[]** of labels, **error** if a formatted json array 
-#            of labels cannot be rebuilt.
-public function createAFormattedJsonOfLabels(json[] labels) returns json | error {
-
-    json[] labelDetails = [];
-    foreach json label in labels {
-        map<json> labelRecord = <map<json>>label;
-        labelDetails[labelDetails.length()] = {
-            "labelName":check labelRecord.name,
-            "labelDescription":check labelRecord.description
-        };
-    }
-    return labelDetails;
-}
-
 # The `createAFormattedJsonOfCollaborators` function rebuilds a formatted json array of 
 # collaborators out of the original json array of collaborators.
 # 
@@ -293,58 +182,6 @@ public function createAFormattedJsonOfCollaborators(json[] collaborators) return
     }
     return formattedCollaborators;
 }
-
-# The `getAllLabels` function retrieves all the labels of the repository using the github 
-# API services.
-#
-# + return - Returns a **json** consisting all the labels, **error** if the labels cannot 
-#            be extracted properly.
-public function getAllLabels() returns json | error {
-
-    string url = "/repos/" + ORGANIZATION_NAME + "/" + REPOSITORY_NAME + "/labels";
-
-    http:Request request = new;
-    request.addHeader("Authorization", ACCESS_TOKEN);
-    http:Response | error githubResponse = githubAPIEndpoint->get(url, request);
-
-    if (githubResponse is http:Response) {
-        var jsonPayload = githubResponse.getJsonPayload();
-        if (jsonPayload is json) {
-            return <@untainted>jsonPayload;
-        } else {
-            return error("Error while extracting the jsonPayload from the github response.");
-        }
-    } else {
-        return error("The github response is not in the expected form: http:Response.");
-    }
-}
-
-# The `extractLabelNames` function extract the names of the labels from a json .
-#
-# + labels - Intial set of labels containing varous attributes. 
-# + return - Returns a **string[]** consisting an array of label names, returns an **error** if
-#            an array of label names cannot be created. 
-public function extractLabelNames(json | error labels) returns string[] | error {
-
-    string[] labelNames = [];
-    json[] | error labelArray = trap <json[]>labels;
-
-    if (labelArray is json[]) {
-        foreach json item in labelArray {
-            map<json> | error labelInfo = trap <map<json>>item;
-            if (labelInfo is map<json>) {
-                string labelName = labelInfo.name.toString();
-                labelNames[labelNames.length()] = labelName;
-            } else {
-                return labelInfo;
-            }
-        }
-        return labelNames;
-    } else {
-        return labelArray;
-    }
-}
-
 
 # The `isValidCollaborator` function checks whether a user is a collaborator or not.
 #
@@ -447,36 +284,6 @@ public function isValidComment(string commentId) returns boolean | error {
 
     if (githubResponse is http:Response) {
         return githubResponse.statusCode == 200 ? true : false;
-    } else {
-        return error("The github response is not in the expected form: http:Response.");
-    }
-}
-
-# The `getLabelsIsOnIssue` function retrieves all the labels for a given issue.
-# 
-# + issueNumber - Issue number related to the issue.
-# + return      - Returns a **json[]** which includes all the labels for the given issue or 
-#                 an **error** occurred during processing.
-public function getLabelsOnIssue(string issueNumber) returns json[] | error {
-
-    string url = "/repos/" + ORGANIZATION_NAME + "/" + REPOSITORY_NAME + "/issues/" + issueNumber + "/labels";
-
-    http:Request request = new;
-    request.addHeader("Authorization", ACCESS_TOKEN);
-    http:Response | error githubResponse = githubAPIEndpoint->get(url, request);
-
-    if (githubResponse is http:Response) {
-        var jsonPayload = githubResponse.getJsonPayload();
-        if (jsonPayload is json) {
-            json[] | error labelArray = trap <json[]>jsonPayload;
-            if (labelArray is json[]) {
-                return <@untainted>labelArray;
-            } else {
-                return error("The github jsonPayload is not in the expected form: json[]");
-            }
-        } else {
-            return error("Error while extracting the jsonPayload from the github response.");
-        }
     } else {
         return error("The github response is not in the expected form: http:Response.");
     }
@@ -621,33 +428,4 @@ public function createFormattedUser(json user) returns json | error {
     json userDetails = {"userName":check userVal.login};
 
     return userDetails;
-}
-
-public function removeLabel(string issueNumber, string labelName) returns int {
-
-    http:Request request = new;
-    request.addHeader("Authorization", ACCESS_TOKEN);
-    string url = "/repos/" + ORGANIZATION_NAME + "/" + REPOSITORY_NAME + "/issues/" + issueNumber + "/labels/" + labelName;
-    http:Response | error githubResponse = githubAPIEndpoint->delete(url, request);
-    if (githubResponse is http:Response) {
-        return githubResponse.statusCode;
-    } else {
-        return http:STATUS_BAD_REQUEST;
-    }
-}
-
-public function createAFormattedJsonOfStateLabels(json[] labels) returns json | error {
-
-    json[] labelDetails = [];
-    foreach json label in labels {
-        map<json> labelRecord = <map<json>>label;
-        json description = check labelRecord.description;
-        if (description == "state") {
-            labelDetails[labelDetails.length()] = {
-                "labelName":check labelRecord.name,
-                "labelDescription":check labelRecord.description
-            };
-        }
-    }
-    return labelDetails;
 }

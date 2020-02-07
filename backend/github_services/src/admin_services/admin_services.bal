@@ -112,7 +112,7 @@ service adminService on endPoint {
             response.statusCode = status;
             response.setPayload("Label was not removed from the request successfully.");
         }
-        
+
         error? result = caller->respond(response);
     }
 
@@ -127,7 +127,7 @@ service adminService on endPoint {
         string url = "/repos/" + ORGANIZATION_NAME + "/" + REPOSITORY_NAME + "/labels";
         callBackRequest.addHeader("Authorization", ACCESS_TOKEN);
 
-        http:Response | error githubResponse = githubAPIEndpoint->get(url,callBackRequest);
+        http:Response | error githubResponse = githubAPIEndpoint->get(url, callBackRequest);
 
         if (githubResponse is http:Response) {
             var jsonPayload = githubResponse.getJsonPayload();
