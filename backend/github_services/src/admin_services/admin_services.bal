@@ -477,7 +477,7 @@ service adminService on endPoint {
         if (githubResponse is http:Response) {
             var jsonPayload = githubResponse.getJsonPayload();
             if (jsonPayload is json[]) {
-                json[] | error comments = utilities:createFormattedComments(jsonPayload);
+                json[] | error comments = utilities:createAFormattedJsonOfComments(jsonPayload);
                 if (comments is json[]) {
                     response.statusCode = http:STATUS_OK;
                     response.setJsonPayload(<@untained>comments);
