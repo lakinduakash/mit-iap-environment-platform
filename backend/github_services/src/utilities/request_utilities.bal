@@ -53,7 +53,7 @@ public function createAFormattedJsonOfIssues(json[] issues) returns json[] | err
                 status = <string>label.name;
             } else {
                 labelArray[labelArray.length()] = {
-                    "name":check label.name, 
+                    "name":check label.name,
                     "body":check label.description
                 };
             }
@@ -108,16 +108,16 @@ public function extractIssuesRelatedToUser(json[] listOfIssues, string userName)
                 }
                 if (hasState) {
                     issues[issues.length()] = {
-                        "requsetTitle":check issue.title, 
-                        "requestNumber":check issue.number, 
-                        "requestDetails":check issue.body, 
+                        "requsetTitle":check issue.title,
+                        "requestNumber":check issue.number,
+                        "requestDetails":check issue.body,
                         "state": state
                     };
                 } else {
                     issues[issues.length()] = {
-                        "requsetTitle":check issue.title, 
-                        "requestNumber":check issue.number, 
-                        "requestDetails":check issue.body, 
+                        "requsetTitle":check issue.title,
+                        "requestNumber":check issue.number,
+                        "requestDetails":check issue.body,
                         "state": "Pending"
                     };
                 }
