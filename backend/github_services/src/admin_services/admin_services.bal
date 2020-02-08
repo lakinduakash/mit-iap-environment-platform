@@ -678,7 +678,7 @@ service adminService on endPoint {
         if (githubResponse is http:Response) {
             var jsonPayload = githubResponse.getJsonPayload();
             if (jsonPayload is json[]) {
-                json[] | error issues = utilities:createFormattedIssues(jsonPayload);
+                json[] | error issues = utilities:createAFormattedJsonOfIssues(jsonPayload);
                 if (issues is json[]) {
                     response.statusCode = http:STATUS_OK;
                     response.setJsonPayload(<@untained>issues);

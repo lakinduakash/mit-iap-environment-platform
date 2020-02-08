@@ -198,3 +198,18 @@ public function createAFormattedJsonOfStateLabels(json[] labels) returns json | 
     }
     return labelDetails;
 }
+
+# The `userNameExists` function checks if the username exists inside the labels of the issue.
+#
+# + labels   - Labels of the issue.
+# + userName - Name of the user.
+# + return   - Returns a **boolean** which indicates whether the user exists or not.
+public function userNameExists(json[] labels, string userName) returns boolean {
+
+    foreach json label in labels {
+        if (userName == (label.labelName.toString())) {
+            return true;
+        }
+    }
+    return false;
+}
