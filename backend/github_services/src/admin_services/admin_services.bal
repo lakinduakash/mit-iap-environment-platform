@@ -112,7 +112,7 @@ service adminService on endPoint {
             response.statusCode = status;
             response.setPayload("Label was not removed from the request successfully.");
         }
-        
+
         error? result = caller->respond(response);
     }
 
@@ -127,7 +127,7 @@ service adminService on endPoint {
         string url = "/repos/" + ORGANIZATION_NAME + "/" + REPOSITORY_NAME + "/labels";
         callBackRequest.addHeader("Authorization", ACCESS_TOKEN);
 
-        http:Response | error githubResponse = githubAPIEndpoint->get(url,callBackRequest);
+        http:Response | error githubResponse = githubAPIEndpoint->get(url, callBackRequest);
 
         if (githubResponse is http:Response) {
             var jsonPayload = githubResponse.getJsonPayload();
@@ -477,7 +477,7 @@ service adminService on endPoint {
         if (githubResponse is http:Response) {
             var jsonPayload = githubResponse.getJsonPayload();
             if (jsonPayload is json[]) {
-                json[] | error comments = utilities:createFormattedComments(jsonPayload);
+                json[] | error comments = utilities:createAFormattedJsonOfComments(jsonPayload);
                 if (comments is json[]) {
                     response.statusCode = http:STATUS_OK;
                     response.setJsonPayload(<@untained>comments);
@@ -678,7 +678,7 @@ service adminService on endPoint {
         if (githubResponse is http:Response) {
             var jsonPayload = githubResponse.getJsonPayload();
             if (jsonPayload is json[]) {
-                json[] | error issues = utilities:createFormattedIssues(jsonPayload);
+                json[] | error issues = utilities:createAFormattedJsonOfIssues(jsonPayload);
                 if (issues is json[]) {
                     response.statusCode = http:STATUS_OK;
                     response.setJsonPayload(<@untained>issues);
